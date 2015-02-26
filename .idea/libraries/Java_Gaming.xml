@@ -1,0 +1,29 @@
+<component name="libraryTable">
+  <library name="Java Gaming">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/core-0.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/gluegen-rt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/graphicslib3D.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/jbullet.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/jinput.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/jogl-all.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/jogl-test.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/luaj-jme-3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/luaj-jse-3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/sage.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/sagetest.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/vecmath.jar!/" />
+      <root url="file://$PROJECT_DIR$/libs/Java Gaming/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/libs/Java Gaming/lib" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/gluegen-rt-natives-windows-amd64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/jogl-all-natives-windows-amd64.jar!/" />
+    </NATIVE>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/luaj-sources-3.0.jar!/" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/libs/Java Gaming/lib" recursive="false" />
+  </library>
+</component>
