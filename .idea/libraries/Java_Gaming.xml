@@ -15,7 +15,11 @@
       <root url="jar://$PROJECT_DIR$/libs/Java Gaming/vecmath.jar!/" />
       <root url="file://$PROJECT_DIR$/libs/Java Gaming/lib" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="file://$PROJECT_DIR$/libs/Java Gaming/javadocs/GraphicsLib3D" />
+      <root url="file://$PROJECT_DIR$/libs/Java Gaming/javadocs/Jbullet" />
+      <root url="file://$PROJECT_DIR$/libs/Java Gaming/javadocs/Sage" />
+    </JAVADOC>
     <NATIVE>
       <root url="file://$PROJECT_DIR$/libs/Java Gaming/lib" />
       <root url="jar://$PROJECT_DIR$/libs/Java Gaming/gluegen-rt-natives-windows-amd64.jar!/" />

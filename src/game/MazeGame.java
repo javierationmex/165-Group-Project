@@ -7,6 +7,8 @@ import sage.app.BaseGame;
  */
 public class MazeGame extends BaseGame {
 
+
+
     //Please separate all the initialization of stuff into different methods.
     //For example createPlayers(), createWalls(), etc... so that the initGame is very simple.
 
