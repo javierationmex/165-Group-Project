@@ -1,4 +1,4 @@
-package game.Characters;
+package game.characters;
 
 /**
  * Created by Max on 3/25/2015.

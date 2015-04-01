@@ -1,7 +1,7 @@
-package swingMenus;
+package swingmenus;
 
-import commands.mainMenuCommands.SwitchToMultiPlayerCommand;
-import commands.mainMenuCommands.SwitchToSinglePlayerCommand;
+import commands.mainmenucommands.SwitchToMultiPlayerCommand;
+import commands.mainmenucommands.SwitchToSinglePlayerCommand;
 
 import javax.swing.*;
 

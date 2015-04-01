@@ -1,6 +1,7 @@
-package commands.mainMenuCommands;
+package commands.mainmenucommands;
 
-import swingMenus.Multiplayer.MultiplayerLobby;
+
+import swingmenus.multiplayer.MultiplayerLobby;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -8,11 +9,11 @@ import java.awt.event.ActionEvent;
 /**
  * Created by Max on 3/22/2015.
  */
-public class SwitchToMultiPlayerCommand extends AbstractAction{
+public class SwitchToMultiPlayerCommand extends AbstractAction {
 
     private JFrame frame;
 
-    public SwitchToMultiPlayerCommand(JFrame frame){
+    public SwitchToMultiPlayerCommand(JFrame frame) {
         super("Multiplayer");
         this.frame = frame;
     }

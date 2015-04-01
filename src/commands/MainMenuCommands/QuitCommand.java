@@ -1,4 +1,4 @@
-package commands.mainMenuCommands;
+package commands.mainmenucommands;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

@@ -1,7 +1,7 @@
-package swingMenus.Multiplayer.data;
+package swingmenus.multiplayer.data;
 
 import game.Player;
-import swingMenus.Multiplayer.MultiplayerLobby;
+import swingmenus.multiplayer.MultiplayerLobby;
 
 import java.util.ArrayList;
 
@@ -9,7 +9,7 @@ public class MultiplayerLobbyData {
     private final MultiplayerLobby lobby;
     private String serverIPAddress;
     private int serverPortNumber;
-    private String playerName;
+    private String playerName = "Default Name";
     private ArrayList<Player> players;
 
     public MultiplayerLobbyData(MultiplayerLobby lobby) {
@@ -43,11 +43,11 @@ public class MultiplayerLobbyData {
         this.playerName = playerName;
     }
 
-    public void addPlayer(Player player){
+    public void addPlayer(Player player) {
         this.players.add(player);
     }
 
-    public void removePlayer(Player player){
+    public void removePlayer(Player player) {
         this.players.remove(player);
     }
 }

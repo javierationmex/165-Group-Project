@@ -1,9 +1,9 @@
-package commands.mainMenuCommands;
+package commands.mainmenucommands;
 
-import Networking.Server;
 import game.Player;
-import swingMenus.Base.BaseCharacterSelectionMenu;
-import swingMenus.Multiplayer.data.MultiplayerLobbyData;
+import networking.Server;
+import swingmenus.base.CharacterSelectionScreen;
+import swingmenus.multiplayer.data.MultiplayerLobbyData;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 /**
  * Created by Max on 3/22/2015.
  */
-public class HostGameCommand extends AbstractAction{
+public class HostGameCommand extends AbstractAction {
 
     private JFrame frame;
     private boolean isHostingGame = false;
@@ -22,7 +22,7 @@ public class HostGameCommand extends AbstractAction{
     private MultiplayerLobbyData data;
     private Player host;
 
-    public HostGameCommand(JFrame frame, MultiplayerLobbyData data){
+    public HostGameCommand(JFrame frame, MultiplayerLobbyData data) {
         super("Host Game");
         this.frame = frame;
         this.data = data;
@@ -30,27 +30,28 @@ public class HostGameCommand extends AbstractAction{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(!isHostingGame){
+        if (!isHostingGame) {
             try {
-                server = new Server(5123);
+                server = new Server(51234);
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
             host = new Player(data.getPlayerName());
+            host.setFrame(frame);
             data.addPlayer(host);
             host.setHost(true);
 
             try {
-                host.createLinkedClient(InetAddress.getByName(data.getServerIPAddress()),data.getServerPortNumber());
+                host.createLinkedClient(InetAddress.getByName(data.getServerIPAddress()), data.getServerPortNumber());
             } catch (UnknownHostException e1) {
                 e1.printStackTrace();
             }
 
-            host.setBaseCharacterSelectionMenu(new BaseCharacterSelectionMenu(host));
+            host.setCharacterSelectionScreen(new CharacterSelectionScreen(host, frame));
 
-            frame.setContentPane(host.getBaseCharacterSelectionMenu().getMainView());
+            frame.setContentPane(host.getCharacterSelectionScreen().getMainView());
             frame.setVisible(true);
-        }else{
+        } else {
             System.out.println("Already hosting a game.");
         }
     }

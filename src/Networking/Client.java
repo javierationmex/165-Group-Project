@@ -1,8 +1,13 @@
-package Networking;
+package networking;
 
-import Networking.packets.IPacket;
-import Networking.packets.JoinPacket;
+import game.MazeGame;
 import game.Player;
+import networking.packets.GamePlayerInfoPacket;
+import networking.packets.ServerPlayerInfoPacket;
+import networking.packets.ingame.AllReadyPacket;
+import networking.packets.ingame.UpdateGamePlayerInfoPacket;
+import networking.packets.lobby.JoinPacket;
+import networking.packets.lobby.StartGamePacket;
 import sage.networking.client.GameConnectionClient;
 import sage.scene.TriMesh;
 
@@ -19,6 +24,7 @@ public class Client extends GameConnectionClient {
     private UUID id;
     private ArrayList<TriMesh> ghostAvatars;
     private Player player;
+    private MazeGame mazeGame;
 
     public Client(InetAddress remoteAddr, int remotePort, ProtocolType protocolType, Player player) throws IOException {
         super(remoteAddr, remotePort, protocolType);
@@ -30,22 +36,52 @@ public class Client extends GameConnectionClient {
 
     @Override
     protected void processPacket(Object packet) {
-        System.out.println("In Client Processing Packets");
-        if(packet instanceof JoinPacket){
-            if(((JoinPacket) packet).isSuccess()){
+        if (packet instanceof JoinPacket) {
+            if (((JoinPacket) packet).isSuccess()) {
                 System.out.println("Joined the game.");
-                player.setPlayerInLobby(true);
-            }else{
+            } else {
                 System.out.println("failed");
             }
         }
+        if(packet instanceof ServerPlayerInfoPacket){
+            System.out.println("Updating Character Selection Screen.");
+            player.updateCharacterSelectionScreen(((ServerPlayerInfoPacket) packet).getPlayers());
+        }
+
+        if(packet instanceof StartGamePacket){
+            player.startGame();
+        }
+
+        if(packet instanceof GamePlayerInfoPacket){
+            mazeGame.updateGhostAvatars(((GamePlayerInfoPacket) packet).getPlayers());
+        }
+
+        if(packet instanceof UpdateGamePlayerInfoPacket){
+            //mazeGame.updateGhostAvatar(((UpdateGamePlayerInfoPacket) packet).getPlayer());
+        }
+
+        if(packet instanceof AllReadyPacket){
+            mazeGame.setCanProcess(true);
+        }
     }
 
-    public void sendJoinPacket(){
+    public void sendJoinPacket() {
         try {
             sendPacket(new JoinPacket(this.id, player.getPlayerName()));
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public MazeGame getMazeGame() {
+        return mazeGame;
+    }
+
+    public void setMazeGame(MazeGame mazeGame) {
+        this.mazeGame = mazeGame;
+    }
+
+    public UUID getId() {
+        return id;
     }
 }
