@@ -38,10 +38,10 @@ plane.setColor(Color.GRAY);
 rootNode.addChild(plane);
 
 //Axis
-var xaxis = new Line(new Point3D(-1000, 0, 0), new Point3D(1000, 0, 0), Color.RED, 2);
+var xaxis = new Line(new Point3D(-500, 0, 0), new Point3D(500, 0, 0), Color.RED, 2);
 rootNode.addChild(xaxis);
-var yaxis = new Line(new Point3D(0, -1000, 0), new Point3D(0, 1000, 0), Color.GREEN, 2);
+var yaxis = new Line(new Point3D(0, -500, 0), new Point3D(0, 500, 0), Color.GREEN, 2);
 rootNode.addChild(yaxis);
-var zaxis = new Line(new Point3D(0, 0, -1000), new Point3D(0, 0, 1000), Color.BLUE, 2);
+var zaxis = new Line(new Point3D(0, 0, -500), new Point3D(0, 0, 500), Color.BLUE, 2);
 rootNode.addChild(zaxis);
 }
