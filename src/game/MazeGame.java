@@ -174,7 +174,7 @@ public class MazeGame extends BaseGame {
     }
 
     private void drawSkyBox() {
-        SkyBox skybox = new SkyBox("skybox", 100, 100, 100);
+        SkyBox skybox = new SkyBox("skybox", 500, 500, 500);
 
         String textureDir = "." + File.separator + "textures" + File.separator + "canyon" + File.separator;
         String topFilename = "top.jpg";
