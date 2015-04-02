@@ -1,9 +1,11 @@
 package gameengine.orbit;
 
+import gameengine.player.BaseAbstractInputAction;
 import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
 import net.java.games.input.Component;
 import net.java.games.input.Event;
+import networking.Client;
 import sage.camera.ICamera;
 import sage.input.IInputManager;
 import sage.input.action.AbstractInputAction;
@@ -22,8 +24,9 @@ public class OrbitCameraController {
     private float cameraDistanceFromTarget;
     private Point3D targetPos;
     private Vector3D worldUpVec;
+    private final Client client;
 
-    public OrbitCameraController(ICamera cam, SceneNode target, IInputManager inputMgr, String controllerName) {
+    public OrbitCameraController(ICamera cam, SceneNode target, IInputManager inputMgr, String controllerName, Client client) {
         this.cam = cam;
         this.target = target;
         worldUpVec = new Vector3D(0, 1, 0);
@@ -32,6 +35,7 @@ public class OrbitCameraController {
         cameraElevation = 20.0f;
         update(0.0f);
         setupInput(inputMgr, controllerName);
+        this.client = client;
     }
     public void update(float time)
     {
@@ -186,23 +190,25 @@ public class OrbitCameraController {
         }
     }
 
-    private class RotateCameraAndShapeLeftAction extends AbstractInputAction
+    private class RotateCameraAndShapeLeftAction extends BaseAbstractInputAction
     {
         public void performAction(float time, Event evt)
         {
             cameraAzimuth += 0.1f ;
             cameraAzimuth = cameraAzimuth % 360 ;
             target.rotate((float)0.1, new Vector3D(0,1,0));
+            sendUpdateRotationPacket(client, (float) 0.1, new Vector3D(0, 1, 0));
         }
     }
 
-    private class RotateCameraAndShapeRightAction extends AbstractInputAction
+    private class RotateCameraAndShapeRightAction extends BaseAbstractInputAction
     {
         public void performAction(float time, Event evt)
         {
             cameraAzimuth -= 0.1f ;
             cameraAzimuth = cameraAzimuth % 360 ;
             target.rotate((float)-0.1, new Vector3D(0,1,0));
+            sendUpdateRotationPacket(client, (float)-0.1, new Vector3D(0,1,0));
         }
     }
 }

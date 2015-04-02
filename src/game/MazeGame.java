@@ -8,15 +8,14 @@ import gameengine.player.MovePlayerBackwardAction;
 import gameengine.player.MovePlayerForwardAction;
 import gameengine.player.MovePlayerLeftAction;
 import gameengine.player.MovePlayerRightAction;
-import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
-import networking.packets.ingame.LoadedPlayerPacket;
-import networking.packets.ingame.UpdateAvatarInformationPacket;
+import networking.packets.ingame.UpdateAvatarLocationInformationPacket;
+import networking.packets.ingame.UpdateAvatarRotationInformationPacket;
 import sage.app.BaseGame;
 import sage.camera.ICamera;
 import sage.display.IDisplaySystem;
@@ -35,6 +34,7 @@ import swingmenus.multiplayer.data.PlayerInfo;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Main Class for Game initialization etc here.
@@ -52,10 +52,9 @@ public class MazeGame extends BaseGame {
     private ArrayList<PlayerInfo> playersInfo;
     private float time = 0;
 
-    private Matrix3D oldRotation;
-    private Matrix3D oldTransform;
-    private Matrix3D oldTranslation;
-    private Matrix3D oldScale;
+    private String oldRotation;
+    private String oldTranslation;
+    private String oldScale;
     private boolean canProcess;
 
     public MazeGame(Player player) {
@@ -78,11 +77,8 @@ public class MazeGame extends BaseGame {
         drawPlane();
         setControls();
         display.setTitle("Treasure Hunt 2015");
-        try {
-            client.sendPacket(new LoadedPlayerPacket(client.getId(), true));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+
         //TODO create objects: walls, players, power up boosts, etc. Gotta create a recursive algorithm to auto generate a random maze.
         //TODO maybe have different colored sections of walls that players can walk through if they picked up a certain color boost.
     }
@@ -96,7 +92,7 @@ public class MazeGame extends BaseGame {
         IAction quitGame = new QuitGameAction(this);
 
 
-        cam1Controller = new OrbitCameraController(camera1, playerAvatar, inputMgr, keyboardName);
+        cam1Controller = new OrbitCameraController(camera1, playerAvatar, inputMgr, keyboardName, client);
 
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.ESCAPE,
@@ -104,16 +100,16 @@ public class MazeGame extends BaseGame {
 
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.W,
-                new MovePlayerForwardAction(playerAvatar), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerForwardAction(playerAvatar, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.S,
-                new MovePlayerBackwardAction(playerAvatar), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerBackwardAction(playerAvatar, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.A,
-                new MovePlayerLeftAction(playerAvatar), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerLeftAction(playerAvatar, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.D,
-                new MovePlayerRightAction(playerAvatar), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerRightAction(playerAvatar, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
     }
 
     private void drawPlane() {
@@ -153,10 +149,9 @@ public class MazeGame extends BaseGame {
     }
 
     private void updateOldPosition() {
-        oldRotation = playerAvatar.getWorldRotation();
-        oldTransform = playerAvatar.getWorldTransform();
-        oldTranslation = playerAvatar.getWorldTranslation();
-        oldScale = playerAvatar.getWorldScale();
+        oldRotation = playerAvatar.getLocalRotation().toString();
+        oldTranslation = playerAvatar.getLocalTranslation().toString();
+        oldScale = playerAvatar.getLocalScale().toString();
     }
 
     @Override
@@ -164,9 +159,9 @@ public class MazeGame extends BaseGame {
         this.time += time;
         cam1Controller.update(this.time);
 
-        checkIfToUpdatePlayer();
+        //checkIfToUpdatePlayer();
 
-        if(client != null && canProcess){
+        if(client != null){
             client.processPackets();
         }
         super.update(time);
@@ -175,18 +170,30 @@ public class MazeGame extends BaseGame {
     }
 
     private void checkIfToUpdatePlayer() {
-        if(oldRotation != playerAvatar.getWorldRotation() ||
-           oldTransform != playerAvatar.getWorldTransform() ||
-           oldTranslation != playerAvatar.getWorldTranslation() ||
-           oldScale != playerAvatar.getWorldScale()){
+        if(oldRotation.equals(playerAvatar.getLocalRotation().toString())){
             updateOldPosition();
-            try {
-                client.sendPacket(new UpdateAvatarInformationPacket(client.getId(), playerAvatar));
+            /*try {
+                client.sendPacket(new UpdateAvatarRotationPacket(client.getId(), playerAvatar.getLocalRotation()));
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
-
+        if(oldRotation.equals(playerAvatar.getLocalScale().toString())){
+            updateOldPosition();
+            /*try {
+                client.sendPacket(new UpdateAvatarScalePacket(client.getId(), playerAvatar.getLocalScale()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
+        }
+        if(oldRotation.equals(playerAvatar.getLocalTranslation().toString())){
+            updateOldPosition();
+            /*try {
+                client.sendPacket(new UpdateAvatarTranslationPacket(client.getId(), playerAvatar.getLocalTranslation()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
+        }
     }
 
 
@@ -242,30 +249,63 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(zaxis);
     }
 
-    public void updateGhostAvatars(ArrayList<PlayerInfo> players) {
+/*    public void updateGhostAvatars(ArrayList<PlayerInfo> players) {
         this.playersInfo = players;
         for(PlayerInfo p : players){
             if (!p.getClientID().toString().equals(player.getPlayerUUID().toString())) {
-                removeGameWorldObject(p.getAvatar());
-                addGameWorldObject(p.getAvatar());
-            }
-        }
-    }
-
-    public void updateGhostAvatar(PlayerInfo player) {
-        if (!player.getClientID().toString().equals(this.player.getPlayerUUID().toString())){
-            for(PlayerInfo p : this.playersInfo){
-                if(p.getClientID().toString().equals(player.getClientID().toString())){
-                    p.setAvatar(player.getAvatar());
+                if(p.getAvatar() != null){
                     removeGameWorldObject(p.getAvatar());
                     addGameWorldObject(p.getAvatar());
                 }
             }
         }
+    }*/
 
+    public void updateGhostAvatar(UpdateAvatarLocationInformationPacket packet) {
+        UUID id = packet.getClientID();
+        float x = packet.getX();
+        float y = packet.getY();
+        float z = packet.getZ();
+        if (!id.toString().equals(this.player.getPlayerUUID().toString())){
+            for(PlayerInfo p : this.playersInfo){
+                if(id.toString().equals(p.getClientID().toString())){
+                    p.getAvatar().translate(x, y, z);
+                }
+            }
+        }
+    }
+
+    public void updateGhostAvatar(UpdateAvatarRotationInformationPacket packet) {
+        UUID id = packet.getClientID();
+        float x = packet.getX();
+        Vector3D axis = packet.getAxis();
+        if (!id.toString().equals(this.player.getPlayerUUID().toString())){
+            for(PlayerInfo p : this.playersInfo){
+                if(id.toString().equals(p.getClientID().toString())){
+                    p.getAvatar().rotate(x, axis);
+                }
+            }
+        }
+    }
+
+    public void addGhostAvatar(PlayerInfo player) {
+        if(this.playersInfo == null){
+            this.playersInfo = new ArrayList<PlayerInfo>();
+        }
+        this.playersInfo.add(player);
+        if (!player.getClientID().toString().equals(this.player.getPlayerUUID().toString())){
+            player.getAvatar().translate(0, 1, 50);
+            player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
+            addGameWorldObject(player.getAvatar());
+        }
     }
 
     public void setCanProcess(boolean canProcess) {
         this.canProcess = canProcess;
     }
+
+    public boolean isCanProcess() {
+        return canProcess;
+    }
+
 }

@@ -2,19 +2,17 @@ package networking.packets;
 
 import swingmenus.multiplayer.data.PlayerInfo;
 
-import java.util.ArrayList;
-
 /**
  * Created by Max on 3/25/2015.
  */
 public class GamePlayerInfoPacket implements IPacket {
-    private ArrayList<PlayerInfo> players;
+    private PlayerInfo player;
 
-    public GamePlayerInfoPacket(ArrayList<PlayerInfo> players) {
-        this.players = players;
+    public GamePlayerInfoPacket(PlayerInfo player) {
+        this.player = player;
     }
 
-    public ArrayList<PlayerInfo> getPlayers() {
-        return players;
+    public PlayerInfo getPlayer() {
+        return player;
     }
 }

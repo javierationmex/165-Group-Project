@@ -11,6 +11,7 @@ import sage.networking.server.IClientInfo;
 import swingmenus.multiplayer.data.PlayerInfo;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -83,54 +84,34 @@ public class Server extends GameConnectionServer<UUID> {
 
         if(packet instanceof AddAvatarInformationPacket){
             UUID id = ((AddAvatarInformationPacket) packet).getClientID();
+            PlayerInfo player = null;
             for(PlayerInfo p : players){
                 if(p.getClientID().toString().equals(id.toString())){
                     p.setAvatar(((AddAvatarInformationPacket) packet).getAvatar());
-                }
-            }
-            try {
-                this.sendPacketToAll(new GamePlayerInfoPacket(players));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if(packet instanceof UpdateAvatarInformationPacket){
-            PlayerInfo player = null;
-            UUID id = ((UpdateAvatarInformationPacket) packet).getClientID();
-            for(PlayerInfo p : players){
-                if(p.getClientID().toString().equals(id.toString())){
-                    p.setAvatar(((UpdateAvatarInformationPacket) packet).getAvatar());
                     player = p;
                 }
             }
             try {
-                if(player != null)
-                    this.sendPacketToAll(new UpdateGamePlayerInfoPacket(player));
+                this.sendPacketToAll(new GamePlayerInfoPacket(player));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        if(packet instanceof LoadedPlayerPacket){
-            boolean allReady = true;
-            UUID id = ((LoadedPlayerPacket) packet).getId();
-            for(PlayerInfo p : players){
-                if(p.getClientID().toString().equals(id.toString())){
-                    p.setLoaded(true);
-                }
-                if(!p.isLoaded()){
-                    allReady = false;
-                }
-            }
-            if(allReady){
-                try {
-                    sendPacketToAll(new AllReadyPacket());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        if(packet instanceof UpdateAvatarLocationInformationPacket){
+            try {
+                this.sendPacketToAll((Serializable) packet);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
+        if(packet instanceof UpdateAvatarRotationInformationPacket){
+            try {
+                this.sendPacketToAll((Serializable) packet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
