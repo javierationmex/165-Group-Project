@@ -52,6 +52,7 @@ public class MultiplayerLobby {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ServerInfoDialog dialog = new ServerInfoDialog(data);
+                dialog.setSize(500, 300);
                 dialog.setVisible(true);
             }
         });
