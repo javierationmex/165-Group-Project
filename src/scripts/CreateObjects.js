@@ -15,12 +15,12 @@ with (JavaPackages)
 var rootNode = new Group();
 
 //Sphere
-var t1 = new Sphere(2,100,100,java.awt.Color.green);
+var t1 = new Sphere(2,50,50,java.awt.Color.green);
 t1.translate(5,3,4);
 rootNode.addChild(t1);
 
 //Cylinder
-var c1 = new Cylinder(5,3,100,100);
+var c1 = new Cylinder(5,3,50,50);
 c1.translate(1,5,10);
 rootNode.addChild(c1);
 
@@ -33,7 +33,7 @@ rootNode.addChild(t1);
 var plane = new Rectangle();
 var vec = new Vector3D(1, 0, 0);
 plane.rotate(90, vec);
-plane.scale(400, 400, 400);
+plane.scale(1000, 1000, 1);
 plane.setColor(Color.GRAY);
 rootNode.addChild(plane);
 
