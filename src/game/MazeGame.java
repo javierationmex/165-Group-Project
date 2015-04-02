@@ -27,8 +27,11 @@ import sage.input.action.IAction;
 import sage.input.action.QuitGameAction;
 import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
+import sage.scene.SkyBox;
 import sage.scene.shape.Line;
 import sage.scene.shape.Rectangle;
+import sage.texture.Texture;
+import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
 
 import javax.script.ScriptEngine;
@@ -166,8 +169,45 @@ public class MazeGame extends BaseGame {
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
-
+        drawSkyBox();
         addPlayer();
+    }
+
+    private void drawSkyBox() {
+        SkyBox skybox = new SkyBox("skybox", 100, 100, 100);
+
+        String textureDir = "." + File.separator + "textures" + File.separator + "canyon" + File.separator;
+        String topFilename = "top.jpg";
+        String topFilePath = textureDir + topFilename;
+
+        String frontFilename = "front.jpg";
+        String frontFilePath = textureDir + frontFilename;
+
+        String leftFilename = "left.jpg";
+        String leftFilePath = textureDir + leftFilename;
+
+        String rightFilename = "right.jpg";
+        String rightFilePath = textureDir + rightFilename;
+
+        String backFilename = "back.jpg";
+        String backFilePath = textureDir + backFilename;
+
+        Texture top = TextureManager.loadTexture2D(topFilePath);
+        skybox.setTexture(SkyBox.Face.Up, top);
+        skybox.setTexture(SkyBox.Face.Down, top);
+        Texture front = TextureManager.loadTexture2D(frontFilePath);
+        skybox.setTexture(SkyBox.Face.North, front);
+        Texture back = TextureManager.loadTexture2D(backFilePath);
+        skybox.setTexture(SkyBox.Face.South, back);
+        Texture left = TextureManager.loadTexture2D(leftFilePath);
+        skybox.setTexture(SkyBox.Face.West, left);
+        Texture right = TextureManager.loadTexture2D(rightFilePath);
+        skybox.setTexture(SkyBox.Face.East, right);
+
+
+
+        addGameWorldObject(skybox);
+
     }
 
     private void addPlayer() {
@@ -188,6 +228,7 @@ public class MazeGame extends BaseGame {
         }
         addGameWorldObject(playerAvatar);
         camera1 = display.getRenderer().getCamera();
+        camera1.setPerspectiveFrustum(60, 1, 1, 1000);
         camera1.setLocation(new Point3D(0, 1, 50));
     }
 

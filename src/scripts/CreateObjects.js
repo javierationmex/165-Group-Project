@@ -6,7 +6,7 @@ var JavaPackages = new JavaImporter(
  Packages.sage.scene.shape.Cylinder,
  Packages.sage.scene.shape.Line,
  Packages.sage.scene.shape.Rectangle,
- Packages.gameEngine.shapes.Trapesoid,
+ Packages.gameengine.shapes.Trapesoid,
  Packages.graphicslib3D.Vector3D,
  Packages.graphicslib3D.Point3D);
 

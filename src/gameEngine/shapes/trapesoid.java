@@ -1,4 +1,4 @@
-package gameEngine.shapes;
+package gameengine.shapes;
 
 import sage.scene.TriMesh;
 
