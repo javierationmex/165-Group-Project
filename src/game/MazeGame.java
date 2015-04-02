@@ -204,6 +204,7 @@ public class MazeGame extends BaseGame {
         Texture right = TextureManager.loadTexture2D(rightFilePath);
         skybox.setTexture(SkyBox.Face.East, right);
 
+        skybox.translate(0, 100, 0);
 
 
         addGameWorldObject(skybox);
