@@ -31,10 +31,18 @@ import sage.scene.shape.Line;
 import sage.scene.shape.Rectangle;
 import swingmenus.multiplayer.data.PlayerInfo;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.awt.*;
+import java.awt.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
+
 
 /**
  * Main Class for Game initialization etc here.
@@ -51,6 +59,9 @@ public class MazeGame extends BaseGame {
     private SceneNode playerAvatar;
     private ArrayList<PlayerInfo> playersInfo;
     private float time = 0;
+
+    private SceneNode rootNode;
+    private ScriptEngine engine;
 
     private String oldRotation;
     private String oldTranslation;
@@ -73,14 +84,54 @@ public class MazeGame extends BaseGame {
         inputMgr = getInputManager();
         renderer = display.getRenderer();
         initGameObjects();
-        drawAxis();
-        drawPlane();
+        initScripting();
         setControls();
-        display.setTitle("Treasure Hunt 2015");
+        display.setTitle("Maze Game");
 
 
         //TODO create objects: walls, players, power up boosts, etc. Gotta create a recursive algorithm to auto generate a random maze.
         //TODO maybe have different colored sections of walls that players can walk through if they picked up a certain color boost.
+    }
+
+    private void initScripting() {
+        ScriptEngineManager factory = new ScriptEngineManager();
+        String scriptDir = "." + File.separator + "src" + File.separator + "scripts" + File.separator;
+        String CreateObjectsScriptFileName = "CreateObjects.js";
+        String CreateObjectsScriptPath = scriptDir + CreateObjectsScriptFileName;
+
+        /*// get a list of the script engines on this platform
+        java.util.List<ScriptEngineFactory> list = factory.getEngineFactories();
+        //List<ScriptEngineFactory> list = factory.getEngineFactories();
+        System.out.println("Script Engine Factories found:");
+        for (ScriptEngineFactory f : list) {
+            System.out.println(" Name = " + f.getEngineName()
+                    + " language = " + f.getLanguageName()
+                    + " extensions = " + f.getExtensions());
+        }*/
+
+        // get the JavaScript engine
+        engine = factory.getEngineByName("js");
+        // run the script
+        executeScript(engine, CreateObjectsScriptPath);
+
+        rootNode = (SceneNode) engine.get("rootNode");
+        addGameWorldObject(rootNode);
+    }
+
+    private void executeScript(ScriptEngine engine, String scriptFileName) {
+        try
+        { FileReader fileReader = new FileReader(scriptFileName);
+            engine.eval(fileReader); //execute the script statements in the file
+            fileReader.close();
+        }
+        catch (FileNotFoundException e1)
+        { System.out.println(scriptFileName + " not found " + e1); }
+        catch (IOException e2)
+        { System.out.println("IO problem with " + scriptFileName + e2); }
+        catch (ScriptException e3)
+        { System.out.println("ScriptException in " + scriptFileName + e3); }
+        catch (NullPointerException e4)
+        { System.out.println ("Null ptr exception in " + scriptFileName + e4); }
     }
 
     private void setControls() {
@@ -110,14 +161,6 @@ public class MazeGame extends BaseGame {
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.D,
                 new MovePlayerRightAction(playerAvatar, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-    }
-
-    private void drawPlane() {
-        Rectangle plane = new Rectangle("plane");
-        plane.rotate(90, new Vector3D(1, 0, 0));
-        plane.scale(400, 400, 400);
-        plane.setColor(Color.GRAY);
-        addGameWorldObject(plane);
     }
 
     private void initGameObjects() {
@@ -169,34 +212,6 @@ public class MazeGame extends BaseGame {
         //TODO override later
     }
 
-    private void checkIfToUpdatePlayer() {
-        if(oldRotation.equals(playerAvatar.getLocalRotation().toString())){
-            updateOldPosition();
-            /*try {
-                client.sendPacket(new UpdateAvatarRotationPacket(client.getId(), playerAvatar.getLocalRotation()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-        }
-        if(oldRotation.equals(playerAvatar.getLocalScale().toString())){
-            updateOldPosition();
-            /*try {
-                client.sendPacket(new UpdateAvatarScalePacket(client.getId(), playerAvatar.getLocalScale()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-        }
-        if(oldRotation.equals(playerAvatar.getLocalTranslation().toString())){
-            updateOldPosition();
-            /*try {
-                client.sendPacket(new UpdateAvatarTranslationPacket(client.getId(), playerAvatar.getLocalTranslation()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-        }
-    }
-
-
     @Override
     protected void shutdown() {
         super.shutdown();
@@ -238,30 +253,8 @@ public class MazeGame extends BaseGame {
         return displaySystem ;
     }
 
-    private void drawAxis() {
-        Line xaxis = new Line(new Point3D(-1000, 0, 0), new Point3D(1000, 0, 0), Color.RED, 2);
-        addGameWorldObject(xaxis);
-
-        Line yaxis = new Line(new Point3D(0, -1000, 0), new Point3D(0, 1000, 0), Color.GREEN, 2);
-        addGameWorldObject(yaxis);
-
-        Line zaxis = new Line(new Point3D(0, 0, -1000), new Point3D(0, 0, 1000), Color.BLUE, 2);
-        addGameWorldObject(zaxis);
-    }
-
-/*    public void updateGhostAvatars(ArrayList<PlayerInfo> players) {
-        this.playersInfo = players;
-        for(PlayerInfo p : players){
-            if (!p.getClientID().toString().equals(player.getPlayerUUID().toString())) {
-                if(p.getAvatar() != null){
-                    removeGameWorldObject(p.getAvatar());
-                    addGameWorldObject(p.getAvatar());
-                }
-            }
-        }
-    }*/
-
     public void updateGhostAvatar(UpdateAvatarLocationInformationPacket packet) {
+
         UUID id = packet.getClientID();
         float x = packet.getX();
         float y = packet.getY();

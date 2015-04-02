@@ -33,6 +33,7 @@ public class HostGameCommand extends AbstractAction {
         if (!isHostingGame) {
             try {
                 server = new Server(51234);
+                System.out.println(server.getLocalInetAddress().toString());
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

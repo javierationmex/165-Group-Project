@@ -194,10 +194,10 @@ public class OrbitCameraController {
     {
         public void performAction(float time, Event evt)
         {
-            cameraAzimuth += 0.1f ;
+            cameraAzimuth += 1.3f ;
             cameraAzimuth = cameraAzimuth % 360 ;
-            target.rotate((float)0.1, new Vector3D(0,1,0));
-            sendUpdateRotationPacket(client, (float) 0.1, new Vector3D(0, 1, 0));
+            target.rotate((float)1.3, new Vector3D(0,1,0));
+            sendUpdateRotationPacket(client, (float) 1.3, new Vector3D(0, 1, 0));
         }
     }
 
@@ -205,10 +205,10 @@ public class OrbitCameraController {
     {
         public void performAction(float time, Event evt)
         {
-            cameraAzimuth -= 0.1f ;
+            cameraAzimuth -= 1.3f ;
             cameraAzimuth = cameraAzimuth % 360 ;
-            target.rotate((float)-0.1, new Vector3D(0,1,0));
-            sendUpdateRotationPacket(client, (float)-0.1, new Vector3D(0,1,0));
+            target.rotate((float)-1.3, new Vector3D(0,1,0));
+            sendUpdateRotationPacket(client, (float)-1.3, new Vector3D(0,1,0));
         }
     }
 }
