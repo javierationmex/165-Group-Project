@@ -180,10 +180,10 @@ public class MazeGame extends BaseGame {
             TriMesh mushroom = loader.loadModel(mushroomFilePath);
             mushroom.updateLocalBound();
             addGameWorldObject(mushroom);
-            mushroom.scale(10, 10, 10);
-            mushroom.translate(-20, 2, 0);
+            mushroom.scale(6, 6, 6);
+            mushroom.translate(-20, 4, 0);
 
-            String mushroomTextureFilename = "red-mushroom-texture.png";
+            String mushroomTextureFilename = "texture-mushroom-2.jpg";
             String mushroomTextureFilePath = mushroomDir + mushroomTextureFilename;
             Texture mushroomTexture = TextureManager.loadTexture2D(mushroomTextureFilePath);
             mushroom.setTexture(mushroomTexture);
@@ -197,7 +197,7 @@ public class MazeGame extends BaseGame {
             chesspiece.updateLocalBound();
             addGameWorldObject(chesspiece);
             chesspiece.scale(1, 1, 1);
-            chesspiece.translate(20, 2, 0);
+            chesspiece.translate(20, 4, 0);
 
             String chesspieceTextureFilename = "chess-texture.jpg";
             String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
