@@ -25,26 +25,26 @@ import sage.input.IInputManager;
 import sage.input.InputManager;
 import sage.input.action.IAction;
 import sage.input.action.QuitGameAction;
+import sage.model.loader.OBJLoader;
 import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
-import sage.scene.shape.Line;
-import sage.scene.shape.Rectangle;
+import sage.scene.TriMesh;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.awt.*;
-import java.awt.List;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.UUID;
+
+//import objects.mushroom.*;
 
 
 /**
@@ -169,8 +169,19 @@ public class MazeGame extends BaseGame {
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
-        drawSkyBox();
+        //drawSkyBox();
         addPlayer();
+
+        OBJLoader loader = new OBJLoader();
+        String mushroomDir = "." + File.separator + "objects" + File.separator + "mushroom" + File.separator;
+        String mushroomFilename = "mushroom.obj";
+        String mushroomFilePath = mushroomDir + mushroomFilename;
+        TriMesh mushroom = loader.loadModel(mushroomFilePath);
+        mushroom.updateLocalBound();
+        addGameWorldObject(mushroom);
+        mushroom.scale(10, 10, 10);
+        mushroom.translate(0, 10, 0);
+
     }
 
     private void drawSkyBox() {
@@ -335,12 +346,12 @@ public class MazeGame extends BaseGame {
         }
     }
 
-    public void setCanProcess(boolean canProcess) {
-        this.canProcess = canProcess;
-    }
-
     public boolean isCanProcess() {
         return canProcess;
+    }
+
+    public void setCanProcess(boolean canProcess) {
+        this.canProcess = canProcess;
     }
 
 }
