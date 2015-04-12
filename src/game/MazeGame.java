@@ -180,7 +180,7 @@ public class MazeGame extends BaseGame {
         mushroom.updateLocalBound();
         addGameWorldObject(mushroom);
         mushroom.scale(10, 10, 10);
-        mushroom.translate(0, 5, 0);
+        mushroom.translate(0, 2, 0);
 
     }
 
