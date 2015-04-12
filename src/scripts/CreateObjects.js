@@ -30,12 +30,12 @@ t1.translate(-5,2,5);
 rootNode.addChild(t1);
 
 //Floor plane
-var plane = new Rectangle();
-var vec = new Vector3D(1, 0, 0);
-plane.rotate(90, vec);
-plane.scale(1000, 1000, 1);
-plane.setColor(Color.GRAY);
-rootNode.addChild(plane);
+//var plane = new Rectangle();
+//var vec = new Vector3D(1, 0, 0);
+//plane.rotate(90, vec);
+//plane.scale(1000, 1000, 1);
+//plane.setColor(Color.GRAY);
+//rootNode.addChild(plane);
 
 //Axis
 var xaxis = new Line(new Point3D(-500, 0, 0), new Point3D(500, 0, 0), Color.RED, 2);
