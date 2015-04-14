@@ -167,17 +167,22 @@ public class MazeGame extends BaseGame {
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
-//<<<<<<< HEAD
-        OBJLoader loader = new OBJLoader();
 
+<<<<<<< HEAD
         //drawSkyBox();
 //=======
+=======
+>>>>>>> d7fdbf0e7fe1194642f52969d39ec84cc149bf26
         //drawSkyBox();
-//>>>>>>> df1f1a0de63a95fe88d56e9455cf76b190bd963e
+
         addPlayer();
 
         {
+<<<<<<< HEAD
             loader = new OBJLoader();
+=======
+            OBJLoader loader = new OBJLoader();
+>>>>>>> d7fdbf0e7fe1194642f52969d39ec84cc149bf26
             String mushroomDir = "." + File.separator + "materials" + File.separator;
             String mushroomFilename = "mushroom.obj";
             String mushroomFilePath = mushroomDir + mushroomFilename;
@@ -193,7 +198,11 @@ public class MazeGame extends BaseGame {
             mushroom.setTexture(mushroomTexture);
         }
         {
+<<<<<<< HEAD
             loader = new OBJLoader();
+=======
+            OBJLoader loader = new OBJLoader();
+>>>>>>> d7fdbf0e7fe1194642f52969d39ec84cc149bf26
             String chesspieceDir = "." + File.separator + "materials" + File.separator;
             String chesspieceFilename = "chesspiece.obj";
             String chesspieceFilePath = chesspieceDir + chesspieceFilename;
@@ -215,7 +224,7 @@ public class MazeGame extends BaseGame {
     private void initTerrain() {
         // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "height.jpg";
+        String heightFilename = "height2.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         TerrainBlock imageTerrain = createTerBlock(myHeightMap);
