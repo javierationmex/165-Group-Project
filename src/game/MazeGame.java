@@ -168,21 +168,12 @@ public class MazeGame extends BaseGame {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
 
-<<<<<<< HEAD
-        //drawSkyBox();
-//=======
-=======
->>>>>>> d7fdbf0e7fe1194642f52969d39ec84cc149bf26
-        //drawSkyBox();
+        drawSkyBox();
 
         addPlayer();
 
         {
-<<<<<<< HEAD
-            loader = new OBJLoader();
-=======
             OBJLoader loader = new OBJLoader();
->>>>>>> d7fdbf0e7fe1194642f52969d39ec84cc149bf26
             String mushroomDir = "." + File.separator + "materials" + File.separator;
             String mushroomFilename = "mushroom.obj";
             String mushroomFilePath = mushroomDir + mushroomFilename;
@@ -198,11 +189,7 @@ public class MazeGame extends BaseGame {
             mushroom.setTexture(mushroomTexture);
         }
         {
-<<<<<<< HEAD
-            loader = new OBJLoader();
-=======
             OBJLoader loader = new OBJLoader();
->>>>>>> d7fdbf0e7fe1194642f52969d39ec84cc149bf26
             String chesspieceDir = "." + File.separator + "materials" + File.separator;
             String chesspieceFilename = "chesspiece.obj";
             String chesspieceFilePath = chesspieceDir + chesspieceFilename;
@@ -217,6 +204,7 @@ public class MazeGame extends BaseGame {
             Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
             chesspiece.setTexture(chesspieceTexture);
         }
+        //Initialize Terrain
         initTerrain();
 
     }
@@ -297,6 +285,7 @@ public class MazeGame extends BaseGame {
 
     private void addPlayer() {
         if(player.getCharacterID() == 1){
+
             playerAvatar = new CustomPyramid("PLAYER1");
         }else if(player.getCharacterID() == 0){
             playerAvatar = new CustomCube("PLAYER1");
