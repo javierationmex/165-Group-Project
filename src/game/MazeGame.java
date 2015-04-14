@@ -103,22 +103,15 @@ public class MazeGame extends BaseGame {
 
     private void initScripting() {
         ScriptEngineManager factory = new ScriptEngineManager();
+
+        // Set up script general pathing
         String scriptDir = "." + File.separator + "src" + File.separator + "scripts" + File.separator;
         String CreateObjectsScriptFileName = "CreateObjects.js";
         String CreateObjectsScriptPath = scriptDir + CreateObjectsScriptFileName;
 
-        /*// get a list of the script engines on this platform
-        java.util.List<ScriptEngineFactory> list = factory.getEngineFactories();
-        //List<ScriptEngineFactory> list = factory.getEngineFactories();
-        System.out.println("Script Engine Factories found:");
-        for (ScriptEngineFactory f : list) {
-            System.out.println(" Name = " + f.getEngineName()
-                    + " language = " + f.getLanguageName()
-                    + " extensions = " + f.getExtensions());
-        }*/
-
         // get the JavaScript engine
         engine = factory.getEngineByName("js");
+
         // run the script
         executeScript(engine, CreateObjectsScriptPath);
 
@@ -174,7 +167,13 @@ public class MazeGame extends BaseGame {
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
+//<<<<<<< HEAD
+        OBJLoader loader = new OBJLoader();
+
+        drawSkyBox();
+//=======
         //drawSkyBox();
+//>>>>>>> df1f1a0de63a95fe88d56e9455cf76b190bd963e
         addPlayer();
 
         {
