@@ -14,20 +14,20 @@ with (JavaPackages)
 {
 var rootNode = new Group();
 
-//Sphere
-var t1 = new Sphere(2,50,50,java.awt.Color.green);
-t1.translate(5,3,4);
-rootNode.addChild(t1);
+////Sphere
+//var t1 = new Sphere(2,50,50,java.awt.Color.green);
+//t1.translate(5,3,4);
+//rootNode.addChild(t1);
+//
+////Cylinder
+//var c1 = new Cylinder(5,3,50,50);
+//c1.translate(1,5,10);
+//rootNode.addChild(c1);
 
-//Cylinder
-var c1 = new Cylinder(5,3,50,50);
-c1.translate(1,5,10);
-rootNode.addChild(c1);
-
-//Trapesoid
-var t1 = new Trapesoid();
-t1.translate(-5,2,5);
-rootNode.addChild(t1);
+////Trapesoid
+//var t1 = new Trapesoid();
+//t1.translate(-5,2,5);
+//rootNode.addChild(t1);
 
 //Floor plane
 //var plane = new Rectangle();
@@ -38,10 +38,10 @@ rootNode.addChild(t1);
 //rootNode.addChild(plane);
 
 //Axis
-var xaxis = new Line(new Point3D(-500, 0, 0), new Point3D(500, 0, 0), Color.RED, 2);
-rootNode.addChild(xaxis);
-var yaxis = new Line(new Point3D(0, -500, 0), new Point3D(0, 500, 0), Color.GREEN, 2);
-rootNode.addChild(yaxis);
-var zaxis = new Line(new Point3D(0, 0, -500), new Point3D(0, 0, 500), Color.BLUE, 2);
-rootNode.addChild(zaxis);
+//var xaxis = new Line(new Point3D(-500, 0, 0), new Point3D(500, 0, 0), Color.RED, 2);
+//rootNode.addChild(xaxis);
+//var yaxis = new Line(new Point3D(0, -500, 0), new Point3D(0, 500, 0), Color.GREEN, 2);
+//rootNode.addChild(yaxis);
+//var zaxis = new Line(new Point3D(0, 0, -500), new Point3D(0, 0, 500), Color.BLUE, 2);
+//rootNode.addChild(zaxis);
 }
