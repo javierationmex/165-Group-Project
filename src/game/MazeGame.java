@@ -212,7 +212,7 @@ public class MazeGame extends BaseGame {
     private void initTerrain() {
         // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "height2.jpg";
+        String heightFilename = "maze2.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         TerrainBlock imageTerrain = createTerBlock(myHeightMap);
@@ -289,6 +289,22 @@ public class MazeGame extends BaseGame {
             playerAvatar = new CustomPyramid("PLAYER1");
         }else if(player.getCharacterID() == 0){
             playerAvatar = new CustomCube("PLAYER1");
+        }
+        {
+            OBJLoader loader = new OBJLoader();
+            String chesspieceDir = "." + File.separator + "materials" + File.separator;
+            String chesspieceFilename = "chesspiece.obj";
+            String chesspieceFilePath = chesspieceDir + chesspieceFilename;
+            TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
+            chesspiece.updateLocalBound();
+            playerAvatar = (chesspiece);
+            playerAvatar.scale(0.5f, 0.5f, 0.5f);
+            //chesspiece.translate(20, 3, 0);
+
+            String chesspieceTextureFilename = "chess-texture.jpg";
+            String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
+            Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
+            chesspiece.setTexture(chesspieceTexture);
         }
         playerAvatar.translate(0, 1, 50);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
