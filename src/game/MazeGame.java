@@ -167,13 +167,9 @@ public class MazeGame extends BaseGame {
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
-//<<<<<<< HEAD
-        OBJLoader loader = new OBJLoader();
 
-        drawSkyBox();
-//=======
         //drawSkyBox();
-//>>>>>>> df1f1a0de63a95fe88d56e9455cf76b190bd963e
+
         addPlayer();
 
         {
