@@ -29,6 +29,7 @@ import sage.model.loader.OBJLoader;
 import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
+import sage.scene.TriMesh;
 import sage.scene.state.RenderState;
 import sage.scene.state.TextureState;
 import sage.terrain.AbstractHeightMap;
@@ -169,44 +170,44 @@ public class MazeGame extends BaseGame {
 //<<<<<<< HEAD
         OBJLoader loader = new OBJLoader();
 
-        drawSkyBox();
+        //drawSkyBox();
 //=======
         //drawSkyBox();
 //>>>>>>> df1f1a0de63a95fe88d56e9455cf76b190bd963e
         addPlayer();
 
-//        {
-//            OBJLoader loader = new OBJLoader();
-//            String mushroomDir = "." + File.separator + "materials" + File.separator;
-//            String mushroomFilename = "mushroom.obj";
-//            String mushroomFilePath = mushroomDir + mushroomFilename;
-//            TriMesh mushroom = loader.loadModel(mushroomFilePath);
-//            mushroom.updateLocalBound();
-//            addGameWorldObject(mushroom);
-//            mushroom.scale(6, 6, 6);
-//            mushroom.translate(-20, 3, 0);
-//
-//            String mushroomTextureFilename = "texture-mushroom-2.jpg";
-//            String mushroomTextureFilePath = mushroomDir + mushroomTextureFilename;
-//            Texture mushroomTexture = TextureManager.loadTexture2D(mushroomTextureFilePath);
-//            mushroom.setTexture(mushroomTexture);
-//        }
-//        {
-//            OBJLoader loader = new OBJLoader();
-//            String chesspieceDir = "." + File.separator + "materials" + File.separator;
-//            String chesspieceFilename = "chesspiece.obj";
-//            String chesspieceFilePath = chesspieceDir + chesspieceFilename;
-//            TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
-//            chesspiece.updateLocalBound();
-//            addGameWorldObject(chesspiece);
-//            chesspiece.scale(1, 1, 1);
-//            chesspiece.translate(20, 3, 0);
-//
-//            String chesspieceTextureFilename = "chess-texture.jpg";
-//            String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
-//            Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
-//            chesspiece.setTexture(chesspieceTexture);
-//        }
+        {
+            loader = new OBJLoader();
+            String mushroomDir = "." + File.separator + "materials" + File.separator;
+            String mushroomFilename = "mushroom.obj";
+            String mushroomFilePath = mushroomDir + mushroomFilename;
+            TriMesh mushroom = loader.loadModel(mushroomFilePath);
+            mushroom.updateLocalBound();
+            addGameWorldObject(mushroom);
+            mushroom.scale(6, 6, 6);
+            mushroom.translate(-20, 3, 0);
+
+            String mushroomTextureFilename = "texture-mushroom-2.jpg";
+            String mushroomTextureFilePath = mushroomDir + mushroomTextureFilename;
+            Texture mushroomTexture = TextureManager.loadTexture2D(mushroomTextureFilePath);
+            mushroom.setTexture(mushroomTexture);
+        }
+        {
+            loader = new OBJLoader();
+            String chesspieceDir = "." + File.separator + "materials" + File.separator;
+            String chesspieceFilename = "chesspiece.obj";
+            String chesspieceFilePath = chesspieceDir + chesspieceFilename;
+            TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
+            chesspiece.updateLocalBound();
+            addGameWorldObject(chesspiece);
+            chesspiece.scale(1, 1, 1);
+            chesspiece.translate(20, 3, 0);
+
+            String chesspieceTextureFilename = "chess-texture.jpg";
+            String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
+            Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
+            chesspiece.setTexture(chesspieceTexture);
+        }
         initTerrain();
 
     }

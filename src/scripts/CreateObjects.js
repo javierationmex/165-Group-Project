@@ -14,7 +14,7 @@ with (JavaPackages)
 {
 var rootNode = new Group();
 
-//Sphere
+/*//Sphere
 var t1 = new Sphere(2,50,50,java.awt.Color.green);
 t1.translate(5,3,4);
 rootNode.addChild(t1);
@@ -22,7 +22,7 @@ rootNode.addChild(t1);
 //Cylinder
 var c1 = new Cylinder(5,3,50,50);
 c1.translate(1,5,10);
-rootNode.addChild(c1);
+rootNode.addChild(c1);*/
 
 //Trapesoid
 var t1 = new Trapesoid();
