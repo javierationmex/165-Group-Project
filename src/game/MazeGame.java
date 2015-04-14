@@ -29,23 +29,26 @@ import sage.model.loader.OBJLoader;
 import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
-import sage.scene.shape.Line;
-import sage.scene.shape.Rectangle;
+import sage.scene.state.RenderState;
+import sage.scene.state.TextureState;
+import sage.terrain.AbstractHeightMap;
+import sage.terrain.ImageBasedHeightMap;
+import sage.terrain.TerrainBlock;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.awt.*;
-import java.awt.List;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.UUID;
+
+//import objects.mushroom.*;
 
 
 /**
@@ -163,10 +166,85 @@ public class MazeGame extends BaseGame {
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
+//<<<<<<< HEAD
         OBJLoader loader = new OBJLoader();
 
         drawSkyBox();
+//=======
+        //drawSkyBox();
+//>>>>>>> df1f1a0de63a95fe88d56e9455cf76b190bd963e
         addPlayer();
+
+//        {
+//            OBJLoader loader = new OBJLoader();
+//            String mushroomDir = "." + File.separator + "materials" + File.separator;
+//            String mushroomFilename = "mushroom.obj";
+//            String mushroomFilePath = mushroomDir + mushroomFilename;
+//            TriMesh mushroom = loader.loadModel(mushroomFilePath);
+//            mushroom.updateLocalBound();
+//            addGameWorldObject(mushroom);
+//            mushroom.scale(6, 6, 6);
+//            mushroom.translate(-20, 3, 0);
+//
+//            String mushroomTextureFilename = "texture-mushroom-2.jpg";
+//            String mushroomTextureFilePath = mushroomDir + mushroomTextureFilename;
+//            Texture mushroomTexture = TextureManager.loadTexture2D(mushroomTextureFilePath);
+//            mushroom.setTexture(mushroomTexture);
+//        }
+//        {
+//            OBJLoader loader = new OBJLoader();
+//            String chesspieceDir = "." + File.separator + "materials" + File.separator;
+//            String chesspieceFilename = "chesspiece.obj";
+//            String chesspieceFilePath = chesspieceDir + chesspieceFilename;
+//            TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
+//            chesspiece.updateLocalBound();
+//            addGameWorldObject(chesspiece);
+//            chesspiece.scale(1, 1, 1);
+//            chesspiece.translate(20, 3, 0);
+//
+//            String chesspieceTextureFilename = "chess-texture.jpg";
+//            String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
+//            Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
+//            chesspiece.setTexture(chesspieceTexture);
+//        }
+        initTerrain();
+
+    }
+
+    private void initTerrain() {
+        // create height map and terrain block
+        String heightDir = "." + File.separator + "materials" + File.separator;
+        String heightFilename = "height.jpg";
+        String heightFilePath = heightDir + heightFilename;
+        ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
+        TerrainBlock imageTerrain = createTerBlock(myHeightMap);
+        // create texture and texture state to color the terrain
+        TextureState grassState;
+        String heighttextureDir = "." + File.separator + "materials" + File.separator;
+        String heighttextureFilename = "plaster.jpg";
+        String heighttextureFilePath = heighttextureDir + heighttextureFilename;
+        Texture grassTexture = TextureManager.loadTexture2D(heighttextureFilePath);
+        grassTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
+        grassState = (TextureState) display.getRenderer().createRenderState(RenderState.RenderStateType.Texture);
+        grassState.setTexture(grassTexture, 0);
+        grassState.setEnabled(true);
+        // apply the texture to the terrain
+        imageTerrain.setRenderState(grassState);
+        addGameWorldObject(imageTerrain);
+    }
+
+    private TerrainBlock createTerBlock(AbstractHeightMap heightMap) {
+        float heightScale = 0.05f;
+        Vector3D terrainScale = new Vector3D(1, heightScale, 1);
+        // use the size of the height map as the size of the terrain
+        int terrainSize = heightMap.getSize();
+        // specify terrain origin so heightmap (0,0) is at world origin
+        float cornerHeight = heightMap.getTrueHeightAtPoint(0, 0) * heightScale;
+        Point3D terrainOrigin = new Point3D(0, -cornerHeight, 0);
+        // create a terrain block using the height map
+        String name = "Terrain:" + heightMap.getClass().getSimpleName();
+        TerrainBlock tb = new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
+        return tb;
     }
 
     private void drawSkyBox() {
@@ -331,12 +409,12 @@ public class MazeGame extends BaseGame {
         }
     }
 
-    public void setCanProcess(boolean canProcess) {
-        this.canProcess = canProcess;
-    }
-
     public boolean isCanProcess() {
         return canProcess;
+    }
+
+    public void setCanProcess(boolean canProcess) {
+        this.canProcess = canProcess;
     }
 
 }
