@@ -296,7 +296,7 @@ public class MazeGame extends BaseGame {
             TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
             chesspiece.updateLocalBound();
             playerAvatar = (chesspiece);
-            playerAvatar.scale(0.5f, 0.5f, 0.5f);
+            playerAvatar.scale(0.2f, 0.2f, 0.2f);
             //chesspiece.translate(20, 3, 0);
 
             String chesspieceTextureFilename = "chess-texture.jpg";
@@ -304,7 +304,7 @@ public class MazeGame extends BaseGame {
             Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
             chesspiece.setTexture(chesspieceTexture);
         }
-        playerAvatar.translate(0, 1, 50);
+        playerAvatar.translate(0, 2, 50);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
 
         updateOldPosition();
