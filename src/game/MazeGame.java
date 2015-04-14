@@ -168,7 +168,7 @@ public class MazeGame extends BaseGame {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
 
-        //drawSkyBox();
+        drawSkyBox();
 
         addPlayer();
 
@@ -204,6 +204,7 @@ public class MazeGame extends BaseGame {
             Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
             chesspiece.setTexture(chesspieceTexture);
         }
+        //Initialize Terrain
         initTerrain();
 
     }
@@ -284,6 +285,7 @@ public class MazeGame extends BaseGame {
 
     private void addPlayer() {
         if(player.getCharacterID() == 1){
+
             playerAvatar = new CustomPyramid("PLAYER1");
         }else if(player.getCharacterID() == 0){
             playerAvatar = new CustomCube("PLAYER1");
