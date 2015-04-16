@@ -1,5 +1,11 @@
 package game;
 
+import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.dispatch.CollisionConfiguration;
+import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.dynamics.DynamicsWorld;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import game.characters.CustomCube;
 import game.characters.CustomPyramid;
 import gameengine.FullScreenDisplaySystem;
@@ -12,6 +18,7 @@ import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
 import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
 import networking.packets.ingame.UpdateAvatarLocationInformationPacket;
@@ -25,11 +32,9 @@ import sage.input.IInputManager;
 import sage.input.InputManager;
 import sage.input.action.IAction;
 import sage.input.action.QuitGameAction;
-import sage.model.loader.OBJLoader;
 import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
-import sage.scene.TriMesh;
 import sage.scene.state.RenderState;
 import sage.scene.state.TextureState;
 import sage.terrain.AbstractHeightMap;
@@ -38,17 +43,19 @@ import sage.terrain.TerrainBlock;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
+import trimesh.ChessPieceRock;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.swing.*;
+import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
-
 //import objects.mushroom.*;
 
 
@@ -75,6 +82,18 @@ public class MazeGame extends BaseGame {
     private String oldTranslation;
     private String oldScale;
     private boolean canProcess;
+    private CollisionDispatcher collDispatcher;
+    private BroadphaseInterface broadPhaseHandler;
+    private ConstraintSolver solver;
+    private CollisionConfiguration collConfig;
+    private RigidBody physicsGround;
+    private RigidBody physicsBall;
+    private int maxProxies = 1024;
+    private Vector3f worldAabbMin = new Vector3f(-10000, -10000, -10000);
+    private Vector3f worldAabbMax = new Vector3f(10000, 10000, 10000);
+    private DynamicsWorld physicsWorld;
+    private String keyboardName;
+    private String gameControllerName;
 
     public MazeGame(Player player) {
         this.player = player;
@@ -88,8 +107,23 @@ public class MazeGame extends BaseGame {
 
     @Override
     protected void initGame() {
-        eventManager = EventManager.getInstance();
+
+        //CustomDialog cDialog = new CustomDialog(null, true);
+        //String s = (cDialog.getInputText());
+
+        //CONTROLLER ENVORUMENT SETUP
+        ControllerEnvironment ce = ControllerEnvironment.getDefaultEnvironment();
+        // get the set of controllers from the controller environment
+        Controller[] cs = ce.getControllers();
         inputMgr = getInputManager();
+
+//        Object keyboardNameresult = JOptionPane.showInputDialog(null, "Please choose a keyboard", "KEYBOARD DIALOG", JOptionPane.QUESTION_MESSAGE, null, inputMgr.getControllers().toArray(), 0);
+//        if (keyboardNameresult!=null) keyboardName = keyboardNameresult.toString();
+        Object gameControllerNameresult = JOptionPane.showInputDialog(null, "Please choose a game controller", "GAME CONTROLLER DIALOG", JOptionPane.QUESTION_MESSAGE, null, inputMgr.getControllers().toArray(), 0);
+        if (gameControllerNameresult != null) gameControllerName = gameControllerNameresult.toString();
+
+        eventManager = EventManager.getInstance();
+        //inputMgr = getInputManager();
         renderer = display.getRenderer();
         initGameObjects();
         initScripting();
@@ -100,6 +134,47 @@ public class MazeGame extends BaseGame {
         //TODO create objects: walls, players, power up boosts, etc. Gotta create a recursive algorithm to auto generate a random maze.
         //TODO maybe have different colored sections of walls that players can walk through if they picked up a certain color boost.
     }
+//    private void createPhysicsWorld() {
+//        Transform myTransform ;
+//        // define the broad-phase collision to be used (Sweep-and-Prune)
+//        broadPhaseHandler = new AxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
+//        // set up the narrow-phase collision handler ("dispatcher")
+//        collConfig = new DefaultCollisionConfiguration();
+//        collDispatcher = new CollisionDispatcher(collConfig);
+//        // create a constraint solver
+//        solver = new SequentialImpulseConstraintSolver();
+//        // create a physics world utilizing the above objects
+//        physicsWorld = new DiscreteDynamicsWorld(collDispatcher, broadPhaseHandler, solver, collConfig);
+//        physicsWorld.setGravity(new Vector3f(0, -10, 0));
+//        // define physicsGround plane: normal vector = 'up', dist from origin = 1
+//        CollisionShape groundShape =
+//                new StaticPlaneShape(new Vector3f(0, 1, 0), 1);
+//        // set position and orientation of physicsGround's transform
+//        myTransform = new Transform(); myTransform.origin.set(new Vector3f(0, -1, 0));
+//        myTransform.setRotation(new Quat4f(0, 0, 0, 1));
+//        // define construction info for a 'physicsGround' rigid body
+//        DefaultMotionState groundMotionState =
+//                new DefaultMotionState(myTransform);
+//        RigidBodyConstructionInfo groundCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape,new Vector3f(0, 0, 0));
+//        groundCI.restitution = 0.8f;
+//        // create the physicsGround rigid body and add it to the physics world
+//        physicsGround = new RigidBody(groundCI); physicsWorld.addRigidBody(physicsGround);
+//        // define a collision shape for a physicsBall
+//        CollisionShape fallShape = new SphereShape(1);
+//        // define a transform for position and orientation of ball collision shape
+//        myTransform = new Transform(); myTransform.origin.set(new Vector3f(0, 20, 0)); myTransform.setRotation(new Quat4f(0, 0, 0, 1));
+//        // define the parameters of the collision shape
+//        DefaultMotionState fallMotionState =
+//                new DefaultMotionState(myTransform);
+//        float myFallMass = 1;
+//        Vector3f myFallInertia = new Vector3f(0, 0, 0); fallShape.calculateLocalInertia(myFallMass, myFallInertia);
+//        // define construction info for a 'physicsBall' rigid body
+//        RigidBodyConstructionInfo fallRigidBodyCI = new RigidBodyConstructionInfo(myFallMass,fallMotionState,fallShape,myFallInertia);
+//        fallRigidBodyCI.restitution = 0.8f;
+//        // create the physicsBall rigid body and add it to the physics world
+//        physicsBall = new RigidBody(fallRigidBodyCI);
+//        physicsWorld.addRigidBody(physicsBall);
+//    }
 
     private void initScripting() {
         ScriptEngineManager factory = new ScriptEngineManager();
@@ -145,7 +220,7 @@ public class MazeGame extends BaseGame {
 
 
         cam1Controller = new OrbitCameraController(camera1, playerAvatar, inputMgr, keyboardName, client);
-
+        //cam1Controller = new ThirdPersonChaseCameraController(camera1,playerAvatar,inputMgr,con)
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.ESCAPE,
                 quitGame, IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
@@ -168,42 +243,11 @@ public class MazeGame extends BaseGame {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
 
-        drawSkyBox();
+        //drawSkyBox();
 
         addPlayer();
 
-        {
-            OBJLoader loader = new OBJLoader();
-            String mushroomDir = "." + File.separator + "materials" + File.separator;
-            String mushroomFilename = "mushroom.obj";
-            String mushroomFilePath = mushroomDir + mushroomFilename;
-            TriMesh mushroom = loader.loadModel(mushroomFilePath);
-            mushroom.updateLocalBound();
-            addGameWorldObject(mushroom);
-            mushroom.scale(6, 6, 6);
-            mushroom.translate(-20, 3, 0);
 
-            String mushroomTextureFilename = "texture-mushroom-2.jpg";
-            String mushroomTextureFilePath = mushroomDir + mushroomTextureFilename;
-            Texture mushroomTexture = TextureManager.loadTexture2D(mushroomTextureFilePath);
-            mushroom.setTexture(mushroomTexture);
-        }
-        {
-            OBJLoader loader = new OBJLoader();
-            String chesspieceDir = "." + File.separator + "materials" + File.separator;
-            String chesspieceFilename = "chesspiece.obj";
-            String chesspieceFilePath = chesspieceDir + chesspieceFilename;
-            TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
-            chesspiece.updateLocalBound();
-            addGameWorldObject(chesspiece);
-            chesspiece.scale(1, 1, 1);
-            chesspiece.translate(20, 3, 0);
-
-            String chesspieceTextureFilename = "chess-texture.jpg";
-            String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
-            Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
-            chesspiece.setTexture(chesspieceTexture);
-        }
         //Initialize Terrain
         initTerrain();
 
@@ -279,33 +323,20 @@ public class MazeGame extends BaseGame {
         skybox.translate(0, 100, 0);
 
 
-        addGameWorldObject(skybox);
+        //addGameWorldObject(skybox);
 
     }
 
     private void addPlayer() {
         if(player.getCharacterID() == 1){
-
             playerAvatar = new CustomPyramid("PLAYER1");
         }else if(player.getCharacterID() == 0){
             playerAvatar = new CustomCube("PLAYER1");
         }
-        {
-            OBJLoader loader = new OBJLoader();
-            String chesspieceDir = "." + File.separator + "materials" + File.separator;
-            String chesspieceFilename = "chesspiece.obj";
-            String chesspieceFilePath = chesspieceDir + chesspieceFilename;
-            TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
-            chesspiece.updateLocalBound();
-            playerAvatar = (chesspiece);
-            playerAvatar.scale(0.2f, 0.2f, 0.2f);
-            //chesspiece.translate(20, 3, 0);
+        playerAvatar = new ChessPieceRock();
+        playerAvatar.scale(0.2f, 0.2f, 0.2f);
+        //chesspiece.translate(20, 3, 0);
 
-            String chesspieceTextureFilename = "chess-texture.jpg";
-            String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
-            Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
-            chesspiece.setTexture(chesspieceTexture);
-        }
         playerAvatar.translate(0, 2, 50);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
 
@@ -330,6 +361,7 @@ public class MazeGame extends BaseGame {
 
     @Override
     protected void update(float time) {
+
         this.time += time;
         cam1Controller.update(this.time);
 
