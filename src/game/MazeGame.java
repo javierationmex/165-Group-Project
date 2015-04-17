@@ -25,11 +25,9 @@ import sage.input.IInputManager;
 import sage.input.InputManager;
 import sage.input.action.IAction;
 import sage.input.action.QuitGameAction;
-import sage.model.loader.OBJLoader;
 import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
-import sage.scene.TriMesh;
 import sage.scene.state.RenderState;
 import sage.scene.state.TextureState;
 import sage.terrain.AbstractHeightMap;
@@ -38,11 +36,15 @@ import sage.terrain.TerrainBlock;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
+import trimesh.ChessPieceRock;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -164,44 +166,8 @@ public class MazeGame extends BaseGame {
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
-
         //drawSkyBox();
-
         addPlayer();
-
-        /*{
-            OBJLoader loader = new OBJLoader();
-            String mushroomDir = "." + File.separator + "materials" + File.separator;
-            String mushroomFilename = "mushroom.obj";
-            String mushroomFilePath = mushroomDir + mushroomFilename;
-            TriMesh mushroom = loader.loadModel(mushroomFilePath);
-            mushroom.updateLocalBound();
-            addGameWorldObject(mushroom);
-            mushroom.scale(6, 6, 6);
-            mushroom.translate(-20, 3, 0);
-
-            String mushroomTextureFilename = "texture-mushroom-2.jpg";
-            String mushroomTextureFilePath = mushroomDir + mushroomTextureFilename;
-            Texture mushroomTexture = TextureManager.loadTexture2D(mushroomTextureFilePath);
-            mushroom.setTexture(mushroomTexture);
-        }
-        {
-            OBJLoader loader = new OBJLoader();
-            String chesspieceDir = "." + File.separator + "materials" + File.separator;
-            String chesspieceFilename = "chesspiece.obj";
-            String chesspieceFilePath = chesspieceDir + chesspieceFilename;
-            TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
-            chesspiece.updateLocalBound();
-            addGameWorldObject(chesspiece);
-            chesspiece.scale(1, 1, 1);
-            chesspiece.translate(20, 3, 0);
-
-            String chesspieceTextureFilename = "chess-texture.jpg";
-            String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
-            Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
-            chesspiece.setTexture(chesspieceTexture);
-        }*/
-        //Initialize Terrain
         initTerrain();
 
     }
@@ -288,23 +254,9 @@ public class MazeGame extends BaseGame {
         }else if(player.getCharacterID() == 0){
             playerAvatar = new CustomCube("PLAYER1");
         }
-        {
-            OBJLoader loader = new OBJLoader();
-            String chesspieceDir = "." + File.separator + "materials" + File.separator;
-            String chesspieceFilename = "chesspiece.obj";
-            String chesspieceFilePath = chesspieceDir + chesspieceFilename;
-            TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
-            chesspiece.updateLocalBound();
-            playerAvatar = (chesspiece);
-            playerAvatar.scale(0.2f, 0.2f, 0.2f);
-            //chesspiece.translate(20, 3, 0);
-
-            String chesspieceTextureFilename = "chess-texture.jpg";
-            String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
-            Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
-            chesspiece.setTexture(chesspieceTexture);
-        }
-        playerAvatar.translate(0, 2, 50);
+        playerAvatar = new ChessPieceRock();
+        playerAvatar.scale(0.1f, 0.1f, 0.1f);
+        playerAvatar.translate(0, 3, 50);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
 
         updateOldPosition();
