@@ -27,7 +27,7 @@ public class MovePlayerRightAction extends BaseAbstractInputAction {
         dir = dir.mult(rot);
         dir.scale((double)(speed * time));
         avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
-        sendUpdateLocationPacket(client, (float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
+        sendUpdateLocationPacket(client, avatar.getLocalTranslation(), avatar.getLocalScale(), avatar.getLocalRotation());
     }
 
 }

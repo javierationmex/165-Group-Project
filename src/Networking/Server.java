@@ -98,15 +98,7 @@ public class Server extends GameConnectionServer<UUID> {
             }
         }
 
-        if(packet instanceof UpdateAvatarLocationInformationPacket){
-            try {
-                this.sendPacketToAll((Serializable) packet);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if(packet instanceof UpdateAvatarRotationInformationPacket){
+        if(packet instanceof UpdateAvatarInfoPacket){
             try {
                 this.sendPacketToAll((Serializable) packet);
             } catch (IOException e) {

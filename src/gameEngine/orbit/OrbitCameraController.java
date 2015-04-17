@@ -197,7 +197,7 @@ public class OrbitCameraController {
             cameraAzimuth += 1.3f ;
             cameraAzimuth = cameraAzimuth % 360 ;
             target.rotate((float)1.3, new Vector3D(0,1,0));
-            sendUpdateRotationPacket(client, (float) 1.3, new Vector3D(0, 1, 0));
+            sendUpdateLocationPacket(client, target.getLocalTranslation(), target.getLocalScale(), target.getLocalRotation());
         }
     }
 
@@ -208,7 +208,7 @@ public class OrbitCameraController {
             cameraAzimuth -= 1.3f ;
             cameraAzimuth = cameraAzimuth % 360 ;
             target.rotate((float)-1.3, new Vector3D(0,1,0));
-            sendUpdateRotationPacket(client, (float)-1.3, new Vector3D(0,1,0));
+            sendUpdateLocationPacket(client, target.getLocalTranslation(), target.getLocalScale(), target.getLocalRotation());
         }
     }
 }
