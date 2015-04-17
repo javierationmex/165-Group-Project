@@ -8,14 +8,14 @@ import gameengine.player.MovePlayerBackwardAction;
 import gameengine.player.MovePlayerForwardAction;
 import gameengine.player.MovePlayerLeftAction;
 import gameengine.player.MovePlayerRightAction;
+import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
-import networking.packets.ingame.UpdateAvatarLocationInformationPacket;
-import networking.packets.ingame.UpdateAvatarRotationInformationPacket;
+import networking.packets.ingame.UpdateAvatarInfoPacket;
 import sage.app.BaseGame;
 import sage.camera.ICamera;
 import sage.display.IDisplaySystem;
@@ -42,10 +42,7 @@ import swingmenus.multiplayer.data.PlayerInfo;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -172,7 +169,7 @@ public class MazeGame extends BaseGame {
 
         addPlayer();
 
-        {
+        /*{
             OBJLoader loader = new OBJLoader();
             String mushroomDir = "." + File.separator + "materials" + File.separator;
             String mushroomFilename = "mushroom.obj";
@@ -203,7 +200,7 @@ public class MazeGame extends BaseGame {
             String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
             Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
             chesspiece.setTexture(chesspieceTexture);
-        }
+        }*/
         //Initialize Terrain
         initTerrain();
 
@@ -216,6 +213,7 @@ public class MazeGame extends BaseGame {
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         TerrainBlock imageTerrain = createTerBlock(myHeightMap);
+
         // create texture and texture state to color the terrain
         TextureState grassState;
         String heighttextureDir = "." + File.separator + "materials" + File.separator;
@@ -384,29 +382,21 @@ public class MazeGame extends BaseGame {
         return displaySystem ;
     }
 
-    public void updateGhostAvatar(UpdateAvatarLocationInformationPacket packet) {
+    public void updateGhostAvatar(UpdateAvatarInfoPacket packet) {
 
         UUID id = packet.getClientID();
-        float x = packet.getX();
-        float y = packet.getY();
-        float z = packet.getZ();
+        Matrix3D translation = new Matrix3D();
+        translation.concatenate(packet.getTranslation());
+        Matrix3D scale = new Matrix3D();
+        scale.concatenate(packet.getScale());
+        Matrix3D rotation = new Matrix3D();
+        rotation.concatenate(packet.getRotation());
         if (!id.toString().equals(this.player.getPlayerUUID().toString())){
             for(PlayerInfo p : this.playersInfo){
                 if(id.toString().equals(p.getClientID().toString())){
-                    p.getAvatar().translate(x, y, z);
-                }
-            }
-        }
-    }
-
-    public void updateGhostAvatar(UpdateAvatarRotationInformationPacket packet) {
-        UUID id = packet.getClientID();
-        float x = packet.getX();
-        Vector3D axis = packet.getAxis();
-        if (!id.toString().equals(this.player.getPlayerUUID().toString())){
-            for(PlayerInfo p : this.playersInfo){
-                if(id.toString().equals(p.getClientID().toString())){
-                    p.getAvatar().rotate(x, axis);
+                    p.getAvatar().setLocalTranslation(translation);
+                    p.getAvatar().setLocalScale(scale);
+                    p.getAvatar().setLocalRotation(rotation);
                 }
             }
         }

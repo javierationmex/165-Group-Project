@@ -4,8 +4,7 @@ import game.MazeGame;
 import game.Player;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
-import networking.packets.ingame.UpdateAvatarLocationInformationPacket;
-import networking.packets.ingame.UpdateAvatarRotationInformationPacket;
+import networking.packets.ingame.UpdateAvatarInfoPacket;
 import networking.packets.lobby.JoinPacket;
 import networking.packets.lobby.StartGamePacket;
 import sage.networking.client.GameConnectionClient;
@@ -56,12 +55,8 @@ public class Client extends GameConnectionClient {
             mazeGame.addGhostAvatar(((GamePlayerInfoPacket) packet).getPlayer());
         }
 
-        if(packet instanceof UpdateAvatarLocationInformationPacket){
-            mazeGame.updateGhostAvatar(((UpdateAvatarLocationInformationPacket) packet));
-        }
-
-        if(packet instanceof UpdateAvatarRotationInformationPacket){
-            mazeGame.updateGhostAvatar(((UpdateAvatarRotationInformationPacket) packet));
+        if(packet instanceof UpdateAvatarInfoPacket){
+            mazeGame.updateGhostAvatar(((UpdateAvatarInfoPacket) packet));
         }
     }
 

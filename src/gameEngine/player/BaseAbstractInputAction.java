@@ -1,10 +1,9 @@
 package gameengine.player;
 
-import graphicslib3D.Vector3D;
+import graphicslib3D.Matrix3D;
 import net.java.games.input.Event;
 import networking.Client;
-import networking.packets.ingame.UpdateAvatarLocationInformationPacket;
-import networking.packets.ingame.UpdateAvatarRotationInformationPacket;
+import networking.packets.ingame.UpdateAvatarInfoPacket;
 import sage.input.action.AbstractInputAction;
 
 import java.io.IOException;
@@ -14,17 +13,9 @@ import java.io.IOException;
  */
 public class BaseAbstractInputAction extends AbstractInputAction {
 
-    public void sendUpdateLocationPacket(Client client, float x, float y, float z){
+    public void sendUpdateLocationPacket(Client client, Matrix3D translate, Matrix3D scale, Matrix3D rotation){
         try {
-            client.sendPacket(new UpdateAvatarLocationInformationPacket(client.getId(), x, y, z));
-        } catch (IOException ev) {
-            ev.printStackTrace();
-        }
-    }
-
-    public void sendUpdateRotationPacket(Client client, float x, Vector3D axis){
-        try {
-            client.sendPacket(new UpdateAvatarRotationInformationPacket(client.getId(), x, axis));
+            client.sendPacket(new UpdateAvatarInfoPacket(client.getId(), translate, scale, rotation));
         } catch (IOException ev) {
             ev.printStackTrace();
         }
