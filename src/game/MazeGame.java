@@ -3,7 +3,7 @@ package game;
 import game.characters.CustomCube;
 import game.characters.CustomPyramid;
 import gameengine.FullScreenDisplaySystem;
-import gameengine.orbit.OrbitCameraController;
+import gameengine.cameras.OrbitCameraController;
 import gameengine.player.MovePlayerBackwardAction;
 import gameengine.player.MovePlayerForwardAction;
 import gameengine.player.MovePlayerLeftAction;
@@ -28,6 +28,7 @@ import sage.input.action.QuitGameAction;
 import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
+import sage.scene.shape.Rectangle;
 import sage.scene.state.RenderState;
 import sage.scene.state.TextureState;
 import sage.terrain.AbstractHeightMap;
@@ -37,10 +38,12 @@ import sage.texture.Texture;
 import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
 import trimesh.ChessPieceRock;
+import trimesh.Mushroom;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -170,12 +173,17 @@ public class MazeGame extends BaseGame {
         addPlayer();
         initTerrain();
 
+        Mushroom s = new Mushroom();
+        addGameWorldObject(s);
+        s.translate(200, 6, 200);
+        s.scale(20, 50, 20);
+
     }
 
     private void initTerrain() {
         // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "maze2.jpg";
+        String heightFilename = "rounded-maze2.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         TerrainBlock imageTerrain = createTerBlock(myHeightMap);
@@ -183,7 +191,7 @@ public class MazeGame extends BaseGame {
         // create texture and texture state to color the terrain
         TextureState grassState;
         String heighttextureDir = "." + File.separator + "materials" + File.separator;
-        String heighttextureFilename = "plaster.jpg";
+        String heighttextureFilename = "green-leather-texture.jpg";
         String heighttextureFilePath = heighttextureDir + heighttextureFilename;
         Texture grassTexture = TextureManager.loadTexture2D(heighttextureFilePath);
         grassTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
@@ -193,6 +201,20 @@ public class MazeGame extends BaseGame {
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
         addGameWorldObject(imageTerrain);
+        //Floor plane
+        Rectangle plane = new Rectangle();
+        Vector3D vec = new Vector3D(1, 0, 0);
+        plane.rotate(90, vec);
+        plane.scale(1000, 1000, 1);
+        plane.translate(0, 5, 0);
+        plane.setColor(Color.GRAY);
+        String planetextureDir = "." + File.separator + "materials" + File.separator;
+        String planetexturefilename = "sand.jpg";
+        String planetexturefilepath = planetextureDir + planetexturefilename;
+        Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
+        plane.setTexture(planetexture);
+        addGameWorldObject(plane);
+
     }
 
     private TerrainBlock createTerBlock(AbstractHeightMap heightMap) {
@@ -255,8 +277,8 @@ public class MazeGame extends BaseGame {
             playerAvatar = new CustomCube("PLAYER1");
         }
         playerAvatar = new ChessPieceRock();
-        playerAvatar.scale(0.1f, 0.1f, 0.1f);
-        playerAvatar.translate(0, 3, 50);
+        playerAvatar.scale(0.2f, 0.2f, 0.2f);
+        playerAvatar.translate(0, 6, 50);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
 
         updateOldPosition();
@@ -360,7 +382,7 @@ public class MazeGame extends BaseGame {
         }
         this.playersInfo.add(player);
         if (!player.getClientID().toString().equals(this.player.getPlayerUUID().toString())){
-            player.getAvatar().translate(0, 1, 50);
+            player.getAvatar().translate(0, 5, 50);
             player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
             addGameWorldObject(player.getAvatar());
         }

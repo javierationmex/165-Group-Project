@@ -24,8 +24,7 @@ public class Mushroom extends Group implements Serializable {
         String mushroomFilePath = mushroomDir + mushroomFilename;
         TriMesh mushroom = loader.loadModel(mushroomFilePath);
         mushroom.updateLocalBound();
-        mushroom.scale(6, 6, 6);
-        mushroom.translate(-20, 3, 0);
+
 
         String mushroomTextureFilename = "texture-mushroom-2.jpg";
         String mushroomTextureFilePath = mushroomDir + mushroomTextureFilename;
