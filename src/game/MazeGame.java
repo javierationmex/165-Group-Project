@@ -3,7 +3,7 @@ package game;
 import game.characters.CustomCube;
 import game.characters.CustomPyramid;
 import gameengine.FullScreenDisplaySystem;
-import gameengine.cameras.OrbitCameraController;
+import gameengine.OrbitCameraController;
 import gameengine.player.MovePlayerBackwardAction;
 import gameengine.player.MovePlayerForwardAction;
 import gameengine.player.MovePlayerLeftAction;
