@@ -37,6 +37,8 @@ public class CharacterSelectionScreen {
         characterOptions = new Vector();
         characterOptions.add("Cube");
         characterOptions.add("Pyramid");
+        characterOptions.add("Ship");
+        characterOptions.add("Rook");
         model = new DefaultComboBoxModel(characterOptions);
         this.player.setCharacterSelectionScreen(this);
         $$$setupUI$$$();

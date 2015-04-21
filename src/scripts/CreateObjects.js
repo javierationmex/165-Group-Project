@@ -7,6 +7,7 @@ var JavaPackages = new JavaImporter(
  Packages.sage.scene.shape.Line,
  Packages.sage.scene.shape.Rectangle,
  Packages.gameengine.shapes.Trapesoid,
+ Packages.trimesh.Mushroom,
  Packages.graphicslib3D.Vector3D,
  Packages.graphicslib3D.Point3D);
 
@@ -28,6 +29,11 @@ var rootNode = new Group();
 //var t1 = new Trapesoid();
 //t1.translate(-5,2,5);
 //rootNode.addChild(t1);
+
+var s = new Mushroom();
+s.translate(200, 6, 200);
+s.scale(20, 50, 20);
+rootNode.addChild(s);
 
 //Floor plane
 //var plane = new Rectangle();

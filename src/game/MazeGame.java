@@ -39,6 +39,7 @@ import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
 import trimesh.ChessPieceRock;
 import trimesh.Mushroom;
+import trimesh.Ship;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -171,10 +172,13 @@ public class MazeGame extends BaseGame {
         addPlayer();
         initTerrain();
 
+/*
+        Moved to script
         Mushroom s = new Mushroom();
         addGameWorldObject(s);
         s.translate(200, 6, 200);
         s.scale(20, 50, 20);
+*/
 
     }
 
@@ -274,11 +278,13 @@ public class MazeGame extends BaseGame {
             playerAvatar = new CustomPyramid("PLAYER1");
         }else if(player.getCharacterID() == 0){
             playerAvatar = new CustomCube("PLAYER1");
+        }else if(player.getCharacterID() == 2){
+            playerAvatar = new Ship().getChild();
+        }else if(player.getCharacterID() == 4){
+            playerAvatar = new ChessPieceRock().getChild();
         }
-        playerAvatar = new ChessPieceRock().getChild();
 
         //set the character ID here and catch it in addGhostAvatar();
-        player.setCharacterID(3);
 
         playerAvatar.scale(0.2f, 0.2f, 0.2f);
         playerAvatar.translate(0, 5, 50);
@@ -401,10 +407,16 @@ public class MazeGame extends BaseGame {
             this.playersInfo = new ArrayList<PlayerInfo>();
         }
         this.playersInfo.add(player);
-        if (!player.getClientID().toString().equals(this.player.getPlayerUUID().toString())){
+        if (!player.getClientID().toString().equals(this.player.getPlayerUUID().toString())) {
 
             //Add avatar adding here
-            if(player.getCharacterID() == 3){
+            if(player.getCharacterID() == 0) {
+                player.setAvatar(new CustomCube("PLAYER1"));
+            }else if(player.getCharacterID() == 1){
+                player.setAvatar(new CustomPyramid("PLAYER1"));
+            }else if (player.getCharacterID() == 2){
+                player.setAvatar(new Ship().getChild());
+            }else if(player.getCharacterID() == 3) {
                 player.setAvatar(new ChessPieceRock().getChild());
             }
             player.getAvatar().translate(0, 5, 50);
