@@ -87,7 +87,7 @@ public class Server extends GameConnectionServer<UUID> {
             PlayerInfo player = null;
             for(PlayerInfo p : players){
                 if(p.getClientID().toString().equals(id.toString())){
-                    p.setAvatar(((AddAvatarInformationPacket) packet).getAvatar());
+                    p.setCharacterID(((AddAvatarInformationPacket) packet).getAvatarID());
                     player = p;
                 }
             }

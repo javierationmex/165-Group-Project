@@ -15,6 +15,8 @@ import java.io.Serializable;
 public class ChessPieceRock extends Group implements Serializable {
     private static final long serialVersionUID = 7526552295622776147L;
 
+    TriMesh child;
+
     public ChessPieceRock() {
         OBJLoader loader = new OBJLoader();
         String chesspieceDir = "." + File.separator + "materials" + File.separator;
@@ -29,5 +31,10 @@ public class ChessPieceRock extends Group implements Serializable {
         chesspiece.setTexture(chesspieceTexture);
 
         this.addChild(chesspiece);
+        child = chesspiece;
+    }
+
+    public TriMesh getChild() {
+        return child;
     }
 }

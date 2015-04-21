@@ -54,6 +54,8 @@ public class PlayerInfo implements IPacket {
         this.avatar = avatar;
     }
 
+
+
     public boolean isLoaded() {
         return loaded;
     }
