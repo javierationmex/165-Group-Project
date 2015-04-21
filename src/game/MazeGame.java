@@ -275,15 +275,19 @@ public class MazeGame extends BaseGame {
         }else if(player.getCharacterID() == 0){
             playerAvatar = new CustomCube("PLAYER1");
         }
-        playerAvatar = new ChessPieceRock();
+        playerAvatar = new ChessPieceRock().getChild();
+
+        //set the character ID here and catch it in addGhostAvatar();
+        player.setCharacterID(3);
+
         playerAvatar.scale(0.2f, 0.2f, 0.2f);
-        playerAvatar.translate(0, 6, 50);
+        playerAvatar.translate(0, 5, 50);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
 
         updateOldPosition();
 
         try {
-            client.sendPacket(new AddAvatarInformationPacket(client.getId(), playerAvatar));
+            client.sendPacket(new AddAvatarInformationPacket(client.getId(), player.getCharacterID()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -304,14 +308,31 @@ public class MazeGame extends BaseGame {
         this.time += time;
         cam1Controller.update(this.time);
 
-        //checkIfToUpdatePlayer();
+        if(playerChanged()){
+            try {
+                client.sendPacket(new UpdateAvatarInfoPacket(client.getId(), playerAvatar.getLocalTranslation(), playerAvatar.getLocalScale(), playerAvatar.getLocalRotation()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         if(client != null){
             client.processPackets();
         }
+
         super.update(time);
 
         //TODO override later
+    }
+
+    private boolean playerChanged() {
+        if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
+           !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
+           !oldScale.equals(playerAvatar.getLocalScale().toString())){
+            updateOldPosition();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -381,6 +402,11 @@ public class MazeGame extends BaseGame {
         }
         this.playersInfo.add(player);
         if (!player.getClientID().toString().equals(this.player.getPlayerUUID().toString())){
+
+            //Add avatar adding here
+            if(player.getCharacterID() == 3){
+                player.setAvatar(new ChessPieceRock().getChild());
+            }
             player.getAvatar().translate(0, 5, 50);
             player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
             addGameWorldObject(player.getAvatar());

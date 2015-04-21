@@ -10,18 +10,18 @@ import java.util.UUID;
  */
 public class AddAvatarInformationPacket implements IPacket {
     private UUID clientID;
-    private SceneNode avatar;
+    private int avatarID;
 
-    public AddAvatarInformationPacket(UUID clientID, SceneNode avatar) {
+    public AddAvatarInformationPacket(UUID clientID, int avatarID) {
         this.clientID = clientID;
-        this.avatar = avatar;
+        this.avatarID = avatarID;
     }
 
     public UUID getClientID() {
         return clientID;
     }
 
-    public SceneNode getAvatar() {
-        return avatar;
+    public int getAvatarID() {
+        return avatarID;
     }
 }

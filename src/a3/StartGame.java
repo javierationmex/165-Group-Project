@@ -1,7 +1,9 @@
 package a3;
 
-import commands.mainmenucommands.SwitchToMultiPlayerCommand;
-import commands.mainmenucommands.SwitchToSinglePlayerCommand;
+
+
+import swingmenus.mainmenucommands.SwitchToMultiPlayerCommand;
+import swingmenus.mainmenucommands.SwitchToSinglePlayerCommand;
 
 import javax.swing.*;
 import java.awt.*;
