@@ -4,6 +4,7 @@ import game.characters.CustomCube;
 import game.characters.CustomPyramid;
 import gameengine.CameraController;
 import gameengine.FullScreenDisplaySystem;
+import gameengine.TogglePhysics;
 import gameengine.player.MovePlayerBackwardAction;
 import gameengine.player.MovePlayerForwardAction;
 import gameengine.player.MovePlayerLeftAction;
@@ -25,9 +26,13 @@ import sage.input.IInputManager;
 import sage.input.InputManager;
 import sage.input.action.IAction;
 import sage.input.action.QuitGameAction;
+import sage.physics.IPhysicsEngine;
+import sage.physics.IPhysicsObject;
+import sage.physics.PhysicsEngineFactory;
 import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
+import sage.scene.shape.Cube;
 import sage.scene.shape.Rectangle;
 import sage.scene.state.RenderState;
 import sage.scene.state.TextureState;
@@ -78,6 +83,11 @@ public class MazeGame extends BaseGame {
     private String oldTranslation;
     private String oldScale;
     private boolean canProcess;
+    private IPhysicsEngine physicsEngine;
+    private IPhysicsObject playerAvatarP, groundPlaneP, cubeP;
+    private Rectangle groundPlane;
+    private boolean isPhysicsEnabled;
+    private Cube cube;
 
     public MazeGame(Player player) {
         this.player = player;
@@ -94,11 +104,53 @@ public class MazeGame extends BaseGame {
         eventManager = EventManager.getInstance();
         inputMgr = getInputManager();
         renderer = display.getRenderer();
+
         initGameObjects();
+        initPhysicsSystem();
+        createSagePhysicsWorld();
+
         initScripting();
         setControls();
         display.setTitle("Maze Game");
 
+        isPhysicsEnabled = false;
+
+
+
+    }
+
+    protected void initPhysicsSystem()
+    {
+        String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
+        physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
+        physicsEngine.initSystem();
+        float[] gravity = {0, -15f, 0};
+        physicsEngine.setGravity(gravity);
+    }
+
+    private void createSagePhysicsWorld() { // add the ball physics
+        float mass = 1.0f;
+
+        if(player.getCharacterID() == 3){
+            //radius, ???, radius*height
+            float[] halfExtents = {5, 0, 5};
+            playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
+                    mass, playerAvatar.getWorldTransform().getValues(),halfExtents);
+            playerAvatar.setPhysicsObject(playerAvatarP);
+            playerAvatarP.setBounciness(1.0f);
+        }
+        float cubeSize[] = {1,1,1};
+        cubeP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0.5f, cube.getWorldTransform().getValues(), cubeSize);
+        cubeP.setBounciness(1.0f);
+        cube.setPhysicsObject(cubeP);
+
+        // add the ground groundPlane physics
+        float up[] = {0,1,0}; // {0,1,0} is flat
+        groundPlaneP =
+                physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),
+                        groundPlane.getLocalTranslation().getValues(), up, 0.0f);
+        groundPlaneP.setBounciness(0f);
+        groundPlane.setPhysicsObject(groundPlaneP);
 
     }
 
@@ -163,6 +215,9 @@ public class MazeGame extends BaseGame {
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.D,
                 new MovePlayerRightAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        inputMgr.associateAction(
+                keyboardName, Component.Identifier.Key.F2,
+                new TogglePhysics(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_AND_RELEASE);
     }
 
     private void initGameObjects() {
@@ -178,14 +233,18 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(s);
         s.translate(200, 6, 200);
         s.scale(20, 50, 20);
-*/
+        cube = new Cube();
+        cube.translate(0, 20, 55);
+        cube.setWorldTranslation(cube.getLocalTranslation());
+        cube.setShowBound(true);
 
+        addGameWorldObject(cube);
     }
 
     private void initTerrain() {
         // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "rounded-maze2.jpg";
+        String heightFilename = "maze2.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         imageTerrain = createTerBlock(myHeightMap);
@@ -202,21 +261,21 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
+        imageTerrain.translate(0,-5,0);
         addGameWorldObject(imageTerrain);
+        //Floor groundPlane
 
-        //Floor plane
-        Rectangle plane = new Rectangle();
+        groundPlane = new Rectangle();
         Vector3D vec = new Vector3D(1, 0, 0);
-        plane.rotate(90, vec);
-        plane.scale(1000, 1000, 1);
-        plane.translate(0, 5, 0);
-        plane.setColor(Color.GRAY);
+        groundPlane.rotate(90, vec);
+        groundPlane.scale(1000, 1000, 1);
+        groundPlane.setColor(Color.GRAY);
         String planetextureDir = "." + File.separator + "materials" + File.separator;
         String planetexturefilename = "sand.jpg";
         String planetexturefilepath = planetextureDir + planetexturefilename;
         Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
-        plane.setTexture(planetexture);
-        addGameWorldObject(plane);
+        groundPlane.setTexture(planetexture);
+        addGameWorldObject(groundPlane);
 
     }
 
@@ -287,7 +346,8 @@ public class MazeGame extends BaseGame {
         //set the character ID here and catch it in addGhostAvatar();
 
         playerAvatar.scale(0.2f, 0.2f, 0.2f);
-        playerAvatar.translate(0, 5, 50);
+        playerAvatar.translate(0, 10, 50);
+        playerAvatar.setShowBound(true);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
 
         updateOldPosition();
@@ -307,6 +367,9 @@ public class MazeGame extends BaseGame {
         oldRotation = playerAvatar.getLocalRotation().toString();
         oldTranslation = playerAvatar.getLocalTranslation().toString();
         oldScale = playerAvatar.getLocalScale().toString();
+        playerAvatar.setWorldRotation(playerAvatar.getLocalRotation());
+        playerAvatar.setWorldTranslation(playerAvatar.getLocalTranslation());
+        playerAvatar.setWorldScale(playerAvatar.getLocalScale());
     }
 
     @Override
@@ -321,6 +384,22 @@ public class MazeGame extends BaseGame {
                 e.printStackTrace();
             }
         }
+
+        if (isPhysicsEnabled) {
+            Matrix3D mat;
+            Vector3D translateVec, rotateVec;
+            physicsEngine.update(20.0f);
+            for (SceneNode s : getGameWorld()){
+                if (s.getPhysicsObject() != null){
+                    mat = new Matrix3D(s.getPhysicsObject().getTransform());
+                    translateVec = mat.getCol(3);
+                    //rotateVec = mat.getCol(2);
+                    s.getLocalTranslation().setCol(3,translateVec);
+                    //s.getLocalRotation().setCol(3,rotateVec);
+                }
+            }
+        }
+
 
         if(client != null){
             client.processPackets();
@@ -418,11 +497,21 @@ public class MazeGame extends BaseGame {
                 player.setAvatar(new Ship().getChild());
             }else if(player.getCharacterID() == 3) {
                 player.setAvatar(new ChessPieceRock().getChild());
+                //radius, ???, radius*height
+                float[] halfExtents = {10, 10, 10};
+                IPhysicsObject playerP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
+                        1.0f, player.getAvatar().getWorldTransform().getValues(), halfExtents);
+                player.getAvatar().setPhysicsObject(playerP);
+                playerP.setBounciness(1.0f);
             }
             player.getAvatar().translate(0, 5, 50);
             player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
             addGameWorldObject(player.getAvatar());
         }
+    }
+
+    public void togglePhysics(boolean yesno){
+        isPhysicsEnabled = yesno;
     }
 
     public boolean isCanProcess() {

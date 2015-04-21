@@ -26,9 +26,9 @@ public class CameraController {
         this.cam = cam;
         this.target = target;
         worldUpVec = new Vector3D(0, 1, 0);
-        cameraDistanceFromTarget = 30.0f;
+        cameraDistanceFromTarget = 50.0f;
         cameraAzimuth = 180;
-        cameraElevation = 30.0f;
+        cameraElevation = 20.0f;
         update(0.0f);
         setupInput(inputMgr, controllerName);
         //this.client = client;
