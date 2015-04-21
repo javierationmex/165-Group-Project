@@ -44,6 +44,7 @@ import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
 import trimesh.ChessPieceRock;
 import trimesh.Mushroom;
+import trimesh.Pod;
 import trimesh.Ship;
 
 import javax.script.ScriptEngine;
@@ -340,16 +341,20 @@ public class MazeGame extends BaseGame {
             playerAvatar = new CustomCube("PLAYER1");
         }else if(player.getCharacterID() == 2){
             playerAvatar = new Ship().getChild();
+            playerAvatar.rotate(180, new Vector3D(0, 1, 0));
         }else if(player.getCharacterID() == 3){
             playerAvatar = new ChessPieceRock().getChild();
+        }else if(player.getCharacterID() == 4){
+            playerAvatar = new Pod().getChild();
+            playerAvatar.rotate(180, new Vector3D(0, 1, 0));
         }
 
         //set the character ID here and catch it in addGhostAvatar();
 
         playerAvatar.scale(0.2f, 0.2f, 0.2f);
         playerAvatar.translate(0, 10, 50);
-        playerAvatar.setShowBound(true);
-        playerAvatar.rotate(180, new Vector3D(0, 1, 0));
+        //playerAvatar.setShowBound(true);
+
 
         updateOldPosition();
 
@@ -498,13 +503,16 @@ public class MazeGame extends BaseGame {
                 player.setAvatar(new Ship().getChild());
             }else if(player.getCharacterID() == 3) {
                 player.setAvatar(new ChessPieceRock().getChild());
+            }else if(player.getCharacterID() == 4) {
+                player.setAvatar(new Pod().getChild());
+            }
                 //radius, ???, radius*height
                 float[] halfExtents = {10, 10, 10};
                 IPhysicsObject playerP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
                         1.0f, player.getAvatar().getWorldTransform().getValues(), halfExtents);
                 player.getAvatar().setPhysicsObject(playerP);
                 playerP.setBounciness(1.0f);
-            }
+
             player.getAvatar().translate(0, 5, 50);
             player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
             addGameWorldObject(player.getAvatar());

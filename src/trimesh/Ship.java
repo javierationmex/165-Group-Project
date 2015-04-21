@@ -27,8 +27,8 @@ public class Ship extends Group implements Serializable{
 
         String shipTextureFilename = "ship-texture5.png";
         String shipTextureFilePath = shipDir + shipTextureFilename;
-        Texture chesspieceTexture = TextureManager.loadTexture2D(shipTextureFilePath);
-        ship.setTexture(chesspieceTexture);
+        Texture shipTexture = TextureManager.loadTexture2D(shipTextureFilePath);
+        ship.setTexture(shipTexture);
 
         ship.translate(0,1,0);
         this.addChild(ship);
