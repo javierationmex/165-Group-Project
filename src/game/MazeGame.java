@@ -77,7 +77,7 @@ public class MazeGame extends BaseGame {
 
     private SceneNode rootNode;
     private ScriptEngine engine;
-
+    private TerrainBlock imageTerrain;
     private String oldRotation;
     private String oldTranslation;
     private String oldScale;
@@ -204,16 +204,16 @@ public class MazeGame extends BaseGame {
 
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.W,
-                new MovePlayerForwardAction(playerAvatar, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerForwardAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.S,
-                new MovePlayerBackwardAction(playerAvatar, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerBackwardAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.A,
-                new MovePlayerLeftAction(playerAvatar, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerLeftAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.D,
-                new MovePlayerRightAction(playerAvatar, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerRightAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.F2,
                 new TogglePhysics(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_AND_RELEASE);
@@ -222,7 +222,6 @@ public class MazeGame extends BaseGame {
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
-
         //drawSkyBox();
         addPlayer();
         initTerrain();
@@ -231,14 +230,12 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(s);
         s.translate(200, 6, 200);
         s.scale(20, 50, 20);
-
         cube = new Cube();
         cube.translate(0, 20, 55);
         cube.setWorldTranslation(cube.getLocalTranslation());
         cube.setShowBound(true);
 
         addGameWorldObject(cube);
-
     }
 
     private void initTerrain() {
@@ -247,7 +244,7 @@ public class MazeGame extends BaseGame {
         String heightFilename = "rounded-maze2.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
-        TerrainBlock imageTerrain = createTerBlock(myHeightMap);
+        imageTerrain = createTerBlock(myHeightMap);
 
         // create texture and texture state to color the terrain
         TextureState grassState;
