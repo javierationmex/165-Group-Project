@@ -1,4 +1,4 @@
-package commands.mainmenucommands;
+package swingmenus.mainmenucommands;
 
 
 import game.Player;

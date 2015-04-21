@@ -1,7 +1,8 @@
 package swingmenus.multiplayer;
 
-import commands.mainmenucommands.HostGameCommand;
-import commands.mainmenucommands.JoinGameCommand;
+
+import swingmenus.mainmenucommands.HostGameCommand;
+import swingmenus.mainmenucommands.JoinGameCommand;
 import swingmenus.multiplayer.data.MultiplayerLobbyData;
 
 import javax.swing.*;
