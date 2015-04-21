@@ -2,8 +2,8 @@ package game;
 
 import game.characters.CustomCube;
 import game.characters.CustomPyramid;
+import gameengine.CameraController;
 import gameengine.FullScreenDisplaySystem;
-import gameengine.OrbitCameraController;
 import gameengine.player.MovePlayerBackwardAction;
 import gameengine.player.MovePlayerForwardAction;
 import gameengine.player.MovePlayerLeftAction;
@@ -65,7 +65,7 @@ public class MazeGame extends BaseGame {
     private IEventManager eventManager;
     private IInputManager inputMgr;
     private IRenderer renderer;
-    private OrbitCameraController cam1Controller;
+    private CameraController cam1Controller;
     private SceneNode playerAvatar;
     private ArrayList<PlayerInfo> playersInfo;
     private float time = 0;
@@ -99,8 +99,6 @@ public class MazeGame extends BaseGame {
         display.setTitle("Maze Game");
 
 
-        //TODO create objects: walls, players, power up boosts, etc. Gotta create a recursive algorithm to auto generate a random maze.
-        //TODO maybe have different colored sections of walls that players can walk through if they picked up a certain color boost.
     }
 
     private void initScripting() {
@@ -146,7 +144,7 @@ public class MazeGame extends BaseGame {
         IAction quitGame = new QuitGameAction(this);
 
 
-        cam1Controller = new OrbitCameraController(camera1, playerAvatar, inputMgr, keyboardName, client);
+        cam1Controller = new CameraController(camera1, playerAvatar, inputMgr, keyboardName);
 
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.ESCAPE,
