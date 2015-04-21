@@ -233,6 +233,7 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(s);
         s.translate(200, 6, 200);
         s.scale(20, 50, 20);
+        */
         cube = new Cube();
         cube.translate(0, 20, 55);
         cube.setWorldTranslation(cube.getLocalTranslation());
@@ -339,7 +340,7 @@ public class MazeGame extends BaseGame {
             playerAvatar = new CustomCube("PLAYER1");
         }else if(player.getCharacterID() == 2){
             playerAvatar = new Ship().getChild();
-        }else if(player.getCharacterID() == 4){
+        }else if(player.getCharacterID() == 3){
             playerAvatar = new ChessPieceRock().getChild();
         }
 
