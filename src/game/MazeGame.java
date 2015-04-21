@@ -181,7 +181,7 @@ public class MazeGame extends BaseGame {
     private void initTerrain() {
         // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "rounded-maze2.jpg";
+        String heightFilename = "maze2.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         imageTerrain = createTerBlock(myHeightMap);
@@ -205,7 +205,7 @@ public class MazeGame extends BaseGame {
         Vector3D vec = new Vector3D(1, 0, 0);
         plane.rotate(90, vec);
         plane.scale(1000, 1000, 1);
-        plane.translate(0, 5, 0);
+        plane.translate(0, 4, 0);
         plane.setColor(Color.GRAY);
         String planetextureDir = "." + File.separator + "materials" + File.separator;
         String planetexturefilename = "sand.jpg";
@@ -281,7 +281,7 @@ public class MazeGame extends BaseGame {
         player.setCharacterID(3);
 
         playerAvatar.scale(0.2f, 0.2f, 0.2f);
-        playerAvatar.translate(0, 5, 50);
+        playerAvatar.translate(0, 4, 50);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
 
         updateOldPosition();
