@@ -25,7 +25,7 @@ public class Ship extends Group implements Serializable{
         TriMesh ship = loader.loadModel(shipFilePath);
         ship.updateLocalBound();
 
-        String shipTextureFilename = "ship-texture5.png";
+        String shipTextureFilename = "ship-texture6.jpg";
         String shipTextureFilePath = shipDir + shipTextureFilename;
         Texture shipTexture = TextureManager.loadTexture2D(shipTextureFilePath);
         ship.setTexture(shipTexture);

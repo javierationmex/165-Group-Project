@@ -25,7 +25,7 @@ public class Pod extends Group implements Serializable{
         TriMesh pod = loader.loadModel(podFilePath);
         pod.updateLocalBound();
 
-        String podTextureFilename = "pod-texture-done2.jpg";
+        String podTextureFilename = "pod-texture-done3.jpg";
         String podTextureFilePath = podDir + podTextureFilename;
         Texture podTexture = TextureManager.loadTexture2D(podTextureFilePath);
         pod.setTexture(podTexture);
