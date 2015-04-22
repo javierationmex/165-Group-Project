@@ -382,7 +382,7 @@ public class MazeGame extends BaseGame {
     protected void update(float time) {
         this.time += time;
         cam1Controller.update(this.time);
-
+        super.update(time);
         if(playerChanged()){
             try {
                 client.sendPacket(new UpdateAvatarInfoPacket(client.getId(), playerAvatar.getLocalTranslation(), playerAvatar.getLocalScale(), playerAvatar.getLocalRotation()));
@@ -411,7 +411,7 @@ public class MazeGame extends BaseGame {
             client.processPackets();
         }
 
-        super.update(time);
+
 
         //TODO override later
     }
