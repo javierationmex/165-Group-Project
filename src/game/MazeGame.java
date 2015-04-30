@@ -1,5 +1,21 @@
 package game;
 
+import com.bulletphysics.collision.broadphase.AxisSweep3;
+import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.dispatch.CollisionConfiguration;
+import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.collision.shapes.SphereShape;
+import com.bulletphysics.collision.shapes.StaticPlaneShape;
+import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.DynamicsWorld;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
+import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.Transform;
 import game.characters.CustomCube;
 import game.characters.CustomPyramid;
 import gameengine.CameraController;
@@ -43,13 +59,15 @@ import sage.texture.Texture;
 import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
 import trimesh.ChessPieceRock;
-import trimesh.Mushroom;
 import trimesh.Pod;
 import trimesh.Ship;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.swing.*;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -57,7 +75,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
-
 //import objects.mushroom.*;
 
 
@@ -90,6 +107,17 @@ public class MazeGame extends BaseGame {
     private boolean isPhysicsEnabled;
     private Cube cube;
 
+    private CollisionDispatcher collDispatcher;
+    private BroadphaseInterface broadPhaseHandler;
+    private ConstraintSolver solver;
+    private CollisionConfiguration collConfig;
+    private RigidBody physicsGround;
+    private RigidBody physicsBall;
+    private int maxProxies = 1024;
+    private Vector3f worldAabbMin = new Vector3f(-10000, -10000, -10000);
+    private Vector3f worldAabbMax = new Vector3f(10000, 10000, 10000);
+    private DynamicsWorld physicsWorld;
+
     public MazeGame(Player player) {
         this.player = player;
         this.client = player.getClient();
@@ -99,7 +127,57 @@ public class MazeGame extends BaseGame {
     //Please separate all the initialization of stuff into different methods.
     //For example createPlayers(), createWalls(), etc... so that the initGame is very simple.
 
+    private void createPhysicsWorld() {
+        Transform myTransform;
+// define the broad-phase collision to be used (Sweep-and-Prune)
+        broadPhaseHandler =
+                new AxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
+// set up the narrow-phase collision handler ("dispatcher")
+        collConfig = new DefaultCollisionConfiguration();
+        collDispatcher = new CollisionDispatcher(collConfig);
+// create a constraint solver
+        solver = new SequentialImpulseConstraintSolver();
+// create a physics world utilizing the above objects
+        physicsWorld = new DiscreteDynamicsWorld(collDispatcher, broadPhaseHandler, solver, collConfig);
+        physicsWorld.setGravity(new Vector3f(0, -10, 0));
+// define physicsGround plane: normal vector = 'up', dist from origin = 1
+        CollisionShape groundShape =
+                new StaticPlaneShape(new Vector3f(0, 1, 0), 1);
+// set position and orientation of physicsGround's transform
+        myTransform = new Transform();
+        myTransform.origin.set(new Vector3f(0, -1, 0));
+        myTransform.setRotation(new Quat4f(0, 0, 0, 1));
+// define construction info for a 'physicsGround' rigid body
+        DefaultMotionState groundMotionState =
+                new DefaultMotionState(myTransform);
+        RigidBodyConstructionInfo groundCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f(0, 0, 0));
+        groundCI.restitution = 0.8f;
+// create the physicsGround rigid body and add it to the physics world
+        physicsGround = new RigidBody(groundCI);
+        physicsWorld.addRigidBody(physicsGround);
+// define a collision shape for a physicsBall
+        CollisionShape fallShape = new SphereShape(1);
+// define a transform for position and orientation of ball collision shape
+        myTransform = new Transform();
+        myTransform.origin.set(new Vector3f(0, 20, 0));
+        myTransform.setRotation(new Quat4f(0, 0, 0, 1));
+// define the parameters of the collision shape
+        DefaultMotionState fallMotionState =
+                new DefaultMotionState(myTransform);
+        float myFallMass = 1;
+        Vector3f myFallInertia = new Vector3f(0, 0, 0);
+        fallShape.calculateLocalInertia(myFallMass, myFallInertia);
+// define construction info for a 'physicsBall' rigid body
+        RigidBodyConstructionInfo fallRigidBodyCI = new RigidBodyConstructionInfo(myFallMass, fallMotionState, fallShape, myFallInertia);
+        fallRigidBodyCI.restitution = 0.8f;
+// create the physicsBall rigid body and add it to the physics world
+        physicsBall = new RigidBody(fallRigidBodyCI);
+        physicsWorld.addRigidBody(physicsBall);
 
+    }
+
+    // other methods as in SAGE example.
+// for example, to create the graphics objects and scene.
     @Override
     protected void initGame() {
         eventManager = EventManager.getInstance();
@@ -125,7 +203,7 @@ public class MazeGame extends BaseGame {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -15f, 0};
+        float[] gravity = {0, -98f, 0};
         physicsEngine.setGravity(gravity);
     }
 
@@ -138,7 +216,8 @@ public class MazeGame extends BaseGame {
             playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
                     mass, playerAvatar.getWorldTransform().getValues(),halfExtents);
             playerAvatar.setPhysicsObject(playerAvatarP);
-            playerAvatarP.setBounciness(1.0f);
+            playerAvatarP.setBounciness(0.0f);
+            //playerAvatarP.setDamping(0.2f,0.2f);
         }
         float cubeSize[] = {1,1,1};
         cubeP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0.5f, cube.getWorldTransform().getValues(), cubeSize);
@@ -152,6 +231,7 @@ public class MazeGame extends BaseGame {
                         groundPlane.getLocalTranslation().getValues(), up, 0.0f);
         groundPlaneP.setBounciness(0f);
         groundPlane.setPhysicsObject(groundPlaneP);
+
 
     }
 
@@ -190,7 +270,8 @@ public class MazeGame extends BaseGame {
     }
 
     private void setControls() {
-        String keyboardName = inputMgr.getKeyboardName();
+        String keyboardName = JOptionPane.showInputDialog(null, "Pick a keyboard", "Input", JOptionPane.QUESTION_MESSAGE, null, inputMgr.getControllers().toArray(), "keyboard").toString();
+        //String keyboardName = inputMgr.getKeyboardName();
         ArrayList<Controller> controllers = inputMgr.getControllers();
         String controllerName = null;
         if (controllers.size() > 2)
@@ -352,7 +433,8 @@ public class MazeGame extends BaseGame {
         //set the character ID here and catch it in addGhostAvatar();
 
         playerAvatar.scale(0.2f, 0.2f, 0.2f);
-        playerAvatar.translate(0, 10, 50);
+        playerAvatar.rotate(180, new Vector3D(0, 1, 0));
+        playerAvatar.translate(0, 2, 50);
         //playerAvatar.setShowBound(true);
 
 
@@ -411,7 +493,15 @@ public class MazeGame extends BaseGame {
             client.processPackets();
         }
 
-
+        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
+        float x = (float) avLoc.getX();
+        float z = (float) avLoc.getZ();
+        float terHeight = imageTerrain.getHeightFromWorld(avLoc);
+        if (avLoc.getY() < terHeight) {
+            System.out.println("collision");
+            playerAvatar.getLocalTranslation().setElementAt(0, 3, x - 2);
+            playerAvatar.getLocalTranslation().setElementAt(2, 3, z - 2);
+        }
 
         //TODO override later
     }
