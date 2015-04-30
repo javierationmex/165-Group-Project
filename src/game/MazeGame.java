@@ -495,13 +495,53 @@ public class MazeGame extends BaseGame {
 
         Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
         float x = (float) avLoc.getX();
+        float y = (float) avLoc.getY();
         float z = (float) avLoc.getZ();
         float terHeight = imageTerrain.getHeightFromWorld(avLoc);
         if (avLoc.getY() < terHeight) {
             System.out.println("collision");
-            playerAvatar.getLocalTranslation().setElementAt(0, 3, x - 2);
-            playerAvatar.getLocalTranslation().setElementAt(2, 3, z - 2);
+
+            float newx1 = x + 2;
+            float newy1 = y;
+            float newz1 = z + 2;
+            Point3D newloc1 = new Point3D(newx1, newy1, newz1);
+            float newterHeight1 = imageTerrain.getHeightFromWorld(newloc1);
+
+            float newx2 = x - 2;
+            float newy2 = y;
+            float newz2 = z - 2;
+            Point3D newloc2 = new Point3D(newx2, newy2, newz2);
+            float newterHeight2 = imageTerrain.getHeightFromWorld(newloc2);
+
+
+            float newx3 = x + 2;
+            float newy3 = y;
+            float newz3 = z - 2;
+            Point3D newloc3 = new Point3D(newx3, newy3, newz3);
+            float newterHeight3 = imageTerrain.getHeightFromWorld(newloc3);
+
+            float newx4 = x - 2;
+            float newy4 = y;
+            float newz4 = z + 2;
+            Point3D newloc4 = new Point3D(newx4, newy4, newz4);
+            float newterHeight4 = imageTerrain.getHeightFromWorld(newloc4);
+
+
+            if (newy1 >= newterHeight1) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx1);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz1);
+            } else if (newy2 >= newterHeight2) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx2);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz2);
+            } else if (newy3 >= newterHeight3) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx3);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz3);
+            } else if (newy4 >= newterHeight4) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx4);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz4);
+            }
         }
+
 
         //TODO override later
     }
