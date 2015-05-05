@@ -2,7 +2,8 @@ package networking;
 
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
-import networking.packets.ingame.*;
+import networking.packets.ingame.AddAvatarInformationPacket;
+import networking.packets.ingame.UpdateAvatarInfoPacket;
 import networking.packets.lobby.ChangeCharacterPacket;
 import networking.packets.lobby.JoinPacket;
 import networking.packets.lobby.StartGamePacket;
@@ -31,7 +32,7 @@ public class Server extends GameConnectionServer<UUID> {
 
     @Override
     public void acceptClient(IClientInfo clientInfo, Object firstPacket) {
-        if(!gameStarted){
+        if (!gameStarted) {
             if (firstPacket instanceof JoinPacket) {
                 this.addClient(clientInfo, ((JoinPacket) firstPacket).getClientID());
                 this.addPlayer(new PlayerInfo(((JoinPacket) firstPacket).getClientID(), ((JoinPacket) firstPacket).getPlayerName()));
@@ -45,7 +46,7 @@ public class Server extends GameConnectionServer<UUID> {
                     e.printStackTrace();
                 }
             }
-        }else{
+        } else {
             System.out.println("Sorry game has already started.");
         }
     }
@@ -56,12 +57,12 @@ public class Server extends GameConnectionServer<UUID> {
 
     @Override
     public void processPacket(Object packet, InetAddress senderIP, int senderPort) {
-        if(packet instanceof ChangeCharacterPacket){
+        if (packet instanceof ChangeCharacterPacket) {
             UUID id = ((ChangeCharacterPacket) packet).getClientID();
             int characterID = ((ChangeCharacterPacket) packet).getNewCharacterID();
             boolean ready = ((ChangeCharacterPacket) packet).isReady();
-            for(PlayerInfo p : players){
-                if(p.getClientID().toString().equals(id.toString())){
+            for (PlayerInfo p : players) {
+                if (p.getClientID().toString().equals(id.toString())) {
                     p.setReady(ready);
                     p.setCharacterID(characterID);
                 }
@@ -73,7 +74,7 @@ public class Server extends GameConnectionServer<UUID> {
             }
         }
 
-        if(packet instanceof StartGamePacket){
+        if (packet instanceof StartGamePacket) {
             gameStarted = true;
             try {
                 sendPacketToAll((StartGamePacket) packet);
@@ -82,11 +83,11 @@ public class Server extends GameConnectionServer<UUID> {
             }
         }
 
-        if(packet instanceof AddAvatarInformationPacket){
+        if (packet instanceof AddAvatarInformationPacket) {
             UUID id = ((AddAvatarInformationPacket) packet).getClientID();
             PlayerInfo player = null;
-            for(PlayerInfo p : players){
-                if(p.getClientID().toString().equals(id.toString())){
+            for (PlayerInfo p : players) {
+                if (p.getClientID().toString().equals(id.toString())) {
                     p.setCharacterID(((AddAvatarInformationPacket) packet).getAvatarID());
                     player = p;
                 }
@@ -98,7 +99,7 @@ public class Server extends GameConnectionServer<UUID> {
             }
         }
 
-        if(packet instanceof UpdateAvatarInfoPacket){
+        if (packet instanceof UpdateAvatarInfoPacket) {
             try {
                 this.sendPacketToAll((Serializable) packet);
             } catch (IOException e) {
@@ -106,4 +107,10 @@ public class Server extends GameConnectionServer<UUID> {
             }
         }
     }
+
+
+    public void sendNPCinfo() {
+
+    }
+
 }
