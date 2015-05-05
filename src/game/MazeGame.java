@@ -327,7 +327,7 @@ public class MazeGame extends BaseGame {
     private void initTerrain() {
         // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "maze2.jpg";
+        String heightFilename = "rounded-maze2.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         imageTerrain = createTerBlock(myHeightMap);
@@ -344,14 +344,15 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
-        imageTerrain.translate(0,-5,0);
+        imageTerrain.translate(0, -1, 0);
         addGameWorldObject(imageTerrain);
         //Floor groundPlane
 
         groundPlane = new Rectangle();
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
-        groundPlane.scale(1000, 1000, 1);
+        groundPlane.scale(2000, 2000, 1);
+        groundPlane.translate(0, 0, 0);
         groundPlane.setColor(Color.GRAY);
         String planetextureDir = "." + File.separator + "materials" + File.separator;
         String planetexturefilename = "sand.jpg";
@@ -493,59 +494,93 @@ public class MazeGame extends BaseGame {
             client.processPackets();
         }
 
-        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
+
+        // if (avLoc.getY() < terHeight) {
+        // System.out.println("collision");
+        //  Z Z Z
+        //  7 8 1   x
+        //  6 X 2   x
+        //  5 4 3   x
+        //
+        //1 x++ ,y ,z++
+        //2 x++ ,y ,z
+        //3 x++ ,y ,z--
+        //4 x   ,y ,z--
+        //5 x-- ,y ,z--
+        //6 x-- ,y ,z
+        //7 x-- ,y ,z++
+        //8 x   ,y ,z++
+
+
+        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
         float x = (float) avLoc.getX();
         float y = (float) avLoc.getY();
         float z = (float) avLoc.getZ();
-        float terHeight = imageTerrain.getHeightFromWorld(avLoc);
-        if (avLoc.getY() < terHeight) {
-            System.out.println("collision");
 
-            float newx1 = x + 2;
-            float newy1 = y;
-            float newz1 = z + 2;
-            Point3D newloc1 = new Point3D(newx1, newy1, newz1);
-            float newterHeight1 = imageTerrain.getHeightFromWorld(newloc1);
+        int o = 3;
+        float[] newx = {0, x + o, x + o, x + o, x, x - o, x - o, x - o, x};
+        float[] newy = {0, y, y, y, y, y, y, y, y};
+        float[] newz = {0, z + o, z, z - o, z - o, z - o, z, z + o, z + o};
 
-            float newx2 = x - 2;
-            float newy2 = y;
-            float newz2 = z - 2;
-            Point3D newloc2 = new Point3D(newx2, newy2, newz2);
-            float newterHeight2 = imageTerrain.getHeightFromWorld(newloc2);
-
-
-            float newx3 = x + 2;
-            float newy3 = y;
-            float newz3 = z - 2;
-            Point3D newloc3 = new Point3D(newx3, newy3, newz3);
-            float newterHeight3 = imageTerrain.getHeightFromWorld(newloc3);
-
-            float newx4 = x - 2;
-            float newy4 = y;
-            float newz4 = z + 2;
-            Point3D newloc4 = new Point3D(newx4, newy4, newz4);
-            float newterHeight4 = imageTerrain.getHeightFromWorld(newloc4);
-
-
-            if (newy1 >= newterHeight1) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx1);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz1);
-            } else if (newy2 >= newterHeight2) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx2);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz2);
-            } else if (newy3 >= newterHeight3) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx3);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz3);
-            } else if (newy4 >= newterHeight4) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx4);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz4);
-            }
+        Point3D[] newloc = new Point3D[9];
+        float[] newterHeight = new float[9];
+        boolean[] colidesWithTerrian = new boolean[9];
+        for (int i = 0; i < 9; i++) {
+            newloc[i] = new Point3D(newx[i], newy[i], newz[i]);
+            newterHeight[i] = imageTerrain.getHeightFromWorld(newloc[i]);
+            colidesWithTerrian[i] = newterHeight[i] >= newy[i];
         }
+        System.out.println();
+        System.out.print(colidesWithTerrian[7]);
+        System.out.print(colidesWithTerrian[8]);
+        System.out.println(colidesWithTerrian[1]);
+        System.out.print(colidesWithTerrian[6]);
+        System.out.print(colidesWithTerrian[0]);
+        System.out.println(colidesWithTerrian[2]);
+        System.out.print(colidesWithTerrian[5]);
+        System.out.print(colidesWithTerrian[4]);
+        System.out.println(colidesWithTerrian[3]);
+
+
+//            if (newy1 >= newterHeight1) {
+//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx1);
+//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz1);
+//            } else if (newy2 >= newterHeight3) {
+//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx2);
+//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz2);
+//            } else if (newy3 >= newterHeight2) {
+//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx3);
+//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz3);
+//            } else if (newy4 >= newterHeight4) {
+//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx4);
+//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz4);
+//            }
 
 
         //TODO override later
     }
 
+    private boolean collidesWithTerrain(Point3D p) {
+        boolean collides = true;
+
+        float x = (float) p.getX();
+        float y = (float) p.getY();
+        float z = (float) p.getZ();
+        float[] newx = {0, x + 1, x + 1, x + 1, x, x - 1, x - 1, x - 1, x};
+        float[] newy = {0, y, y, y, y, y, y, y, y};
+        float[] newz = {0, z + 1, z, z - 1, z - 1, z - 1, z, z + 1, z + 1};
+
+        Point3D[] newloc = new Point3D[9];
+        float[] newterHeight = new float[9];
+        // boolean[] colidesWithTerrian = new boolean[9];
+        for (int i = 0; i < 9; i++) {
+            newloc[i] = new Point3D(newx[i], newy[i], newz[i]);
+            newterHeight[i] = imageTerrain.getHeightFromWorld(newloc[i]);
+            if (newterHeight[i] >= newy[i]) collides = true;
+        }
+
+        return collides;
+    }
     private boolean playerChanged() {
         if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
            !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
