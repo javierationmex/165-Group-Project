@@ -20,6 +20,7 @@ public class CameraController {
     private float cameraDistanceFromTarget;
     private Point3D targetPos;
     private Vector3D worldUpVec;
+    private float speed = 0.1f;
     // private final Client client;
 
     public CameraController(ICamera cam, SceneNode target, IInputManager inputMgr, String controllerName) {
@@ -76,10 +77,10 @@ public class CameraController {
         public void performAction(float time, Event evt) {
             float rotAmount;
             if (evt.getValue() < -0.3) {
-                rotAmount = -0.1f;
+                rotAmount = -speed*time;
             } else {
                 if (evt.getValue() > 0.3) {
-                    rotAmount = 0.1f;
+                    rotAmount = speed*time;
                 } else {
                     rotAmount = 0.0f;
                 }
@@ -91,14 +92,14 @@ public class CameraController {
 
     private class OrbitLeftAction extends AbstractInputAction {
         public void performAction(float time, Event evt) {
-            cameraAzimuth -= 0.1f;
+            cameraAzimuth -= speed*time;
             cameraAzimuth = cameraAzimuth % 360;
         }
     }
 
     private class OrbitRightAction extends AbstractInputAction {
         public void performAction(float time, Event evt) {
-            cameraAzimuth += 0.1f;
+            cameraAzimuth += speed*time;
             cameraAzimuth = cameraAzimuth % 360;
         }
     }
@@ -107,10 +108,10 @@ public class CameraController {
         public void performAction(float time, Event evt) {
             float rotAmount;
             if (evt.getValue() < -0.3) {
-                rotAmount = -0.1f;
+                rotAmount = -speed*time;
             } else {
                 if (evt.getValue() > 0.3) {
-                    rotAmount = 0.1f;
+                    rotAmount = speed*time;
                 } else {
                     rotAmount = 0.0f;
                 }
@@ -128,7 +129,7 @@ public class CameraController {
 
     private class OrbitUpAction extends AbstractInputAction {
         public void performAction(float time, Event evt) {
-            cameraElevation += 0.1f;
+            cameraElevation += speed*time;
             cameraElevation = cameraElevation % 360;
             if (cameraElevation > 80) {
                 cameraElevation = 80;
@@ -138,7 +139,7 @@ public class CameraController {
 
     private class OrbitDownAction extends AbstractInputAction {
         public void performAction(float time, Event evt) {
-            cameraElevation -= 0.1f;
+            cameraElevation -= speed*time;
             cameraElevation = cameraElevation % 360;
             if (cameraElevation < 0) {
                 cameraElevation = 0;
@@ -148,7 +149,7 @@ public class CameraController {
 
     private class ZoomInAction extends AbstractInputAction {
         public void performAction(float time, Event evt) {
-            cameraDistanceFromTarget -= 0.1f;
+            cameraDistanceFromTarget -= speed*time;
             if (cameraDistanceFromTarget < 3.0) {
                 cameraDistanceFromTarget = (float) 3.0;
             }
@@ -157,7 +158,7 @@ public class CameraController {
 
     private class ZoomOutAction extends AbstractInputAction {
         public void performAction(float time, Event evt) {
-            cameraDistanceFromTarget += 0.1f;
+            cameraDistanceFromTarget += speed*time;
             if (cameraDistanceFromTarget > 60.0) {
                 cameraDistanceFromTarget = (float) 60.0;
             }
@@ -166,18 +167,18 @@ public class CameraController {
 
     private class RotateCameraAndShapeLeftAction extends BaseAbstractInputAction {
         public void performAction(float time, Event evt) {
-            cameraAzimuth += 1.3f;
+            cameraAzimuth += speed*time;
             cameraAzimuth = cameraAzimuth % 360;
-            target.rotate((float) 1.3, new Vector3D(0, 1, 0));
+            target.rotate(speed*time, new Vector3D(0, 1, 0));
 
         }
     }
 
     private class RotateCameraAndShapeRightAction extends BaseAbstractInputAction {
         public void performAction(float time, Event evt) {
-            cameraAzimuth -= 1.3f;
+            cameraAzimuth -= speed*time;
             cameraAzimuth = cameraAzimuth % 360;
-            target.rotate((float) -1.3, new Vector3D(0, 1, 0));
+            target.rotate(-speed*time, new Vector3D(0, 1, 0));
         }
     }
 }
