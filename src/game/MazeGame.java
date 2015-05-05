@@ -422,12 +422,10 @@ public class MazeGame extends BaseGame {
             playerAvatar = new CustomCube("PLAYER1");
         }else if(player.getCharacterID() == 2){
             playerAvatar = new Ship().getChild();
-            playerAvatar.rotate(180, new Vector3D(0, 1, 0));
         }else if(player.getCharacterID() == 3){
             playerAvatar = new ChessPieceRock().getChild();
         }else if(player.getCharacterID() == 4){
             playerAvatar = new Pod().getChild();
-            playerAvatar.rotate(180, new Vector3D(0, 1, 0));
         }
 
         //set the character ID here and catch it in addGhostAvatar();
