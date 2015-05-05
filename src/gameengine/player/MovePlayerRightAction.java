@@ -14,7 +14,7 @@ public class MovePlayerRightAction extends BaseAbstractInputAction {
 
     private final Client client;
     private SceneNode avatar;
-    private float speed = 0.01f;
+    private float speed = 0.05f;
     private TerrainBlock terrain;
 
 
@@ -31,7 +31,6 @@ public class MovePlayerRightAction extends BaseAbstractInputAction {
         dir = dir.mult(rot);
         dir.scale((double)(speed * time));
         avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
-        sendUpdateLocationPacket(client, avatar.getLocalTranslation(), avatar.getLocalScale(), avatar.getLocalRotation());
     }
 
 }
