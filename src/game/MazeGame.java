@@ -539,6 +539,19 @@ public class MazeGame extends BaseGame {
         System.out.print(colidesWithTerrian[4]);
         System.out.println(colidesWithTerrian[3]);
 
+        boolean collition = false;
+        for (int i = 1; i < 9; i++) if (colidesWithTerrian[i]) collition = true;
+
+        if (collition) {
+            if (colidesWithTerrian[1] || colidesWithTerrian[1] || colidesWithTerrian[1]) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx[7]);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz[7]);
+            } else if (colidesWithTerrian[5] || colidesWithTerrian[6] || colidesWithTerrian[7]) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx[1]);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz[1]);
+            }
+
+        }
 
 //            if (newy1 >= newterHeight1) {
 //                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx1);
