@@ -550,6 +550,14 @@ public class MazeGame extends BaseGame {
                 playerAvatar.getLocalTranslation().setElementAt(0, 3, newx[1]);
                 playerAvatar.getLocalTranslation().setElementAt(2, 3, newz[1]);
             }
+            if (colidesWithTerrian[8]) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx[4]);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz[4]);
+            }
+            if (colidesWithTerrian[4]) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx[8]);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz[8]);
+            }
 
         }
 
