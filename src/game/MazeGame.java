@@ -217,6 +217,7 @@ public class MazeGame extends BaseGame {
                     mass, playerAvatar.getWorldTransform().getValues(),halfExtents);
             playerAvatar.setPhysicsObject(playerAvatarP);
             playerAvatarP.setBounciness(0.0f);
+
             //playerAvatarP.setDamping(0.2f,0.2f);
         }
         float cubeSize[] = {1,1,1};
@@ -287,7 +288,7 @@ public class MazeGame extends BaseGame {
 
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.W,
-                new MovePlayerForwardAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerForwardAction(playerAvatar, imageTerrain, client, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.S,
                 new MovePlayerBackwardAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
@@ -327,7 +328,7 @@ public class MazeGame extends BaseGame {
     private void initTerrain() {
         // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "rounded-maze2.jpg";
+        String heightFilename = "maze2.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         imageTerrain = createTerBlock(myHeightMap);
@@ -473,6 +474,7 @@ public class MazeGame extends BaseGame {
         }
 
         if (isPhysicsEnabled) {
+            //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
             Matrix3D mat;
             Vector3D translateVec, rotateVec;
             physicsEngine.update(20.0f);
@@ -492,6 +494,12 @@ public class MazeGame extends BaseGame {
             client.processPackets();
         }
 
+
+
+        //TODO override later
+    }
+
+    private void avatarCollisionCorrection() {
 
         // if (avLoc.getY() < terHeight) {
         // System.out.println("collision");
@@ -515,10 +523,11 @@ public class MazeGame extends BaseGame {
         float y = (float) avLoc.getY();
         float z = (float) avLoc.getZ();
 
-        int o = 3;
+        int o = 2;
         float[] newx = {0, x + o, x + o, x + o, x, x - o, x - o, x - o, x};
         float[] newy = {0, y, y, y, y, y, y, y, y};
         float[] newz = {0, z + o, z, z - o, z - o, z - o, z, z + o, z + o};
+
 
         Point3D[] newloc = new Point3D[9];
         float[] newterHeight = new float[9];
@@ -528,33 +537,41 @@ public class MazeGame extends BaseGame {
             newterHeight[i] = imageTerrain.getHeightFromWorld(newloc[i]);
             colidesWithTerrian[i] = newterHeight[i] >= newy[i];
         }
-        System.out.println();
-        System.out.print(colidesWithTerrian[7]);
-        System.out.print(colidesWithTerrian[8]);
-        System.out.println(colidesWithTerrian[1]);
-        System.out.print(colidesWithTerrian[6]);
-        System.out.print(colidesWithTerrian[0]);
-        System.out.println(colidesWithTerrian[2]);
-        System.out.print(colidesWithTerrian[5]);
-        System.out.print(colidesWithTerrian[4]);
-        System.out.println(colidesWithTerrian[3]);
+//        System.out.println();
+//        System.out.print(colidesWithTerrian[7]);
+//        System.out.print(colidesWithTerrian[8]);
+//        System.out.println(colidesWithTerrian[1]);
+//        System.out.print(colidesWithTerrian[6]);
+//        System.out.print(colidesWithTerrian[0]);
+//        System.out.println(colidesWithTerrian[2]);
+//        System.out.print(colidesWithTerrian[5]);
+//        System.out.print(colidesWithTerrian[4]);
+//        System.out.println(colidesWithTerrian[3]);
 
         boolean collition = false;
         for (int i = 1; i < 9; i++) if (colidesWithTerrian[i]) collition = true;
 
+        o = o * 3;
+        float[] futurex = {0, x + o, x + o, x + o, x, x - o, x - o, x - o, x};
+        float[] futurey = {0, y, y, y, y, y, y, y, y};
+        float[] futurez = {0, z + o, z, z - o, z - o, z - o, z, z + o, z + o};
+
         if (collition) {
             if (colidesWithTerrian[1] || colidesWithTerrian[2] || colidesWithTerrian[3]) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx[6]);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz[6]);
-            } else if (colidesWithTerrian[5] || colidesWithTerrian[6] || colidesWithTerrian[7]) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx[2]);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz[2]);
-            } else if (colidesWithTerrian[8]) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx[4]);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz[4]);
-            } else if (colidesWithTerrian[4]) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx[8]);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz[8]);
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, futurex[7]);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, futurez[7]);
+            }
+            if (colidesWithTerrian[5] || colidesWithTerrian[6] || colidesWithTerrian[7]) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, futurex[1]);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, futurez[1]);
+            }
+            if (colidesWithTerrian[8]) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, futurex[4]);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, futurez[4]);
+            }
+            if (colidesWithTerrian[4]) {
+                playerAvatar.getLocalTranslation().setElementAt(0, 3, futurex[8]);
+                playerAvatar.getLocalTranslation().setElementAt(2, 3, futurez[8]);
             }
 
         }
@@ -573,10 +590,7 @@ public class MazeGame extends BaseGame {
 //                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz4);
 //            }
 
-
-        //TODO override later
     }
-
     private boolean collidesWithTerrain(Point3D p) {
         boolean collides = true;
 

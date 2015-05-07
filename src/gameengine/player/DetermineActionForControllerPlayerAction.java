@@ -4,6 +4,7 @@ import net.java.games.input.Component;
 import net.java.games.input.Event;
 import networking.Client;
 import sage.input.action.AbstractInputAction;
+import sage.physics.IPhysicsObject;
 import sage.scene.SceneNode;
 import sage.terrain.TerrainBlock;
 
@@ -14,13 +15,15 @@ import sage.terrain.TerrainBlock;
 public class DetermineActionForControllerPlayerAction extends AbstractInputAction {
 
     private final Client client;
+    IPhysicsObject playerAvatarp;
     private SceneNode player;
     private Component.Identifier.Axis axis;
     private TerrainBlock terrain;
 
-    public DetermineActionForControllerPlayerAction(SceneNode player, Component.Identifier.Axis axis, TerrainBlock imageTerrain, Client client)
+    public DetermineActionForControllerPlayerAction(SceneNode player, Component.Identifier.Axis axis, TerrainBlock imageTerrain, Client client, IPhysicsObject playerAvatarp)
     {
         this.player = player;
+        this.playerAvatarp = playerAvatarp;
         this.axis = axis;
         this.client = client;
         terrain = imageTerrain;
@@ -37,7 +40,7 @@ public class DetermineActionForControllerPlayerAction extends AbstractInputActio
             if(event.getValue() > 0.2){
                 new MovePlayerBackwardAction(player, terrain, client).performAction(v, event);
             }else if (event.getValue() < -0.2){
-                new MovePlayerForwardAction(player, terrain, client).performAction(v, event);
+                new MovePlayerForwardAction(player, terrain, client, playerAvatarp).performAction(v, event);
             }
         }
     }

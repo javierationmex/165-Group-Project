@@ -26,12 +26,23 @@ public class MovePlayerBackwardAction extends BaseAbstractInputAction {
 
     public void performAction(float time, Event e){
 
+
         Matrix3D rot = avatar.getLocalRotation();
         Vector3D dir = new Vector3D(0, 0, 1);
         dir = dir.mult(rot);
         dir.scale((double) (speed * time));
+        Vector3D projectedDirection = new Vector3D(0, 0, 1);
+        projectedDirection = projectedDirection.mult(rot);
+        projectedDirection.scale(2);
+        projectedDirection.add(avatar.getWorldTranslation().getCol(3));
 
-        avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
+        float projectedx = (float) projectedDirection.getX();
+        float projectedy = (float) projectedDirection.getX();
+        float projectedz = (float) projectedDirection.getX();
+        float terrainHeight = terrain.getHeight(projectedx, projectedz);
+        if (projectedy > terrainHeight) {
+            avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
+        }
     }
 
 }
