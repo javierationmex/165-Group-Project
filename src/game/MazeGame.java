@@ -213,7 +213,7 @@ public class MazeGame extends BaseGame {
 
             //radius, ???, radius*height
             float[] halfExtents = {5, 0, 5};
-        playerAvatarP = physicsEngine.addCylinderZObject(physicsEngine.nextUID(),
+        playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
                 mass, playerAvatar.getWorldTransform().getValues(), halfExtents);
 
             playerAvatar.setPhysicsObject(playerAvatarP);
