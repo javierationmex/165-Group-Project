@@ -68,7 +68,6 @@ import javax.script.ScriptException;
 import javax.swing.*;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -207,18 +206,22 @@ public class MazeGame extends BaseGame {
         physicsEngine.setGravity(gravity);
     }
 
+    //PHYSICS
     private void createSagePhysicsWorld() { // add the ball physics
-        float mass = 50.0f;
+        float mass = 5.0f;
 
 
             //radius, ???, radius*height
-            float[] halfExtents = {5, 0, 5};
+        float[] avatarsize = {5, 1, 5};
         playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
-                mass, playerAvatar.getWorldTransform().getValues(), halfExtents);
+                mass, playerAvatar.getWorldTransform().getValues(), avatarsize);
 
             playerAvatar.setPhysicsObject(playerAvatarP);
-        playerAvatarP.setBounciness(0.2f);
+        playerAvatarP.setBounciness(0.0f);
 
+        playerAvatarP.setSleepThresholds(0.5f, 0.5f);
+        playerAvatarP.setDamping(0.9999f, 0f);
+        playerAvatarP.setFriction(10);
 
         float cubeSize[] = {1,1,1};
         cubeP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0.5f, cube.getWorldTransform().getValues(), cubeSize);
@@ -229,9 +232,9 @@ public class MazeGame extends BaseGame {
         float up[] = {0,1,0}; // {0,1,0} is flat
         groundPlaneP =
                 physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),
-                        groundPlane.getLocalTranslation().getValues(), up, 0.9f);
+                        imageTerrain.getLocalTranslation().getValues(), up, 0.1f);
         groundPlaneP.setBounciness(0.5f);
-        groundPlane.setPhysicsObject(groundPlaneP);
+        imageTerrain.setPhysicsObject(groundPlaneP);
 
 
 
@@ -346,22 +349,22 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
-        imageTerrain.translate(0, -2, 0);
+        imageTerrain.translate(0, 0, 0);
         addGameWorldObject(imageTerrain);
         //Floor groundPlane
 
-        groundPlane = new Rectangle();
-        Vector3D vec = new Vector3D(1, 0, 0);
-        groundPlane.rotate(90, vec);
-        groundPlane.scale(2000, 2000, 1);
-        groundPlane.translate(0, 0, 0);
-        groundPlane.setColor(Color.GRAY);
-        String planetextureDir = "." + File.separator + "materials" + File.separator;
-        String planetexturefilename = "sand.jpg";
-        String planetexturefilepath = planetextureDir + planetexturefilename;
-        Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
-        groundPlane.setTexture(planetexture);
-        addGameWorldObject(groundPlane);
+//        groundPlane = new Rectangle();
+//        Vector3D vec = new Vector3D(1, 0, 0);
+//        groundPlane.rotate(90, vec);
+//        groundPlane.scale(2000, 2000, 1);
+//        groundPlane.translate(0, 0, 0);
+//        groundPlane.setColor(Color.GRAY);
+//        String planetextureDir = "." + File.separator + "materials" + File.separator;
+//        String planetexturefilename = "sand.jpg";
+//        String planetexturefilepath = planetextureDir + planetexturefilename;
+//        Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
+//        groundPlane.setTexture(planetexture);
+//        addGameWorldObject(groundPlane);
 
     }
 
@@ -473,13 +476,13 @@ public class MazeGame extends BaseGame {
                 e.printStackTrace();
             }
         }
-//
-//        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
-//        float x = (float) avLoc.getX();
-//        float z = (float) avLoc.getZ();
-//        float terHeight = imageTerrain.getHeight(x,z);
-//        float desiredHeight = terHeight + (float)imageTerrain.getOrigin().getY() + 0.5f;
-//        playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
+
+        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
+        float x = (float) avLoc.getX();
+        float z = (float) avLoc.getZ();
+        float terHeight = imageTerrain.getHeight(x, z);
+        float desiredHeight = terHeight + (float) imageTerrain.getOrigin().getY() + 0.5f;
+        playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
 
         if (isPhysicsEnabled) {
             //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
