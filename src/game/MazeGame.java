@@ -277,7 +277,7 @@ public class MazeGame extends BaseGame {
     private void initTerrain() {
         // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "boston.jpg";
+        String heightFilename = "rounded-maze2.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         imageTerrain = createTerBlock(myHeightMap);
@@ -294,16 +294,17 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
-        imageTerrain.scale(5, 3, 5);
-        imageTerrain.translate(-imageTerrain.getSize() / 2, -3, -imageTerrain.getSize() / 2);
 
+        imageTerrain.translate(-imageTerrain.getSize() / 2, -3, -imageTerrain.getSize() / 2);
+        imageTerrain.scale(20, 1, 1);
         addGameWorldObject(imageTerrain);
         //Floor groundPlane
 
         groundPlane = new Rectangle();
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
-        groundPlane.scale(2000, 2000, 1);
+        groundPlane.scale(1000, 1000, 1);
+        groundPlane.scale(20, 1, 1);
         //groundPlane.translate(0, 0, 0);
         groundPlane.setColor(Color.GRAY);
         String planetextureDir = "." + File.separator + "materials" + File.separator;
