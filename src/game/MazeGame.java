@@ -165,7 +165,7 @@ public class MazeGame extends BaseGame {
         playerAvatarP.setBounciness(0.0f);
 
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
-        playerAvatarP.setDamping(0.9999999f, 0.5f);
+        playerAvatarP.setDamping(0.99f, 0.0f);
         playerAvatarP.setFriction(0);
 
         float cubeSize[] = {3, 3, 3};
@@ -277,7 +277,7 @@ public class MazeGame extends BaseGame {
     private void initTerrain() {
         // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "maze2.jpg";
+        String heightFilename = "boston.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         imageTerrain = createTerBlock(myHeightMap);
@@ -294,7 +294,9 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
+        imageTerrain.scale(5, 3, 5);
         imageTerrain.translate(-imageTerrain.getSize() / 2, -3, -imageTerrain.getSize() / 2);
+
         addGameWorldObject(imageTerrain);
         //Floor groundPlane
 
