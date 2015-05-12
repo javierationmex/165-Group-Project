@@ -1,21 +1,16 @@
+// WHILE SPACE IS PRESSED reduce angular damp to drift
+//add speed up
+
+
+
 package game;
 
-import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.dispatch.CollisionConfiguration;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.SphereShape;
-import com.bulletphysics.collision.shapes.StaticPlaneShape;
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
-import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
-import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.Transform;
 import game.characters.CustomCube;
 import game.characters.CustomPyramid;
 import gameengine.CameraController;
@@ -66,8 +61,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.swing.*;
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -123,57 +118,7 @@ public class MazeGame extends BaseGame {
         this.client.setMazeGame(this);
     }
 
-    //Please separate all the initialization of stuff into different methods.
-    //For example createPlayers(), createWalls(), etc... so that the initGame is very simple.
 
-    private void createPhysicsWorld() {
-        Transform myTransform;
-// define the broad-phase collision to be used (Sweep-and-Prune)
-        broadPhaseHandler =
-                new AxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
-// set up the narrow-phase collision handler ("dispatcher")
-        collConfig = new DefaultCollisionConfiguration();
-        collDispatcher = new CollisionDispatcher(collConfig);
-// create a constraint solver
-        solver = new SequentialImpulseConstraintSolver();
-// create a physics world utilizing the above objects
-        physicsWorld = new DiscreteDynamicsWorld(collDispatcher, broadPhaseHandler, solver, collConfig);
-        physicsWorld.setGravity(new Vector3f(0, -10, 0));
-// define physicsGround plane: normal vector = 'up', dist from origin = 1
-        CollisionShape groundShape =
-                new StaticPlaneShape(new Vector3f(0, 1, 0), 1);
-// set position and orientation of physicsGround's transform
-        myTransform = new Transform();
-        myTransform.origin.set(new Vector3f(0, -1, 0));
-        myTransform.setRotation(new Quat4f(0, 0, 0, 1));
-// define construction info for a 'physicsGround' rigid body
-        DefaultMotionState groundMotionState =
-                new DefaultMotionState(myTransform);
-        RigidBodyConstructionInfo groundCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f(0, 0, 0));
-        groundCI.restitution = 0.8f;
-// create the physicsGround rigid body and add it to the physics world
-        physicsGround = new RigidBody(groundCI);
-        physicsWorld.addRigidBody(physicsGround);
-// define a collision shape for a physicsBall
-        CollisionShape fallShape = new SphereShape(1);
-// define a transform for position and orientation of ball collision shape
-        myTransform = new Transform();
-        myTransform.origin.set(new Vector3f(0, 20, 0));
-        myTransform.setRotation(new Quat4f(0, 0, 0, 1));
-// define the parameters of the collision shape
-        DefaultMotionState fallMotionState =
-                new DefaultMotionState(myTransform);
-        float myFallMass = 1;
-        Vector3f myFallInertia = new Vector3f(0, 0, 0);
-        fallShape.calculateLocalInertia(myFallMass, myFallInertia);
-// define construction info for a 'physicsBall' rigid body
-        RigidBodyConstructionInfo fallRigidBodyCI = new RigidBodyConstructionInfo(myFallMass, fallMotionState, fallShape, myFallInertia);
-        fallRigidBodyCI.restitution = 0.8f;
-// create the physicsBall rigid body and add it to the physics world
-        physicsBall = new RigidBody(fallRigidBodyCI);
-        physicsWorld.addRigidBody(physicsBall);
-
-    }
 
     // other methods as in SAGE example.
 // for example, to create the graphics objects and scene.
@@ -208,11 +153,11 @@ public class MazeGame extends BaseGame {
 
     //PHYSICS
     private void createSagePhysicsWorld() { // add the ball physics
-        float mass = 5.0f;
+        float mass = 0.5f;
 
 
             //radius, ???, radius*height
-        float[] avatarsize = {5, 1, 5};
+        float[] avatarsize = {3, 3, 3};
         playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
                 mass, playerAvatar.getWorldTransform().getValues(), avatarsize);
 
@@ -220,21 +165,21 @@ public class MazeGame extends BaseGame {
         playerAvatarP.setBounciness(0.0f);
 
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
-        playerAvatarP.setDamping(0.9999f, 0f);
-        playerAvatarP.setFriction(10);
+        playerAvatarP.setDamping(0.9999999f, 0.5f);
+        playerAvatarP.setFriction(0);
 
-        float cubeSize[] = {1,1,1};
+        float cubeSize[] = {3, 3, 3};
         cubeP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0.5f, cube.getWorldTransform().getValues(), cubeSize);
-        cubeP.setBounciness(1.0f);
+        cubeP.setBounciness(0.0f);
         cube.setPhysicsObject(cubeP);
 
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
         groundPlaneP =
                 physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),
-                        imageTerrain.getLocalTranslation().getValues(), up, 0.1f);
-        groundPlaneP.setBounciness(0.5f);
-        imageTerrain.setPhysicsObject(groundPlaneP);
+                        groundPlane.getLocalTranslation().getValues(), up, 0.9f);
+        groundPlaneP.setBounciness(0.0f);
+        groundPlane.setPhysicsObject(groundPlaneP);
 
 
 
@@ -349,22 +294,22 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
-        imageTerrain.translate(0, 0, 0);
+        imageTerrain.translate(-imageTerrain.getSize() / 2, -3, -imageTerrain.getSize() / 2);
         addGameWorldObject(imageTerrain);
         //Floor groundPlane
 
-//        groundPlane = new Rectangle();
-//        Vector3D vec = new Vector3D(1, 0, 0);
-//        groundPlane.rotate(90, vec);
-//        groundPlane.scale(2000, 2000, 1);
-//        groundPlane.translate(0, 0, 0);
-//        groundPlane.setColor(Color.GRAY);
-//        String planetextureDir = "." + File.separator + "materials" + File.separator;
-//        String planetexturefilename = "sand.jpg";
-//        String planetexturefilepath = planetextureDir + planetexturefilename;
-//        Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
-//        groundPlane.setTexture(planetexture);
-//        addGameWorldObject(groundPlane);
+        groundPlane = new Rectangle();
+        Vector3D vec = new Vector3D(1, 0, 0);
+        groundPlane.rotate(90, vec);
+        groundPlane.scale(2000, 2000, 1);
+        //groundPlane.translate(0, 0, 0);
+        groundPlane.setColor(Color.GRAY);
+        String planetextureDir = "." + File.separator + "materials" + File.separator;
+        String planetexturefilename = "Asphalt.jpg";
+        String planetexturefilepath = planetextureDir + planetexturefilename;
+        Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
+        groundPlane.setTexture(planetexture);
+        addGameWorldObject(groundPlane);
 
     }
 
