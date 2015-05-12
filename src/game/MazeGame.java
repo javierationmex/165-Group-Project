@@ -221,11 +221,11 @@ public class MazeGame extends BaseGame {
 
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         playerAvatarP.setDamping(0.9999f, 0f);
-        playerAvatarP.setFriction(10);
+        playerAvatarP.setFriction(0);
 
         float cubeSize[] = {1,1,1};
         cubeP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0.5f, cube.getWorldTransform().getValues(), cubeSize);
-        cubeP.setBounciness(1.0f);
+        cubeP.setBounciness(0f);
         cube.setPhysicsObject(cubeP);
 
         // add the ground groundPlane physics
@@ -233,7 +233,7 @@ public class MazeGame extends BaseGame {
         groundPlaneP =
                 physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),
                         imageTerrain.getLocalTranslation().getValues(), up, 0.1f);
-        groundPlaneP.setBounciness(0.5f);
+        groundPlaneP.setBounciness(0f);
         imageTerrain.setPhysicsObject(groundPlaneP);
 
 
