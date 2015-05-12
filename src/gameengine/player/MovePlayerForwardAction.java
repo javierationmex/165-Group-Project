@@ -33,18 +33,25 @@ public class MovePlayerForwardAction extends BaseAbstractInputAction {
         Vector3D dir = new Vector3D(0, 0, -1);
         dir = dir.mult(rot);
         dir.scale((double) (speed * time));
+
         Vector3D projectedDirection = new Vector3D(0, 0, -1);
         projectedDirection = projectedDirection.mult(rot);
-        projectedDirection.scale(2);
+        //projectedDirection.scale(2);
         projectedDirection.add(avatar.getWorldTranslation().getCol(3));
 
         float projectedx = (float) projectedDirection.getX();
-        float projectedy = (float) projectedDirection.getX();
-        float projectedz = (float) projectedDirection.getX();
+        float projectedy = (float) projectedDirection.getY();
+        float projectedz = (float) projectedDirection.getZ();
         float terrainHeight = terrain.getHeight(projectedx, projectedz);
-        if (projectedy > terrainHeight) {
-            avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
+        if (projectedy <= terrainHeight) {
+            //dir=new Vector3D(0, 0, 0);
+
+            // playerAvatarP.setDamping(40f,0f);
+            //avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
         }
+
+        playerAvatarP.setLinearVelocity(new float[]{(float) dir.getX() * 50, (float) dir.getY() * 50, (float) dir.getZ() * 50});
+
 //        //CHECKING HEIGHTS
 //        Point3D avLoc = new Point3D(avatar.getLocalTranslation().getCol(3));
 //        float x = (float) avLoc.getX();

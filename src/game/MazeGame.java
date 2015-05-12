@@ -210,7 +210,7 @@ public class MazeGame extends BaseGame {
     private void createSagePhysicsWorld() { // add the ball physics
         float mass = 1.0f;
 
-        if(player.getCharacterID() == 3){
+
             //radius, ???, radius*height
             float[] halfExtents = {5, 0, 5};
             playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
@@ -218,8 +218,7 @@ public class MazeGame extends BaseGame {
             playerAvatar.setPhysicsObject(playerAvatarP);
             playerAvatarP.setBounciness(0.0f);
 
-            //playerAvatarP.setDamping(0.2f,0.2f);
-        }
+
         float cubeSize[] = {1,1,1};
         cubeP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0.5f, cube.getWorldTransform().getValues(), cubeSize);
         cubeP.setBounciness(1.0f);
@@ -234,6 +233,7 @@ public class MazeGame extends BaseGame {
         groundPlane.setPhysicsObject(groundPlaneP);
 
 
+        playerAvatarP.setDamping(49f, 0f);
     }
 
     private void initScripting() {
