@@ -233,7 +233,7 @@ public class MazeGame extends BaseGame {
         groundPlane.setPhysicsObject(groundPlaneP);
 
 
-        playerAvatarP.setDamping(49f, 0f);
+
     }
 
     private void initScripting() {
@@ -345,7 +345,7 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
-        imageTerrain.translate(0, -1, 0);
+        imageTerrain.translate(0, -6, 0);
         addGameWorldObject(imageTerrain);
         //Floor groundPlane
 
@@ -353,7 +353,7 @@ public class MazeGame extends BaseGame {
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
         groundPlane.scale(2000, 2000, 1);
-        groundPlane.translate(0, 0, 0);
+        groundPlane.translate(0, -2, 0);
         groundPlane.setColor(Color.GRAY);
         String planetextureDir = "." + File.separator + "materials" + File.separator;
         String planetexturefilename = "sand.jpg";
