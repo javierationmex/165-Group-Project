@@ -4,6 +4,7 @@ import graphicslib3D.Matrix3D;
 import graphicslib3D.Vector3D;
 import net.java.games.input.Event;
 import networking.Client;
+import sage.physics.IPhysicsObject;
 import sage.scene.SceneNode;
 import sage.terrain.TerrainBlock;
 
@@ -17,10 +18,12 @@ public class MovePlayerBackwardAction extends BaseAbstractInputAction {
     private SceneNode avatar;
     private float speed = 0.05f;
     private TerrainBlock terrain;
+    private IPhysicsObject playerAvatarP;
 
-    public MovePlayerBackwardAction(SceneNode n, TerrainBlock imageTerrain, Client client) {
+    public MovePlayerBackwardAction(SceneNode n, TerrainBlock imageTerrain, Client client, IPhysicsObject playerAvatarP) {
         avatar = n;
         this.client = client;
+        this.playerAvatarP = playerAvatarP;
         terrain = imageTerrain;
     }
 
@@ -41,8 +44,10 @@ public class MovePlayerBackwardAction extends BaseAbstractInputAction {
         float projectedz = (float) projectedDirection.getX();
         float terrainHeight = terrain.getHeight(projectedx, projectedz);
         if (projectedy > terrainHeight) {
-            avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
+            // avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
         }
+        playerAvatarP.setLinearVelocity(new float[]{(float) dir.getX() * 50, 0, (float) dir.getZ() * 50});
+        playerAvatarP.setFriction(5f);
     }
 
 }

@@ -49,9 +49,12 @@ public class MovePlayerForwardAction extends BaseAbstractInputAction {
             // playerAvatarP.setDamping(40f,0f);
             //avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
         }
-        playerAvatarP.setDamping(0f, 0f);
+        playerAvatarP.setDamping(0.9999f, 0f);
+        playerAvatarP.setFriction(0);
+        playerAvatarP.setSleepThresholds(0, 0);
         playerAvatarP.setLinearVelocity(new float[]{(float) dir.getX() * 50, 0, (float) dir.getZ() * 50});
-        playerAvatarP.setDamping(0.5f, 0f);
+        //playerAvatarP.setFriction(100000);
+        //playerAvatarP.setSleepThresholds(1,1);
 //        //CHECKING HEIGHTS
 //        Point3D avLoc = new Point3D(avatar.getLocalTranslation().getCol(3));
 //        float x = (float) avLoc.getX();

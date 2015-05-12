@@ -203,20 +203,21 @@ public class MazeGame extends BaseGame {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -98f, 0};
+        float[] gravity = {0, -400f, 0};
         physicsEngine.setGravity(gravity);
     }
 
     private void createSagePhysicsWorld() { // add the ball physics
-        float mass = 1.0f;
+        float mass = 50.0f;
 
 
             //radius, ???, radius*height
             float[] halfExtents = {5, 0, 5};
-            playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
-                    mass, playerAvatar.getWorldTransform().getValues(),halfExtents);
+        playerAvatarP = physicsEngine.addCylinderZObject(physicsEngine.nextUID(),
+                mass, playerAvatar.getWorldTransform().getValues(), halfExtents);
+
             playerAvatar.setPhysicsObject(playerAvatarP);
-            playerAvatarP.setBounciness(0.0f);
+        playerAvatarP.setBounciness(0.2f);
 
 
         float cubeSize[] = {1,1,1};
@@ -228,8 +229,8 @@ public class MazeGame extends BaseGame {
         float up[] = {0,1,0}; // {0,1,0} is flat
         groundPlaneP =
                 physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),
-                        groundPlane.getLocalTranslation().getValues(), up, 0.0f);
-        groundPlaneP.setBounciness(0f);
+                        groundPlane.getLocalTranslation().getValues(), up, 0.9f);
+        groundPlaneP.setBounciness(0.5f);
         groundPlane.setPhysicsObject(groundPlaneP);
 
 
@@ -291,7 +292,7 @@ public class MazeGame extends BaseGame {
                 new MovePlayerForwardAction(playerAvatar, imageTerrain, client, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.S,
-                new MovePlayerBackwardAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerBackwardAction(playerAvatar, imageTerrain, client, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.A,
                 new MovePlayerLeftAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
@@ -345,7 +346,7 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
-        imageTerrain.translate(0, -6, 0);
+        imageTerrain.translate(0, -2, 0);
         addGameWorldObject(imageTerrain);
         //Floor groundPlane
 
@@ -353,7 +354,7 @@ public class MazeGame extends BaseGame {
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
         groundPlane.scale(2000, 2000, 1);
-        groundPlane.translate(0, -2, 0);
+        groundPlane.translate(0, 0, 0);
         groundPlane.setColor(Color.GRAY);
         String planetextureDir = "." + File.separator + "materials" + File.separator;
         String planetexturefilename = "sand.jpg";
@@ -432,9 +433,9 @@ public class MazeGame extends BaseGame {
 
         //set the character ID here and catch it in addGhostAvatar();
 
-        playerAvatar.scale(0.2f, 0.2f, 0.2f);
+        //playerAvatar.scale(0.2f, 0.2f, 0.2f);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
-        playerAvatar.translate(0, 2, 50);
+        playerAvatar.translate(0, 4, 50);
         //playerAvatar.setShowBound(true);
 
 
@@ -472,6 +473,13 @@ public class MazeGame extends BaseGame {
                 e.printStackTrace();
             }
         }
+//
+//        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
+//        float x = (float) avLoc.getX();
+//        float z = (float) avLoc.getZ();
+//        float terHeight = imageTerrain.getHeight(x,z);
+//        float desiredHeight = terHeight + (float)imageTerrain.getOrigin().getY() + 0.5f;
+//        playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
 
         if (isPhysicsEnabled) {
             //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());

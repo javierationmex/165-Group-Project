@@ -38,7 +38,7 @@ public class DetermineActionForControllerPlayerAction extends AbstractInputActio
             }
         }else if (axis.equals(Component.Identifier.Axis.X)){
             if(event.getValue() > 0.2){
-                new MovePlayerBackwardAction(player, terrain, client).performAction(v, event);
+                new MovePlayerBackwardAction(player, terrain, client, playerAvatarp).performAction(v, event);
             }else if (event.getValue() < -0.2){
                 new MovePlayerForwardAction(player, terrain, client, playerAvatarp).performAction(v, event);
             }
