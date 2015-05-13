@@ -69,12 +69,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
-//import objects.mushroom.*;
 
-
-/**
- * Main Class for Game initialization etc here.
- */
 public class MazeGame extends BaseGame {
     ICamera camera1;
     private Player player;
@@ -135,28 +130,47 @@ public class MazeGame extends BaseGame {
         initScripting();
         setControls();
         display.setTitle("Maze Game");
-
-        isPhysicsEnabled = false;
-
-
-
+        isPhysicsEnabled = true;
     }
 
+    private void initGameObjects() {
+        IDisplaySystem display = getDisplaySystem();
+        display.setTitle("Treasure Hunt 2015");
+
+        addPlayer();
+        initTerrain();
+        //drawSkyBox();
+
+/*
+        Moved to script
+        Mushroom s = new Mushroom();
+        addGameWorldObject(s);
+        s.translate(200, 6, 200);
+        s.scale(20, 50, 20);
+        */
+        cube = new Cube();
+        cube.translate(0, 10, 0);
+        cube.scale(1, 1, 1);
+        cube.setWorldTranslation(cube.getLocalTranslation());
+        cube.setShowBound(true);
+
+        addGameWorldObject(cube);
+    }
+
+    //PHYSICS SECTION
     protected void initPhysicsSystem()
     {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -400f, 0};
+        float[] gravity = {0, -98f, 0};
         physicsEngine.setGravity(gravity);
     }
 
     //PHYSICS
-    private void createSagePhysicsWorld() { // add the ball physics
-        float mass = 0.5f;
+    private void createSagePhysicsWorld() {
+        float mass = 3.5f;
 
-
-            //radius, ???, radius*height
         float[] avatarsize = {3, 3, 3};
         playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
                 mass, playerAvatar.getWorldTransform().getValues(), avatarsize);
@@ -181,10 +195,10 @@ public class MazeGame extends BaseGame {
         groundPlaneP.setBounciness(0.0f);
         groundPlane.setPhysicsObject(groundPlaneP);
 
-
-
     }
 
+
+    //SCRIPTING SECTION
     private void initScripting() {
         ScriptEngineManager factory = new ScriptEngineManager();
 
@@ -219,6 +233,8 @@ public class MazeGame extends BaseGame {
         { System.out.println ("Null ptr exception in " + scriptFileName + e4); }
     }
 
+
+    //INPUT SECTION
     private void setControls() {
         String keyboardName = JOptionPane.showInputDialog(null, "Pick a keyboard", "Input", JOptionPane.QUESTION_MESSAGE, null, inputMgr.getControllers().toArray(), "keyboard").toString();
         //String keyboardName = inputMgr.getKeyboardName();
@@ -252,32 +268,12 @@ public class MazeGame extends BaseGame {
                 new TogglePhysics(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_AND_RELEASE);
     }
 
-    private void initGameObjects() {
-        IDisplaySystem display = getDisplaySystem();
-        display.setTitle("Treasure Hunt 2015");
-        //drawSkyBox();
-        addPlayer();
-        initTerrain();
 
-/*
-        Moved to script
-        Mushroom s = new Mushroom();
-        addGameWorldObject(s);
-        s.translate(200, 6, 200);
-        s.scale(20, 50, 20);
-        */
-        cube = new Cube();
-        cube.translate(0, 20, 55);
-        cube.setWorldTranslation(cube.getLocalTranslation());
-        cube.setShowBound(true);
-
-        addGameWorldObject(cube);
-    }
-
+    // TERRAIN SECTION
     private void initTerrain() {
-        // create height map and terrain block
+//        // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "rounded-maze2.jpg";
+        String heightFilename = "road.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         imageTerrain = createTerBlock(myHeightMap);
@@ -295,16 +291,17 @@ public class MazeGame extends BaseGame {
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
 
-        imageTerrain.translate(-imageTerrain.getSize() / 2, -3, -imageTerrain.getSize() / 2);
-        imageTerrain.scale(20, 1, 1);
+        imageTerrain.translate(-imageTerrain.getSize() / 2, -1, -imageTerrain.getSize() / 2);
+        imageTerrain.scale(5, 1, 5);
         addGameWorldObject(imageTerrain);
+
         //Floor groundPlane
 
         groundPlane = new Rectangle();
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
         groundPlane.scale(1000, 1000, 1);
-        groundPlane.scale(20, 1, 1);
+        groundPlane.scale(1, 1, 1);
         //groundPlane.translate(0, 0, 0);
         groundPlane.setColor(Color.GRAY);
         String planetextureDir = "." + File.separator + "materials" + File.separator;
@@ -333,7 +330,7 @@ public class MazeGame extends BaseGame {
     private void drawSkyBox() {
         SkyBox skybox = new SkyBox("skybox", 500, 500, 500);
 
-        String textureDir = "." + File.separator + "textures" + File.separator + "canyon" + File.separator;
+        String textureDir = "." + File.separator + "materials" + File.separator + "dunes" + File.separator;
         String topFilename = "top.jpg";
         String topFilePath = textureDir + topFilename;
 
@@ -361,7 +358,7 @@ public class MazeGame extends BaseGame {
         Texture right = TextureManager.loadTexture2D(rightFilePath);
         skybox.setTexture(SkyBox.Face.East, right);
 
-        skybox.translate(0, 100, 0);
+        skybox.translate(0, 900, 0);
 
 
         addGameWorldObject(skybox);
@@ -403,6 +400,11 @@ public class MazeGame extends BaseGame {
         camera1.setLocation(new Point3D(0, 1, 50));
     }
 
+
+    //-------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------UPDATE SECTION -----------------
+    //-------------------------------------------------------------------------------------------------------
+
     private void updateOldPosition() {
         oldRotation = playerAvatar.getLocalRotation().toString();
         oldTranslation = playerAvatar.getLocalTranslation().toString();
@@ -425,12 +427,10 @@ public class MazeGame extends BaseGame {
             }
         }
 
-        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
-        float x = (float) avLoc.getX();
-        float z = (float) avLoc.getZ();
-        float terHeight = imageTerrain.getHeight(x, z);
-        float desiredHeight = terHeight + (float) imageTerrain.getOrigin().getY() + 0.5f;
-        playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
+//        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
+//        float terHeight = imageTerrain.getHeightFromWorld(avLoc);
+//        float desiredHeight = terHeight + (float) imageTerrain.getOrigin().getY() + 0.5f;
+//        playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
 
         if (isPhysicsEnabled) {
             //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
