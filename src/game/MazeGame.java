@@ -139,7 +139,7 @@ public class MazeGame extends BaseGame {
 
         addPlayer();
         initTerrain();
-        //drawSkyBox();
+        drawSkyBox();
 
 /*
         Moved to script
@@ -281,7 +281,7 @@ public class MazeGame extends BaseGame {
         // create texture and texture state to color the terrain
         TextureState grassState;
         String heighttextureDir = "." + File.separator + "materials" + File.separator;
-        String heighttextureFilename = "green-leather-texture.jpg";
+        String heighttextureFilename = "green.jpg";
         String heighttextureFilePath = heighttextureDir + heighttextureFilename;
         Texture grassTexture = TextureManager.loadTexture2D(heighttextureFilePath);
         grassTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
@@ -291,7 +291,7 @@ public class MazeGame extends BaseGame {
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
 
-        imageTerrain.translate(-imageTerrain.getSize() / 2, -1, -imageTerrain.getSize() / 2);
+        imageTerrain.translate(-imageTerrain.getSize() / 2, 0, -imageTerrain.getSize() / 2);
         imageTerrain.scale(5, 1, 5);
         addGameWorldObject(imageTerrain);
 
@@ -300,12 +300,12 @@ public class MazeGame extends BaseGame {
         groundPlane = new Rectangle();
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
-        groundPlane.scale(1000, 1000, 1);
+        groundPlane.scale(5000, 5000, 1);
         groundPlane.scale(1, 1, 1);
         //groundPlane.translate(0, 0, 0);
         groundPlane.setColor(Color.GRAY);
         String planetextureDir = "." + File.separator + "materials" + File.separator;
-        String planetexturefilename = "Asphalt.jpg";
+        String planetexturefilename = "sand.jpg";
         String planetexturefilepath = planetextureDir + planetexturefilename;
         Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
         groundPlane.setTexture(planetexture);
@@ -328,7 +328,7 @@ public class MazeGame extends BaseGame {
     }
 
     private void drawSkyBox() {
-        SkyBox skybox = new SkyBox("skybox", 500, 500, 500);
+        SkyBox skybox = new SkyBox("skybox", 2000, 2000, 2000);
 
         String textureDir = "." + File.separator + "materials" + File.separator + "dunes" + File.separator;
         String topFilename = "top.jpg";
@@ -358,8 +358,9 @@ public class MazeGame extends BaseGame {
         Texture right = TextureManager.loadTexture2D(rightFilePath);
         skybox.setTexture(SkyBox.Face.East, right);
 
-        skybox.translate(0, 900, 0);
+        skybox.translate(0, 100, 0);
 
+        skybox.setZBufferStateEnabled(false);
 
         addGameWorldObject(skybox);
 
@@ -383,7 +384,7 @@ public class MazeGame extends BaseGame {
 
         //playerAvatar.scale(0.2f, 0.2f, 0.2f);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
-        playerAvatar.translate(0, 4, 50);
+        playerAvatar.translate(0, 40, 50);
         //playerAvatar.setShowBound(true);
 
 
@@ -396,7 +397,7 @@ public class MazeGame extends BaseGame {
         }
         addGameWorldObject(playerAvatar);
         camera1 = display.getRenderer().getCamera();
-        camera1.setPerspectiveFrustum(60, 1, 1, 1000);
+        camera1.setPerspectiveFrustum(60, 1, 1, 5000);
         camera1.setLocation(new Point3D(0, 1, 50));
     }
 
@@ -427,10 +428,13 @@ public class MazeGame extends BaseGame {
             }
         }
 
-//        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
-//        float terHeight = imageTerrain.getHeightFromWorld(avLoc);
-//        float desiredHeight = terHeight + (float) imageTerrain.getOrigin().getY() + 0.5f;
-//        playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
+        // APPLIES FRICTION WHEN IN IMAGETERRAIN
+        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
+        float terHeight = imageTerrain.getHeightFromWorld(avLoc);
+        float desiredHeight = terHeight + (float) imageTerrain.getOrigin().getY() + 0.5f;
+        if (avLoc.getY() >= terHeight) playerAvatarP.setFriction(100); else playerAvatarP.setFriction(0);
+
+        //playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
 
         if (isPhysicsEnabled) {
             //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
@@ -455,7 +459,6 @@ public class MazeGame extends BaseGame {
 
 
 
-        //TODO override later
     }
 
     private void avatarCollisionCorrection() {
