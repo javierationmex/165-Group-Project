@@ -565,10 +565,13 @@ public class MazeGame extends BaseGame {
         }
 
 
-        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
+        npcSound.setLocation(new Point3D(cube1.getLocalTranslation().getCol(3)));
         setEarParameters();
     }
 
+    //-------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------SOUND SECTION -----------------
+    //-------------------------------------------------------------------------------------------------------
 
     public void initAudio() {
         AudioResource resource1, resource2;
@@ -593,14 +596,14 @@ public class MazeGame extends BaseGame {
         windSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
-        npcSound.setMaxDistance(10.0f);
+        npcSound.setMaxDistance(100.0f);
         npcSound.setMinDistance(1.0f);
         npcSound.setRollOff(5f);
-        windSound.setMaxDistance(1000.0f);
+        windSound.setMaxDistance(100);
         windSound.setMinDistance(1.0f);
         windSound.setRollOff(5.0f);
-        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
-        windSound.setLocation(new Point3D(finish.getWorldTranslation().getCol(3)));
+        npcSound.setLocation(new Point3D(cube1.getLocalTranslation().getCol(3)));
+        windSound.setLocation(new Point3D(finish.getLocalTranslation().getCol(3)));
         setEarParameters();
         npcSound.play();
         windSound.play();
@@ -615,6 +618,11 @@ public class MazeGame extends BaseGame {
         audioMgr.getEar().setLocation(camera1.getLocation());
         audioMgr.getEar().setOrientation(camDir, new Vector3D(0, 1, 0));
     }
+
+    //-------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------player? SECTION -----------------
+    //-------------------------------------------------------------------------------------------------------
+
     private boolean playerChanged() {
         if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
            !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
