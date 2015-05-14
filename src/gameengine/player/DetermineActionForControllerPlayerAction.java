@@ -32,9 +32,9 @@ public class DetermineActionForControllerPlayerAction extends AbstractInputActio
     public void performAction(float v, Event event) {
         if(axis.equals(Component.Identifier.Axis.Y)){
             if(event.getValue() > 0.2){
-                new MovePlayerLeftAction(player, terrain, client).performAction(v, event);
+                new MovePlayerLeftAction(player, terrain, client, playerAvatarp).performAction(v, event);
             }else if (event.getValue() < -0.2){
-                new MovePlayerRightAction(player, terrain, client).performAction(v, event);
+                new MovePlayerRightAction(player, terrain, client, playerAvatarp).performAction(v, event);
             }
         }else if (axis.equals(Component.Identifier.Axis.X)){
             if(event.getValue() > 0.2){

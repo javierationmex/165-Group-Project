@@ -228,25 +228,25 @@ public class MazeGame extends BaseGame {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -98f, 0};
+        float[] gravity = {0, -300f, 0};
         physicsEngine.setGravity(gravity);
     }
 
     //PHYSICS
     private void createSagePhysicsWorld() {
-        float mass = 0.01f;
+        float mass = 500.01f;
 
         float[] avatarsize = {1, 1, 1};
-        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getWorldTransform().getValues(), 1, 1);
+        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getWorldTransform().getValues(), 2, 2);
         playerAvatar.setPhysicsObject(playerAvatarP);
-        playerAvatarP.setBounciness(0.5f);
+        playerAvatarP.setBounciness(0.1f);
 
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         //playerAvatarP.setDamping(0.999999f, 0f);
         //playerAvatarP.setFriction(0.5f);
 
         //playerAvatarP.setSleepThresholds(0.5f, 0.5f);
-        playerAvatarP.setDamping(0.99f, 0.0f);
+        playerAvatarP.setDamping(0.99f, 0.1f);
         playerAvatarP.setFriction(0.1f);
 
 //        float rightRailSize[] = {2, 2, 4000};
@@ -261,7 +261,7 @@ public class MazeGame extends BaseGame {
 //        leftRail.setPhysicsObject(leftRailP);
 
 
-        float cube1Size[] = {1, 1, 1};
+        float cube1Size[] = {3, 3, 3};
         cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, NPC1.getWorldTransform().getValues(), cube1Size);
         cube1P.setBounciness(5.5f);
         cube1P.setDamping(0.1f, 0.1f);
@@ -272,7 +272,7 @@ public class MazeGame extends BaseGame {
 
 
         float cube2Size[] = {1, 1, 1};
-        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getWorldTransform().getValues(), 1f, 1f);
+        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getWorldTransform().getValues(), 3f, 3f);
         pyramid1P.setBounciness(5.5f);
         pyramid1P.setDamping(0.1f, 0.1f);
         NPC2.setPhysicsObject(pyramid1P);
@@ -348,10 +348,10 @@ public class MazeGame extends BaseGame {
                 new MovePlayerBackwardAction(playerAvatar, imageTerrain, client, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.A,
-                new MovePlayerLeftAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerLeftAction(playerAvatar, imageTerrain, client, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.D,
-                new MovePlayerRightAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerRightAction(playerAvatar, imageTerrain, client, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.F2,
                 new TogglePhysics(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_AND_RELEASE);
@@ -560,14 +560,17 @@ public class MazeGame extends BaseGame {
 
 
             float[] behaviour = new float[3];
-            behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
+            behaviour[0] = (swarmBehaviour[0]) * rand.nextFloat();
             behaviour[1] = 0;
-            behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
+            behaviour[2] = (swarmBehaviour[2]) * rand.nextFloat();
 
             //float halfrand = (rand.nextInt(50 - 0) + 0)/100;
 
             cube1P.setLinearVelocity(behaviour);
 
+            behaviour[0] = (swarmBehaviour[0]) * rand.nextFloat();
+            behaviour[1] = 0;
+            behaviour[2] = (swarmBehaviour[2]) * rand.nextFloat();
 
             pyramid1P.setLinearVelocity(behaviour);
 
@@ -595,7 +598,7 @@ public class MazeGame extends BaseGame {
 
         npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
         windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
-        windSound.setVolume((int) (playerAvatarP.getAngularVelocity()[2] * 0.5));
+        windSound.setVolume((int) (playerAvatarP.getAngularVelocity()[2] * 0.1));
         setEarParameters();
     }
 
@@ -622,10 +625,10 @@ public class MazeGame extends BaseGame {
 
         resource1 = audioMgr.createAudioResource(shipFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource2 = audioMgr.createAudioResource(whooshFilePath, AudioResourceType.AUDIO_SAMPLE);
-        resource3 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource3 = audioMgr.createAudioResource(windFilePath, AudioResourceType.AUDIO_SAMPLE);
         npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 100, true);
         whooshSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
-        windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 50, true);
+        windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 20, true);
 
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
