@@ -582,18 +582,20 @@ public class MazeGame extends BaseGame {
         String windFilePath = soundDir + windFilename;
         String strongwindFilename = "StrongWind.wav";
         String strongwindFilePath = soundDir + strongwindFilename;
+        String whooshFilename = "Whoosh.wav";
+        String whooshFilePath = soundDir + whooshFilename;
 
-        resource1 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource1 = audioMgr.createAudioResource(whooshFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource2 = audioMgr.createAudioResource(windFilePath, AudioResourceType.AUDIO_SAMPLE);
         npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 100, true);
         windSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
-        npcSound.setMaxDistance(50.0f);
-        npcSound.setMinDistance(3.0f);
+        npcSound.setMaxDistance(5.0f);
+        npcSound.setMinDistance(0.0f);
         npcSound.setRollOff(5.0f);
-        windSound.setMaxDistance(50.0f);
-        windSound.setMinDistance(3.0f);
+        windSound.setMaxDistance(5000.0f);
+        windSound.setMinDistance(0.0f);
         windSound.setRollOff(5.0f);
         npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
         windSound.setLocation(new Point3D(groundPlane.getWorldTranslation().getCol(3)));
