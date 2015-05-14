@@ -220,8 +220,8 @@ public class MazeGame extends BaseGame {
         playerAvatarP.setBounciness(0.0f);
 
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
-        playerAvatarP.setDamping(0.9999f, 0f);
-        playerAvatarP.setFriction(0);
+        playerAvatarP.setDamping(0.999999f, 0f);
+        playerAvatarP.setFriction(0.5f);
 
         float cubeSize[] = {1,1,1};
         cubeP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0.5f, cube.getWorldTransform().getValues(), cubeSize);
