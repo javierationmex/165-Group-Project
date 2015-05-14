@@ -578,9 +578,9 @@ public class MazeGame extends BaseGame {
             return;
         }
         String soundDir = "." + File.separator + "materials" + File.separator + "sounds" + File.separator;
-        String windFilename = "Wind.jpg";
+        String windFilename = "Wind.wav";
         String windFilePath = soundDir + windFilename;
-        String strongwindFilename = "StrongWind.jpg";
+        String strongwindFilename = "StrongWind.wav";
         String strongwindFilePath = soundDir + strongwindFilename;
 
         resource1 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
