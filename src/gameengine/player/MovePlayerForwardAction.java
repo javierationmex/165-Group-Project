@@ -50,7 +50,7 @@ public class MovePlayerForwardAction extends BaseAbstractInputAction {
             //avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
         //}
 
-        playerAvatarP.setLinearVelocity(new float[]{(float) dir.getX() * 100, 0, (float) dir.getZ() * 100});
+        playerAvatarP.setLinearVelocity(new float[]{(float) dir.getX() * 150, 0, (float) dir.getZ() * 150});
         //playerAvatarP.setFriction(100000);
         //playerAvatarP.setSleepThresholds(1,1);
 //        //CHECKING HEIGHTS

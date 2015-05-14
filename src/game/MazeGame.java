@@ -194,16 +194,16 @@ public class MazeGame extends BaseGame {
         s.scale(20, 50, 20);
         */
 
-//        rightRail = new Cube();
-//        rightRail.scale(2, 2, 4000);
-//        rightRail.translate(50, 0, 0);
-//        addGameWorldObject(rightRail);
-//        //leftRail.updateGeometricState(0,true);
-//
-//        leftRail = new Cube();
-//        leftRail.scale(2, 2, 4000);
-//        leftRail.translate(-50, 0, 0);
-//        addGameWorldObject(leftRail);
+        rightRail = new Cube();
+        rightRail.scale(2, 2, 4000);
+        rightRail.translate(50, 0, 0);
+        addGameWorldObject(rightRail);
+        //leftRail.updateGeometricState(0,true);
+
+        leftRail = new Cube();
+        leftRail.scale(2, 2, 4000);
+        leftRail.translate(-50, 0, 0);
+        addGameWorldObject(leftRail);
 
         NPC1 = new Pod();
         NPC1.translate(0, 1, -2000);
@@ -254,13 +254,13 @@ public class MazeGame extends BaseGame {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -9.8f, 0};
+        float[] gravity = {0, -98f, 0};
         physicsEngine.setGravity(gravity);
     }
 
     //PHYSICS
     private void createSagePhysicsWorld() {
-        float mass = 10000.0f;
+        float mass = 1000.0f;
 
 
         BoundingSphere playerBoundingBox = (BoundingSphere) playerAvatar.getWorldBound();
@@ -434,7 +434,7 @@ public class MazeGame extends BaseGame {
 
         //Floor groundPlane
 
-        groundPlane = new Rectangle("ground", 500, 10000);
+        groundPlane = new Rectangle("ground", 200, 10000);
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
         //groundPlane.scale(1, 1, 10);
@@ -556,7 +556,8 @@ public class MazeGame extends BaseGame {
     protected void update(float time) {
         this.time += time;
         cam1Controller.update(this.time);
-        super.update(time);
+
+
         if(playerChanged()){
             try {
                 client.sendPacket(new UpdateAvatarInfoPacket(client.getId(), playerAvatar.getLocalTranslation(), playerAvatar.getLocalScale(), playerAvatar.getLocalRotation()));
@@ -628,7 +629,7 @@ public class MazeGame extends BaseGame {
             //playerAvatarP.setTransform(playerAvatar.getLocalTransform().getValues());
             Matrix3D mat;
             Vector3D translateVec, rotateVec;
-            physicsEngine.update(100.0f);
+
             for (SceneNode s : getGameWorld()){
                 if (s.getPhysicsObject() != null){
                     mat = new Matrix3D(s.getPhysicsObject().getTransform());
@@ -651,6 +652,17 @@ public class MazeGame extends BaseGame {
         windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
         windSound.setVolume((int) (playerAvatarP.getAngularVelocity()[2] * 0.1));
         setEarParameters();
+
+
+        super.update(time);
+        physicsEngine.update(time);
+
+        if (playerAvatar.getWorldBound().intersects(finish.getWorldBound())) {
+            finish.translate(0, 0, 100);
+            playerAvatar.scale(10, 10, 10);
+
+            JOptionPane.showMessageDialog(null, "YOU WIN!!!!!!");
+        }
     }
 
     //-------------------------------------------------------------------------------------------------------
