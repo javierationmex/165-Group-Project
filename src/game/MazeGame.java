@@ -253,27 +253,28 @@ public class MazeGame extends BaseGame {
         float mass = 500.01f;
 
         float[] avatarsize = {1, 1, 1};
-        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), 2, 2);
+        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), 4, 4);
         playerAvatar.setPhysicsObject(playerAvatarP);
-        playerAvatarP.setBounciness(0.1f);
+        playerAvatarP.setBounciness(0.9f);
 
-        playerAvatarP.setSleepThresholds(0.5f, 0.5f);
+        // playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         //playerAvatarP.setDamping(0.999999f, 0f);
         //playerAvatarP.setFriction(0.5f);
 
         //playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         playerAvatarP.setDamping(0.99f, 0.1f);
-        playerAvatarP.setFriction(0.1f);
+        playerAvatarP.setFriction(0.9f);
+
 
         float rightRailSize[] = {2, 2, 4000};
         rightRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, rightRail.getLocalTranslation().getValues(), rightRailSize);
-        rightRailP.setBounciness(0.9f);
+        rightRailP.setBounciness(0.0f);
         rightRailP.getTransform()[6] = 50;
         rightRail.setPhysicsObject(rightRailP);
 
         float leftRailSize[] = {2, 2, 4000};
         leftRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, leftRail.getLocalTranslation().getValues(), leftRailSize);
-        leftRailP.setBounciness(0.9f);
+        leftRailP.setBounciness(0.0f);
         leftRail.setPhysicsObject(leftRailP);
 
 
@@ -285,9 +286,7 @@ public class MazeGame extends BaseGame {
         //cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
 
 
-
-
-        float cube2Size[] = {1, 1, 1};
+        float cube2Size[] = {3, 3, 3};
         pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getLocalTranslation().getValues(), 3f, 3f);
         pyramid1P.setBounciness(5.5f);
         pyramid1P.setDamping(0.1f, 0.1f);
@@ -299,7 +298,7 @@ public class MazeGame extends BaseGame {
         groundPlaneP.setBounciness(0.7f);
         groundPlane.setPhysicsObject(groundPlaneP);
 
-        float rockSize[] = {1, 1, 1};
+        float rockSize[] = {3, 3, 3};
         rock1P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock1.getLocalTranslation().getValues(), rockSize);
         rock2P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock2.getLocalTranslation().getValues(), rockSize);
         rock3P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock3.getLocalTranslation().getValues(), rockSize);
@@ -762,14 +761,9 @@ public class MazeGame extends BaseGame {
             }else if(player.getCharacterID() == 4) {
                 player.setAvatar(new Pod().getChild());
             }
-                //radius, ???, radius*height
-//                float[] halfExtents = {10, 10, 10};
-//                IPhysicsObject playerP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
-//                        1.0f, player.getAvatar().getLocalTranslation().getValues(), halfExtents);
-//                player.getAvatar().setPhysicsObject(playerP);
-//                playerP.setBounciness(1.0f);
 
-            player.getAvatar().translate(0, 5, 50);
+
+            player.getAvatar().translate(0, 5, -1000);
             player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
             addGameWorldObject(player.getAvatar());
         }
