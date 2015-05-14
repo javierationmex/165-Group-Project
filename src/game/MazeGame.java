@@ -95,12 +95,13 @@ public class MazeGame extends BaseGame {
     private String oldScale;
     private boolean canProcess;
     private IPhysicsEngine physicsEngine;
-    private IPhysicsObject playerAvatarP, groundPlaneP, cube1P, pyramid1P;
+    private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, cube1P, pyramid1P;
     private Rectangle groundPlane;
     private boolean isPhysicsEnabled;
-    private Cube cube1;
+    private Cube cube1, rightRail, leftRail;
     private Pyramid pyramid1;
     private ChessPieceRock finish;
+
 
     private CollisionDispatcher collDispatcher;
     private BroadphaseInterface broadPhaseHandler;
@@ -193,26 +194,26 @@ public class MazeGame extends BaseGame {
         s.scale(20, 50, 20);
         */
 
-        Cube rightRail = new Cube();
+        rightRail = new Cube();
         rightRail.scale(2, 2, 4000);
         rightRail.translate(50, 0, 0);
         addGameWorldObject(rightRail);
 
 
-        Cube leftRail = new Cube();
+        leftRail = new Cube();
         leftRail.scale(2, 2, 4000);
         leftRail.translate(-50, 0, 0);
         addGameWorldObject(leftRail);
 
         cube1 = new Cube();
-        cube1.translate(150, 1, 0);
+        cube1.translate(150, 1, 2000);
         addGameWorldObject(cube1);
         pyramid1 = new Pyramid();
-        pyramid1.translate(-150, 1, 0);
+        pyramid1.translate(-150, 1, 2000);
         addGameWorldObject(pyramid1);
 
         finish = new ChessPieceRock();
-        finish.translate(0, 0, -2000);
+        finish.translate(0, 0, 3000);
         finish.scale(5, 5, 5);
         addGameWorldObject(finish);
 
@@ -248,12 +249,26 @@ public class MazeGame extends BaseGame {
         playerAvatarP.setDamping(0.99f, 0.0f);
         playerAvatarP.setFriction(0.1f);
 
+//        float rightRailSize[] = {2, 2, 4000};
+//        rightRailP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), 1000, rightRail.getWorldTransform().getValues(), rightRailSize);
+//        rightRailP.setBounciness(0.9f);
+//        rightRailP.getTransform()[6]=50;
+//        rightRail.setPhysicsObject(rightRailP);
+//
+//        float leftRailSize[] = {2, 2, 4000};
+//        leftRailP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), 1000, leftRail.getWorldTransform().getValues(), leftRailSize);
+//        leftRailP.setBounciness(0.9f);
+//        leftRail.setPhysicsObject(leftRailP);
+
+
         float cube1Size[] = {1, 1, 1};
         cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, cube1.getWorldTransform().getValues(), cube1Size);
         cube1P.setBounciness(5.5f);
         cube1P.setDamping(0.1f, 0.1f);
         cube1.setPhysicsObject(cube1P);
-        cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
+        //cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
+
+
 
 
         float cube2Size[] = {1, 1, 1};
@@ -261,12 +276,10 @@ public class MazeGame extends BaseGame {
         pyramid1P.setBounciness(5.5f);
         pyramid1P.setDamping(0.1f, 0.1f);
         pyramid1.setPhysicsObject(pyramid1P);
-        pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
+        //pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
-        groundPlaneP =
-                physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),
-                        groundPlane.getLocalTranslation().getValues(), up, 0.0f);
+        groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), groundPlane.getLocalTranslation().getValues(), up, 0.0f);
         groundPlaneP.setBounciness(0.7f);
         groundPlane.setPhysicsObject(groundPlaneP);
 
@@ -374,10 +387,10 @@ public class MazeGame extends BaseGame {
 
         //Floor groundPlane
 
-        groundPlane = new Rectangle("ground", 5000, 5000);
+        groundPlane = new Rectangle("ground", 500, 10000);
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
-        //groundPlane.scale(5, 1, 1);
+        //groundPlane.scale(1, 1, 10);
         //groundPlane.scale(1, 1, 1);
         //groundPlane.translate(0, 0, 0);
         groundPlane.setColor(Color.GRAY);
@@ -561,7 +574,7 @@ public class MazeGame extends BaseGame {
             //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
             Matrix3D mat;
             Vector3D translateVec, rotateVec;
-            physicsEngine.update(20.0f);
+            physicsEngine.update(100.0f);
             for (SceneNode s : getGameWorld()){
                 if (s.getPhysicsObject() != null){
                     mat = new Matrix3D(s.getPhysicsObject().getTransform());
