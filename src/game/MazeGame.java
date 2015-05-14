@@ -29,6 +29,7 @@ import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
 import sage.app.BaseGame;
+import sage.audio.*;
 import sage.camera.ICamera;
 import sage.display.IDisplaySystem;
 import sage.event.EventManager;
@@ -111,7 +112,8 @@ public class MazeGame extends BaseGame {
     private Vector3f worldAabbMin = new Vector3f(-10000, -10000, -10000);
     private Vector3f worldAabbMax = new Vector3f(10000, 10000, 10000);
     private DynamicsWorld physicsWorld;
-
+    private IAudioManager audioMgr;
+    private Sound windSound, npcSound;
 
     public MazeGame(Player player) {
         this.player = player;
@@ -170,6 +172,7 @@ public class MazeGame extends BaseGame {
 
         initScripting();
         setControls();
+        initAudio();
         display.setTitle("Maze Game");
         isPhysicsEnabled = true;
     }
@@ -562,10 +565,52 @@ public class MazeGame extends BaseGame {
         }
 
 
-
+        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
+        setEarParameters();
     }
 
 
+    public void initAudio() {
+        AudioResource resource1, resource2;
+        audioMgr = AudioManagerFactory.createAudioManager("sage.audio.joal.JOALAudioManager");
+        if (!audioMgr.initialize()) {
+            System.out.println("Audio Manager failed to initialize!");
+            return;
+        }
+        String soundDir = "." + File.separator + "materials" + File.separator + "sounds" + File.separator;
+        String windFilename = "Wind.jpg";
+        String windFilePath = soundDir + windFilename;
+        String strongwindFilename = "StrongWind.jpg";
+        String strongwindFilePath = soundDir + strongwindFilename;
+
+        resource1 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource2 = audioMgr.createAudioResource(windFilePath, AudioResourceType.AUDIO_SAMPLE);
+        npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 100, true);
+        windSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
+        npcSound.initialize(audioMgr);
+        windSound.initialize(audioMgr);
+        npcSound.setMaxDistance(50.0f);
+        npcSound.setMinDistance(3.0f);
+        npcSound.setRollOff(5.0f);
+        windSound.setMaxDistance(50.0f);
+        windSound.setMinDistance(3.0f);
+        windSound.setRollOff(5.0f);
+        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
+        windSound.setLocation(new Point3D(groundPlane.getWorldTranslation().getCol(3)));
+        setEarParameters();
+        npcSound.play();
+        windSound.play();
+    }
+
+    public void setEarParameters() {
+        Matrix3D avDir = (Matrix3D) (playerAvatar.getWorldRotation().clone());
+        //float camAz = camera1.get.getAzimuth();
+        avDir.rotateY(180.0f);
+        Vector3D camDir = new Vector3D(0, 0, 1);
+        camDir = camDir.mult(avDir);
+        audioMgr.getEar().setLocation(camera1.getLocation());
+        audioMgr.getEar().setOrientation(camDir, new Vector3D(0, 1, 0));
+    }
     private boolean playerChanged() {
         if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
            !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
