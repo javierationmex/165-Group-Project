@@ -1,5 +1,4 @@
-// WHILE SPACE IS PRESSED reduce angular damp to drift
-//add speed up
+//AWESOME NAMELESS GAME
 
 
 
@@ -255,13 +254,13 @@ public class MazeGame extends BaseGame {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -300f, 0};
+        float[] gravity = {0, -9.8f, 0};
         physicsEngine.setGravity(gravity);
     }
 
     //PHYSICS
     private void createSagePhysicsWorld() {
-        float mass = 500.01f;
+        float mass = 10000.0f;
 
 
         BoundingSphere playerBoundingBox = (BoundingSphere) playerAvatar.getWorldBound();
