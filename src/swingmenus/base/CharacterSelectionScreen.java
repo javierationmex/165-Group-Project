@@ -94,7 +94,7 @@ public class CharacterSelectionScreen {
                         this.canStartGame = false;
                     }
                 }
-                player.sendStartGamePacket();
+                player.sendStartGamePacket(players.size());
             }
         });
     }

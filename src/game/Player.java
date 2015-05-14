@@ -121,9 +121,10 @@ public class Player {
         this.characterID = characterID;
     }
 
-    public void sendStartGamePacket() {
+    public void sendStartGamePacket(int i) {
+
         try {
-            client.sendPacket(new StartGamePacket());
+            client.sendPacket(new StartGamePacket(i));
         } catch (IOException e) {
             e.printStackTrace();
         }

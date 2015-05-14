@@ -49,7 +49,7 @@ public class MovePlayerForwardAction extends BaseAbstractInputAction {
             // playerAvatarP.setDamping(40f,0f);
             //avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
         //}
-
+//TODO fix the movement.
         playerAvatarP.setLinearVelocity(new float[]{(float) dir.getX() * 100, 0, (float) dir.getZ() * 100});
         //playerAvatarP.setFriction(100000);
         //playerAvatarP.setSleepThresholds(1,1);

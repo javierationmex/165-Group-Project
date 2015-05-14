@@ -27,6 +27,8 @@ import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
+import networking.packets.ingame.AvatarTransformsPacket;
+import networking.packets.ingame.GetAvatarInformationPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
 import sage.app.BaseGame;
 import sage.audio.*;
@@ -94,12 +96,13 @@ public class MazeGame extends BaseGame {
     private String oldTranslation;
     private String oldScale;
     private boolean canProcess;
+    private boolean gotAvatarInfo = false;
     private IPhysicsEngine physicsEngine;
     private IPhysicsObject playerAvatarP, groundPlaneP, cube1P, pyramid1P;
     private Rectangle groundPlane;
     private boolean isPhysicsEnabled;
-    private Cube cube1;
-    private Pyramid pyramid1;
+    //private Cube cube1;
+    //private Pyramid pyramid1;
     private ChessPieceRock finish;
 
     private CollisionDispatcher collDispatcher;
@@ -167,8 +170,8 @@ public class MazeGame extends BaseGame {
         renderer = display.getRenderer();
 
         initGameObjects();
-        initPhysicsSystem();
-        createSagePhysicsWorld();
+        //initPhysicsSystem();
+        //createSagePhysicsWorld();
 
         initScripting();
         setControls();
@@ -181,9 +184,11 @@ public class MazeGame extends BaseGame {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
 
-        addPlayer();
+
         initTerrain();
         drawSkyBox();
+        addPlayer();
+
 
 /*
         Moved to script
@@ -192,12 +197,12 @@ public class MazeGame extends BaseGame {
         s.translate(200, 6, 200);
         s.scale(20, 50, 20);
         */
-        cube1 = new Cube();
+        /*cube1 = new Cube();
         cube1.translate(5, 10, 0);
         addGameWorldObject(cube1);
         pyramid1 = new Pyramid();
         pyramid1.translate(-5, 50, 0);
-        addGameWorldObject(pyramid1);
+        addGameWorldObject(pyramid1);*/
 
         finish = new ChessPieceRock();
         finish.translate(-900, 1, -900);
@@ -209,17 +214,17 @@ public class MazeGame extends BaseGame {
     //=====================================================================================================
     //===================================================================================PHYSICS SECTION
     //=====================================================================================================
-    protected void initPhysicsSystem()
+/*    protected void initPhysicsSystem()
     {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
         float[] gravity = {0, -98f, 0};
         physicsEngine.setGravity(gravity);
-    }
+    }*/
 
     //PHYSICS
-    private void createSagePhysicsWorld() {
+    /*private void createSagePhysicsWorld() {
         float mass = 0.01f;
 
         float[] avatarsize = {1, 1, 1};
@@ -235,18 +240,18 @@ public class MazeGame extends BaseGame {
         playerAvatarP.setDamping(0.99f, 0.0f);
         playerAvatarP.setFriction(0);
 
-        float cube1Size[] = {1, 1, 1};
+       *//* float cube1Size[] = {1, 1, 1};
         cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, cube1.getWorldTransform().getValues(), cube1Size);
         cube1P.setBounciness(0.5f);
         cube1P.setDamping(0.1f, 0.1f);
-        cube1.setPhysicsObject(cube1P);
+        cube1.setPhysicsObject(cube1P);*//*
 
 
-        float cube2Size[] = {1, 1, 1};
+        *//*float cube2Size[] = {1, 1, 1};
         pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, pyramid1.getWorldTransform().getValues(), 1f, 1f);
         pyramid1P.setBounciness(0.5f);
         pyramid1P.setDamping(0.1f, 0.1f);
-        pyramid1.setPhysicsObject(pyramid1P);
+        pyramid1.setPhysicsObject(pyramid1P);*//*
 
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
@@ -256,7 +261,7 @@ public class MazeGame extends BaseGame {
         groundPlaneP.setBounciness(0.0f);
         groundPlane.setPhysicsObject(groundPlaneP);
 
-    }
+    }*/
 
 
     //==========================================================================================SCRIPTING SECTION
@@ -431,7 +436,6 @@ public class MazeGame extends BaseGame {
 
     private void addPlayer() {
         if(player.getCharacterID() == 1){
-
             playerAvatar = new CustomPyramid("PLAYER1");
         }else if(player.getCharacterID() == 0){
             playerAvatar = new CustomCube("PLAYER1");
@@ -443,21 +447,29 @@ public class MazeGame extends BaseGame {
             playerAvatar = new Pod().getChild();
         }
 
-        //set the character ID here and catch it in addGhostAvatar();
-
-        //playerAvatar.scale(0.2f, 0.2f, 0.2f);
-        playerAvatar.rotate(180, new Vector3D(0, 1, 0));
-        playerAvatar.translate(0, 5, 0);
-        //playerAvatar.setShowBound(true);
-
-
-        updateOldPosition();
-
         try {
             client.sendPacket(new AddAvatarInformationPacket(client.getId(), player.getCharacterID()));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //set the character ID here and catch it in addGhostAvatar();
+
+        while(playerAvatar.getLocalRotation() == null){
+            try {
+                client.sendPacket(new GetAvatarInformationPacket(client.getId()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            while(!gotAvatarInfo){
+                client.processPackets();
+            }
+        }
+
+
+        updateOldPosition();
+
+
         addGameWorldObject(playerAvatar);
         camera1 = display.getRenderer().getCamera();
         camera1.setPerspectiveFrustum(60, 1, 1, 5000);
@@ -510,9 +522,9 @@ public class MazeGame extends BaseGame {
 
             Random rand = new Random();
             float ranfdomFloat = rand.nextFloat();
-            SceneNode particle = cube1;
+            //SceneNode particle = cube1;
 
-            float[] swarmBehaviour = new float[3];
+/*            float[] swarmBehaviour = new float[3];
             {
                 Point3D finishPoint = new Point3D(finish.getWorldTranslation().getCol(3));
                 Point3D startPoint = new Point3D(particle.getWorldTranslation().getCol(3));
@@ -542,16 +554,17 @@ public class MazeGame extends BaseGame {
             cube1P.setLinearVelocity(behaviour);
 
 
-            pyramid1P.setLinearVelocity(behaviour);
+            pyramid1P.setLinearVelocity(behaviour);*/
 
             //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
             Matrix3D mat;
             Vector3D translateVec, rotateVec;
-            physicsEngine.update(20.0f);
+            //physicsEngine.update(20.0f);
             for (SceneNode s : getGameWorld()){
                 if (s.getPhysicsObject() != null){
                     mat = new Matrix3D(s.getPhysicsObject().getTransform());
                     translateVec = mat.getCol(3);
+
                     //rotateVec = mat.getCol(2);
                     s.getLocalTranslation().setCol(3,translateVec);
                     //s.getLocalRotation().setCol(3,rotateVec);
@@ -565,7 +578,7 @@ public class MazeGame extends BaseGame {
         }
 
 
-        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
+        //npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
         setEarParameters();
     }
 
@@ -595,7 +608,7 @@ public class MazeGame extends BaseGame {
         windSound.setMaxDistance(50.0f);
         windSound.setMinDistance(3.0f);
         windSound.setRollOff(5.0f);
-        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
+        //npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
         windSound.setLocation(new Point3D(groundPlane.getWorldTranslation().getCol(3)));
         setEarParameters();
         npcSound.play();
@@ -809,5 +822,11 @@ public class MazeGame extends BaseGame {
         }
 
         return collides;
+    }
+
+    public void updateAvatar(AvatarTransformsPacket packet) {
+        playerAvatar.setLocalRotation(packet.getLocalRotation());
+        playerAvatar.setLocalTranslation(packet.getLocalTranslation());
+        gotAvatarInfo = true;
     }
 }
