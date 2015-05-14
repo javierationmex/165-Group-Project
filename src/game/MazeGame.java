@@ -495,7 +495,7 @@ public class MazeGame extends BaseGame {
 
 
         // -------------------------------------------------------------APPLIES FRICTION WHEN IN IMAGETERRAIN
-//        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+//        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
 //        float terHeight = imageTerrain.getHeightFromWorld(avLoc);
 //        if (avLoc.getY() < terHeight) {
 //            playerAvatarP.setFriction(0.9f);
@@ -514,8 +514,8 @@ public class MazeGame extends BaseGame {
 
             float[] swarmBehaviour = new float[3];
             {
-                Point3D finishPoint = new Point3D(finish.getWorldTranslation().getCol(3));
-                Point3D startPoint = new Point3D(particle.getWorldTranslation().getCol(3));
+                Point3D finishPoint = new Point3D(finish.getLocalTranslation().getCol(3));
+                Point3D startPoint = new Point3D(particle.getLocalTranslation().getCol(3));
                 swarmBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.01);
                 swarmBehaviour[1] = 0;
                 swarmBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.01);
@@ -524,11 +524,11 @@ public class MazeGame extends BaseGame {
 
             float[] particleBehaviour = new float[3];
             {
-                Point3D finishPoint = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
-                Point3D startPoint = new Point3D(particle.getWorldTranslation().getCol(3));
-                particleBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.1);
+                Point3D finishPoint = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
+                Point3D startPoint = new Point3D(particle.getLocalTranslation().getCol(3));
+                particleBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.5);
                 particleBehaviour[1] = 0;
-                particleBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.1);
+                particleBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.5);
             }
 
 
@@ -557,6 +557,7 @@ public class MazeGame extends BaseGame {
                     //s.getLocalRotation().setCol(3,rotateVec);
                 }
             }
+
         }
 
 
@@ -565,7 +566,7 @@ public class MazeGame extends BaseGame {
         }
 
 
-        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
+        npcSound.setLocation(new Point3D(cube1.getLocalTranslation().getCol(3)));
         setEarParameters();
     }
 
@@ -597,15 +598,17 @@ public class MazeGame extends BaseGame {
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
         npcSound.setMaxDistance(200);
-        npcSound.setMinDistance(1.0f);
-        npcSound.setRollOff(1.0f);
+        npcSound.setMinDistance(50.0f);
+        npcSound.setRollOff(5.0f);
         windSound.setMaxDistance(200);
-        windSound.setMinDistance(1.0f);
+        windSound.setMinDistance(50.0f);
         windSound.setRollOff(5.0f);
 
-        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
+        //npcSound.setLocation(new Point3D(cube1P.getTransform()[6],cube1P.getTransform()[7],cube1P.getTransform()[8]));
+        npcSound.setLocation(new Point3D(pyramid1.getLocalTranslation().getCol(3)));
 
-        windSound.setLocation(new Point3D(finish.getWorldTranslation().getCol(3)));
+        //windSound.setLocation(new Point3D(finish.getTransform()[6],finish.getTransform()[7],finish.getTransform()[8]));
+        windSound.setLocation(new Point3D(finish.getLocalTranslation().getCol(3)));
         setEarParameters();
         npcSound.play();
         windSound.play();
@@ -627,7 +630,7 @@ public class MazeGame extends BaseGame {
 
     private boolean playerChanged() {
         if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
-                !oldTranslation.equals(playerAvatar.getWorldTranslation().toString()) ||
+                !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
            !oldScale.equals(playerAvatar.getLocalScale().toString())){
             updateOldPosition();
             return true;
@@ -729,7 +732,7 @@ public class MazeGame extends BaseGame {
         //8 x   ,y ,z++
 
 
-        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
         float x = (float) avLoc.getX();
         float y = (float) avLoc.getY();
         float z = (float) avLoc.getZ();
@@ -787,19 +790,6 @@ public class MazeGame extends BaseGame {
 
         }
 
-//            if (newy1 >= newterHeight1) {
-//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx1);
-//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz1);
-//            } else if (newy2 >= newterHeight3) {
-//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx2);
-//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz2);
-//            } else if (newy3 >= newterHeight2) {
-//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx3);
-//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz3);
-//            } else if (newy4 >= newterHeight4) {
-//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx4);
-//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz4);
-//            }
 
     }
 

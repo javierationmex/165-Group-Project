@@ -42,7 +42,7 @@ public class CameraController {
     }
 
     private void updateTarget() {
-        targetPos = new Point3D(target.getWorldTranslation().getCol(3));
+        targetPos = new Point3D(target.getLocalTranslation().getCol(3));
     }
 
     private void updateCameraPosition() {

@@ -37,7 +37,7 @@ public class MovePlayerBackwardAction extends BaseAbstractInputAction {
 //        Vector3D projectedDirection = new Vector3D(0, 0, 1);
 //        projectedDirection = projectedDirection.mult(rot);
 //        projectedDirection.scale(2);
-//        projectedDirection.add(avatar.getWorldTranslation().getCol(3));
+//        projectedDirection.add(avatar.getLocalTranslation().getCol(3));
 //
 //        float projectedx = (float) projectedDirection.getX();
 //        float projectedy = (float) projectedDirection.getX();

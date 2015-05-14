@@ -358,7 +358,8 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i20" class="altColor">
 <td class="colFirst"><code>graphicslib3D.Matrix3D</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../sage/scene/SceneNode.html#getWorldTranslation--">getWorldTranslation</a></span>()</code>
+    <td class="colLast"><code><span class="memberNameLink"><a
+            href="../../sage/scene/SceneNode.html#getLocalTranslation--">getLocalTranslation</a></span>()</code>
 <div class="block">Returns a reference to this SceneNode's world translation transform.</div>
 </td>
 </tr>
@@ -842,13 +843,13 @@ extends java.lang.Object</pre>
  in degrees about the given axis.</div>
 </li>
 </ul>
-<a name="getWorldTranslation--">
+    <a name="getLocalTranslation--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getWorldTranslation</h4>
-<pre>public&nbsp;graphicslib3D.Matrix3D&nbsp;getWorldTranslation()</pre>
+    <h4>getLocalTranslation</h4>
+    <pre>public&nbsp;graphicslib3D.Matrix3D&nbsp;getLocalTranslation()</pre>
 <div class="block">Returns a reference to this SceneNode's world translation transform.  Note that
  a <b><i>reference</i></b> is returned, not a copy (clone).  Any 
  modification to the returned object modifies <i>this</i> node's
