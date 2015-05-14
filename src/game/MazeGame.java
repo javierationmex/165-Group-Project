@@ -565,7 +565,7 @@ public class MazeGame extends BaseGame {
         }
 
 
-        npcSound.setLocation(new Point3D(cube1.getLocalTranslation().getCol(3)));
+        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
         setEarParameters();
     }
 
@@ -592,18 +592,18 @@ public class MazeGame extends BaseGame {
 
         resource1 = audioMgr.createAudioResource(shipFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource2 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
-        npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 50, true);
+        npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 100, true);
         windSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
-        npcSound.setMaxDistance(100.0f);
+        npcSound.setMaxDistance(2000.0f);
         npcSound.setMinDistance(1.0f);
-        npcSound.setRollOff(5f);
-        windSound.setMaxDistance(100);
+        npcSound.setRollOff(1.0f);
+        windSound.setMaxDistance(2000.0f);
         windSound.setMinDistance(1.0f);
         windSound.setRollOff(5.0f);
-        npcSound.setLocation(new Point3D(cube1.getLocalTranslation().getCol(3)));
-        windSound.setLocation(new Point3D(finish.getLocalTranslation().getCol(3)));
+        npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
+        windSound.setLocation(new Point3D(finish.getWorldTranslation().getCol(3)));
         setEarParameters();
         npcSound.play();
         windSound.play();
@@ -625,7 +625,7 @@ public class MazeGame extends BaseGame {
 
     private boolean playerChanged() {
         if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
-           !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
+                !oldTranslation.equals(playerAvatar.getWorldTranslation().toString()) ||
            !oldScale.equals(playerAvatar.getLocalScale().toString())){
             updateOldPosition();
             return true;
