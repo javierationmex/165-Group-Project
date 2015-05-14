@@ -45,7 +45,6 @@ import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
 import sage.scene.shape.Cube;
-import sage.scene.shape.Pyramid;
 import sage.scene.shape.Rectangle;
 import sage.scene.state.RenderState;
 import sage.scene.state.TextureState;
@@ -98,8 +97,9 @@ public class MazeGame extends BaseGame {
     private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, cube1P, pyramid1P;
     private Rectangle groundPlane;
     private boolean isPhysicsEnabled;
-    private Cube cube1, rightRail, leftRail;
-    private Pyramid pyramid1;
+    private Cube rightRail, leftRail;
+    private Pod NPC1;
+    private Ship NPC2;
     private ChessPieceRock finish;
 
 
@@ -114,7 +114,7 @@ public class MazeGame extends BaseGame {
     private Vector3f worldAabbMax = new Vector3f(10000, 10000, 10000);
     private DynamicsWorld physicsWorld;
     private IAudioManager audioMgr;
-    private Sound windSound, npcSound;
+    private Sound windSound, npcSound, whooshSound;
 
     public MazeGame(Player player) {
         this.player = player;
@@ -205,12 +205,12 @@ public class MazeGame extends BaseGame {
         leftRail.translate(-50, 0, 0);
         addGameWorldObject(leftRail);
 
-        cube1 = new Cube();
-        cube1.translate(150, 1, 2000);
-        addGameWorldObject(cube1);
-        pyramid1 = new Pyramid();
-        pyramid1.translate(-150, 1, 2000);
-        addGameWorldObject(pyramid1);
+        NPC1 = new Pod();
+        NPC1.translate(150, 1, 2000);
+        addGameWorldObject(NPC1);
+        NPC2 = new Ship();
+        NPC2.translate(-150, 1, 2000);
+        addGameWorldObject(NPC2);
 
         finish = new ChessPieceRock();
         finish.translate(0, 0, 3000);
@@ -262,20 +262,20 @@ public class MazeGame extends BaseGame {
 
 
         float cube1Size[] = {1, 1, 1};
-        cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, cube1.getWorldTransform().getValues(), cube1Size);
+        cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, NPC1.getWorldTransform().getValues(), cube1Size);
         cube1P.setBounciness(5.5f);
         cube1P.setDamping(0.1f, 0.1f);
-        cube1.setPhysicsObject(cube1P);
+        NPC1.setPhysicsObject(cube1P);
         //cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
 
 
 
 
         float cube2Size[] = {1, 1, 1};
-        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, pyramid1.getWorldTransform().getValues(), 1f, 1f);
+        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getWorldTransform().getValues(), 1f, 1f);
         pyramid1P.setBounciness(5.5f);
         pyramid1P.setDamping(0.1f, 0.1f);
-        pyramid1.setPhysicsObject(pyramid1P);
+        NPC2.setPhysicsObject(pyramid1P);
         //pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
@@ -537,7 +537,7 @@ public class MazeGame extends BaseGame {
 
             Random rand = new Random();
             float ranfdomFloat = rand.nextFloat();
-            SceneNode particle = cube1;
+            SceneNode particle = NPC1;
 
             float[] swarmBehaviour = new float[3];
             {
@@ -593,7 +593,9 @@ public class MazeGame extends BaseGame {
         }
 
 
-        npcSound.setLocation(new Point3D(cube1.getLocalTranslation().getCol(3)));
+        npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
+        windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
+        windSound.setVolume((int) (playerAvatarP.getAngularVelocity()[2] * 0.5));
         setEarParameters();
     }
 
@@ -602,7 +604,7 @@ public class MazeGame extends BaseGame {
     //-------------------------------------------------------------------------------------------------------
 
     public void initAudio() {
-        AudioResource resource1, resource2;
+        AudioResource resource1, resource2, resource3;
         audioMgr = AudioManagerFactory.createAudioManager("sage.audio.joal.JOALAudioManager");
         if (!audioMgr.initialize()) {
             System.out.println("Audio Manager failed to initialize!");
@@ -619,26 +621,33 @@ public class MazeGame extends BaseGame {
         String shipFilePath = soundDir + shipFilename;
 
         resource1 = audioMgr.createAudioResource(shipFilePath, AudioResourceType.AUDIO_SAMPLE);
-        resource2 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource2 = audioMgr.createAudioResource(whooshFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource3 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
         npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 100, true);
-        windSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
+        whooshSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
+        windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 50, true);
+
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
+        whooshSound.initialize(audioMgr);
         npcSound.setMaxDistance(200);
         npcSound.setMinDistance(50.0f);
         npcSound.setRollOff(5.0f);
         windSound.setMaxDistance(200);
         windSound.setMinDistance(50.0f);
         windSound.setRollOff(5.0f);
+        whooshSound.setMaxDistance(200);
+        whooshSound.setMinDistance(50.0f);
+        whooshSound.setRollOff(5.0f);
 
-        //npcSound.setLocation(new Point3D(cube1P.getTransform()[6],cube1P.getTransform()[7],cube1P.getTransform()[8]));
-        npcSound.setLocation(new Point3D(pyramid1.getLocalTranslation().getCol(3)));
-
-        //windSound.setLocation(new Point3D(finish.getTransform()[6],finish.getTransform()[7],finish.getTransform()[8]));
-        windSound.setLocation(new Point3D(finish.getLocalTranslation().getCol(3)));
+        npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
+        windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
+        whooshSound.setLocation(new Point3D(finish.getLocalTranslation().getCol(3)));
         setEarParameters();
         npcSound.play();
         windSound.play();
+        whooshSound.play();
+
     }
 
     public void setEarParameters() {
