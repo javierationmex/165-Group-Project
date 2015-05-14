@@ -193,10 +193,10 @@ public class MazeGame extends BaseGame {
         s.scale(20, 50, 20);
         */
         cube1 = new Cube();
-        cube1.translate(5, 10, 0);
+        cube1.translate(150, 50, 0);
         addGameWorldObject(cube1);
         pyramid1 = new Pyramid();
-        pyramid1.translate(-5, 50, 0);
+        pyramid1.translate(-150, 50, 0);
         addGameWorldObject(pyramid1);
 
         finish = new ChessPieceRock();
@@ -233,18 +233,18 @@ public class MazeGame extends BaseGame {
 
         //playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         playerAvatarP.setDamping(0.99f, 0.0f);
-        playerAvatarP.setFriction(0);
+        playerAvatarP.setFriction(0.1f);
 
         float cube1Size[] = {1, 1, 1};
         cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, cube1.getWorldTransform().getValues(), cube1Size);
-        cube1P.setBounciness(0.5f);
+        cube1P.setBounciness(5.5f);
         cube1P.setDamping(0.1f, 0.1f);
         cube1.setPhysicsObject(cube1P);
 
 
         float cube2Size[] = {1, 1, 1};
         pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, pyramid1.getWorldTransform().getValues(), 1f, 1f);
-        pyramid1P.setBounciness(0.5f);
+        pyramid1P.setBounciness(5.5f);
         pyramid1P.setDamping(0.1f, 0.1f);
         pyramid1.setPhysicsObject(pyramid1P);
 
@@ -252,8 +252,8 @@ public class MazeGame extends BaseGame {
         float up[] = {0,1,0}; // {0,1,0} is flat
         groundPlaneP =
                 physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),
-                        groundPlane.getLocalTranslation().getValues(), up, 0f);
-        groundPlaneP.setBounciness(0.0f);
+                        groundPlane.getLocalTranslation().getValues(), up, 0.0f);
+        groundPlaneP.setBounciness(0.7f);
         groundPlane.setPhysicsObject(groundPlaneP);
 
     }
@@ -363,7 +363,7 @@ public class MazeGame extends BaseGame {
         groundPlane = new Rectangle("ground", 5000, 5000);
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
-        groundPlane.scale(5, 1, 1);
+        //groundPlane.scale(5, 1, 1);
         //groundPlane.scale(1, 1, 1);
         //groundPlane.translate(0, 0, 0);
         groundPlane.setColor(Color.GRAY);
@@ -584,21 +584,23 @@ public class MazeGame extends BaseGame {
         String strongwindFilePath = soundDir + strongwindFilename;
         String whooshFilename = "Whoosh.wav";
         String whooshFilePath = soundDir + whooshFilename;
+        String shipFilename = "ship1.wav";
+        String shipFilePath = soundDir + shipFilename;
 
-        resource1 = audioMgr.createAudioResource(whooshFilePath, AudioResourceType.AUDIO_SAMPLE);
-        resource2 = audioMgr.createAudioResource(windFilePath, AudioResourceType.AUDIO_SAMPLE);
-        npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 100, true);
+        resource1 = audioMgr.createAudioResource(shipFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource2 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
+        npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 50, true);
         windSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
-        npcSound.setMaxDistance(5.0f);
-        npcSound.setMinDistance(0.0f);
-        npcSound.setRollOff(5.0f);
-        windSound.setMaxDistance(5000.0f);
-        windSound.setMinDistance(0.0f);
+        npcSound.setMaxDistance(10.0f);
+        npcSound.setMinDistance(1.0f);
+        npcSound.setRollOff(5f);
+        windSound.setMaxDistance(1000.0f);
+        windSound.setMinDistance(1.0f);
         windSound.setRollOff(5.0f);
         npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
-        windSound.setLocation(new Point3D(groundPlane.getWorldTranslation().getCol(3)));
+        windSound.setLocation(new Point3D(finish.getWorldTranslation().getCol(3)));
         setEarParameters();
         npcSound.play();
         windSound.play();
