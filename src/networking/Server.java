@@ -109,8 +109,27 @@ public class Server extends GameConnectionServer<UUID> {
     }
 
 
-    public void sendNPCinfo() {
-
+    public void sendNPCinfo() {// informs clients of new NPC positions
+//        for(int i=0; i<npcCtrl.getNumOfNPCs(); i++) {
+//            try {
+//                this.sendPacketToAll();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            try {
+//                String message = new String("mnpc," + Integer.toString(i));
+//                message += "," + (npcCtrl.getNPC(i)).getX();
+//                message += "," + (npcCtrl.getNPC(i)).getY();
+//                message += "," + (npcCtrl.getNPC(i)).getZ();
+//                this.sendPacketToAll(message);
+//                // also additional cases for receiving messages about NPCs, such as:
+//                if (messageTokens[0].compareTo("needNPC") == 0) {
+//                    ...}
+//                if (messageTokens[0].compareTo("collide") == 0) {
+//                    ...}
+//
+//            }catch(){}
+//        }
     }
 
 }

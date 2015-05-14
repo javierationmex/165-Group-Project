@@ -69,6 +69,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 public class MazeGame extends BaseGame {
@@ -93,11 +94,12 @@ public class MazeGame extends BaseGame {
     private String oldScale;
     private boolean canProcess;
     private IPhysicsEngine physicsEngine;
-    private IPhysicsObject playerAvatarP, groundPlaneP, cube1P, cube2P;
+    private IPhysicsObject playerAvatarP, groundPlaneP, cube1P, pyramid1P;
     private Rectangle groundPlane;
     private boolean isPhysicsEnabled;
-    private Pyramid cube1;
-    private Cube cube2;
+    private Cube cube1;
+    private Pyramid pyramid1;
+    private ChessPieceRock finish;
 
     private CollisionDispatcher collDispatcher;
     private BroadphaseInterface broadPhaseHandler;
@@ -109,6 +111,7 @@ public class MazeGame extends BaseGame {
     private Vector3f worldAabbMin = new Vector3f(-10000, -10000, -10000);
     private Vector3f worldAabbMax = new Vector3f(10000, 10000, 10000);
     private DynamicsWorld physicsWorld;
+
 
     public MazeGame(Player player) {
         this.player = player;
@@ -186,12 +189,18 @@ public class MazeGame extends BaseGame {
         s.translate(200, 6, 200);
         s.scale(20, 50, 20);
         */
-        cube1 = new Pyramid();
+        cube1 = new Cube();
         cube1.translate(5, 10, 0);
         addGameWorldObject(cube1);
-        cube2 = new Cube();
-        cube2.translate(-5, 10, 0);
-        addGameWorldObject(cube2);
+        pyramid1 = new Pyramid();
+        pyramid1.translate(-5, 50, 0);
+        addGameWorldObject(pyramid1);
+
+        finish = new ChessPieceRock();
+        finish.translate(-900, 1, -900);
+        finish.scale(5, 5, 5);
+        addGameWorldObject(finish);
+
     }
 
     //=====================================================================================================
@@ -211,7 +220,7 @@ public class MazeGame extends BaseGame {
         float mass = 0.01f;
 
         float[] avatarsize = {1, 1, 1};
-        playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, playerAvatar.getWorldTransform().getValues(), avatarsize);
+        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getWorldTransform().getValues(), 1, 1);
         playerAvatar.setPhysicsObject(playerAvatarP);
         playerAvatarP.setBounciness(0.5f);
 
@@ -226,12 +235,15 @@ public class MazeGame extends BaseGame {
         float cube1Size[] = {1, 1, 1};
         cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, cube1.getWorldTransform().getValues(), cube1Size);
         cube1P.setBounciness(0.5f);
+        cube1P.setDamping(0.1f, 0.1f);
         cube1.setPhysicsObject(cube1P);
 
+
         float cube2Size[] = {1, 1, 1};
-        cube2P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, cube2.getWorldTransform().getValues(), 1f, 1f);
-        cube2P.setBounciness(0.5f);
-        cube2.setPhysicsObject(cube1P);
+        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, pyramid1.getWorldTransform().getValues(), 1f, 1f);
+        pyramid1P.setBounciness(0.5f);
+        pyramid1P.setDamping(0.1f, 0.1f);
+        pyramid1.setPhysicsObject(pyramid1P);
 
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
@@ -345,10 +357,10 @@ public class MazeGame extends BaseGame {
 
         //Floor groundPlane
 
-        groundPlane = new Rectangle("ground", 1000, 1000);
+        groundPlane = new Rectangle("ground", 5000, 5000);
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
-        // groundPlane.scale(50000, 50000, 1);
+        groundPlane.scale(5, 1, 1);
         //groundPlane.scale(1, 1, 1);
         //groundPlane.translate(0, 0, 0);
         groundPlane.setColor(Color.GRAY);
@@ -376,7 +388,7 @@ public class MazeGame extends BaseGame {
     }
 
     private void drawSkyBox() {
-        skybox = new SkyBox("skybox", 3000, 3000, 3000);
+        skybox = new SkyBox("skybox", 1000, 1000, 1000);
 
         String textureDir = "." + File.separator + "materials" + File.separator + "dunes" + File.separator;
         String topFilename = "top.jpg";
@@ -432,7 +444,7 @@ public class MazeGame extends BaseGame {
 
         //playerAvatar.scale(0.2f, 0.2f, 0.2f);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
-        playerAvatar.translate(0, 200, 0);
+        playerAvatar.translate(0, 5, 0);
         //playerAvatar.setShowBound(true);
 
 
@@ -492,6 +504,43 @@ public class MazeGame extends BaseGame {
         //playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
 
         if (isPhysicsEnabled) {
+
+            Random rand = new Random();
+            float ranfdomFloat = rand.nextFloat();
+            SceneNode particle = cube1;
+
+            float[] swarmBehaviour = new float[3];
+            {
+                Point3D finishPoint = new Point3D(finish.getWorldTranslation().getCol(3));
+                Point3D startPoint = new Point3D(particle.getWorldTranslation().getCol(3));
+                swarmBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.01);
+                swarmBehaviour[1] = 0;
+                swarmBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.01);
+            }
+
+
+            float[] particleBehaviour = new float[3];
+            {
+                Point3D finishPoint = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+                Point3D startPoint = new Point3D(particle.getWorldTranslation().getCol(3));
+                particleBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.1);
+                particleBehaviour[1] = 0;
+                particleBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.1);
+            }
+
+
+            float[] behaviour = new float[3];
+            behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
+            behaviour[1] = 0;
+            behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
+
+            //float halfrand = (rand.nextInt(50 - 0) + 0)/100;
+
+            cube1P.setLinearVelocity(behaviour);
+
+
+            pyramid1P.setLinearVelocity(behaviour);
+
             //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
             Matrix3D mat;
             Vector3D translateVec, rotateVec;
