@@ -596,13 +596,15 @@ public class MazeGame extends BaseGame {
         windSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
-        npcSound.setMaxDistance(2000.0f);
+        npcSound.setMaxDistance(200);
         npcSound.setMinDistance(1.0f);
         npcSound.setRollOff(1.0f);
-        windSound.setMaxDistance(2000.0f);
+        windSound.setMaxDistance(200);
         windSound.setMinDistance(1.0f);
         windSound.setRollOff(5.0f);
+
         npcSound.setLocation(new Point3D(cube1.getWorldTranslation().getCol(3)));
+
         windSound.setLocation(new Point3D(finish.getWorldTranslation().getCol(3)));
         setEarParameters();
         npcSound.play();
