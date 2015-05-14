@@ -254,13 +254,13 @@ public class MazeGame extends BaseGame {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -98f, 0};
+        float[] gravity = {0, -500f, 0};
         physicsEngine.setGravity(gravity);
     }
 
     //PHYSICS
     private void createSagePhysicsWorld() {
-        float mass = 1000.0f;
+        float mass = 100.0f;
 
 
         BoundingSphere playerBoundingBox = (BoundingSphere) playerAvatar.getWorldBound();
@@ -293,7 +293,7 @@ public class MazeGame extends BaseGame {
 
         BoundingSphere NPC1BoundingBox = (BoundingSphere) NPC1.getWorldBound();
         cube1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC1.getLocalTranslation().getValues(), NPC1BoundingBox.getRadius(), NPC1BoundingBox.getRadius());
-        cube1P.setBounciness(5.5f);
+        cube1P.setBounciness(50.5f);
         cube1P.setDamping(0.1f, 0.1f);
         NPC1.setPhysicsObject(cube1P);
         //cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
@@ -301,7 +301,7 @@ public class MazeGame extends BaseGame {
 
         float cube2Size[] = {3, 3, 3};
         pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getLocalTranslation().getValues(), 3f, 3f);
-        pyramid1P.setBounciness(5.5f);
+        pyramid1P.setBounciness(50.5f);
         pyramid1P.setDamping(0.1f, 0.1f);
         NPC2.setPhysicsObject(pyramid1P);
         //pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
@@ -312,16 +312,16 @@ public class MazeGame extends BaseGame {
         groundPlane.setPhysicsObject(groundPlaneP);
 
         float rockSize[] = {3, 3, 3};
-        rock1P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock1.getLocalTranslation().getValues(), rockSize);
-        rock2P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock2.getLocalTranslation().getValues(), rockSize);
-        rock3P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock3.getLocalTranslation().getValues(), rockSize);
-        rock4P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock4.getLocalTranslation().getValues(), rockSize);
-        rock5P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock5.getLocalTranslation().getValues(), rockSize);
-        rock1P.setBounciness(0f);
-        rock2P.setBounciness(0f);
-        rock3P.setBounciness(0f);
-        rock4P.setBounciness(0f);
-        rock5P.setBounciness(0f);
+        rock1P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock1.getLocalTranslation().getValues(), rockSize);
+        rock2P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock2.getLocalTranslation().getValues(), rockSize);
+        rock3P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock3.getLocalTranslation().getValues(), rockSize);
+        rock4P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock4.getLocalTranslation().getValues(), rockSize);
+        rock5P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock5.getLocalTranslation().getValues(), rockSize);
+        rock1P.setBounciness(50f);
+        rock2P.setBounciness(50f);
+        rock3P.setBounciness(50f);
+        rock4P.setBounciness(50f);
+        rock5P.setBounciness(50f);
 
         rock1.setPhysicsObject(rock1P);
         rock2.setPhysicsObject(rock2P);
@@ -657,12 +657,12 @@ public class MazeGame extends BaseGame {
         super.update(time);
         physicsEngine.update(time);
 
-        if (playerAvatar.getWorldBound().intersects(finish.getWorldBound())) {
-            finish.translate(0, 0, 100);
-            playerAvatar.scale(10, 10, 10);
-
-            JOptionPane.showMessageDialog(null, "YOU WIN!!!!!!");
-        }
+//        if (playerAvatar.getWorldBound().intersects(finish.getWorldBound())) {
+//            finish.translate(0, 0, 100);
+//            playerAvatar.scale(10, 10, 10);
+//
+//            JOptionPane.showMessageDialog(null, "YOU WIN!!!!!!");
+//        }
     }
 
     //-------------------------------------------------------------------------------------------------------
