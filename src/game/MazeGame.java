@@ -206,10 +206,10 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(leftRail);
 
         NPC1 = new Pod();
-        NPC1.translate(150, 1, 2000);
+        NPC1.translate(150, 1, -2000);
         addGameWorldObject(NPC1);
         NPC2 = new Ship();
-        NPC2.translate(-150, 1, 2000);
+        NPC2.translate(-150, 1, -2000);
         addGameWorldObject(NPC2);
 
         finish = new ChessPieceRock();
@@ -223,11 +223,11 @@ public class MazeGame extends BaseGame {
         rock4 = new ChessPieceRock();
         rock5 = new ChessPieceRock();
 
-        rock1.translate(2, 0, 200);
-        rock2.translate(-2, 0, 400);
-        rock3.translate(5, 0, 800);
-        rock4.translate(0, 0, 1000);
-        rock5.translate(2, 0, 1500);
+        rock1.translate(2, 0, 400);
+        rock2.translate(-2, 0, 800);
+        rock3.translate(5, 0, 1400);
+        rock4.translate(0, 0, 1600);
+        rock5.translate(2, 0, 1800);
 
         addGameWorldObject(rock1);
         addGameWorldObject(rock2);
@@ -265,16 +265,16 @@ public class MazeGame extends BaseGame {
         playerAvatarP.setDamping(0.99f, 0.1f);
         playerAvatarP.setFriction(0.1f);
 
-//        float rightRailSize[] = {2, 2, 4000};
-//        rightRailP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), 1000, rightRail.getWorldTransform().getValues(), rightRailSize);
-//        rightRailP.setBounciness(0.9f);
-//        rightRailP.getTransform()[6]=50;
-//        rightRail.setPhysicsObject(rightRailP);
-//
-//        float leftRailSize[] = {2, 2, 4000};
-//        leftRailP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), 1000, leftRail.getWorldTransform().getValues(), leftRailSize);
-//        leftRailP.setBounciness(0.9f);
-//        leftRail.setPhysicsObject(leftRailP);
+        float rightRailSize[] = {2, 2, 4000};
+        rightRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, rightRail.getLocalTranslation().getValues(), rightRailSize);
+        rightRailP.setBounciness(0.9f);
+        rightRailP.getTransform()[6] = 50;
+        rightRail.setPhysicsObject(rightRailP);
+
+        float leftRailSize[] = {2, 2, 4000};
+        leftRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, leftRail.getLocalTranslation().getValues(), leftRailSize);
+        leftRailP.setBounciness(0.9f);
+        leftRail.setPhysicsObject(leftRailP);
 
 
         float cube1Size[] = {3, 3, 3};
@@ -357,7 +357,7 @@ public class MazeGame extends BaseGame {
     }
 
     //=====================================================================================================
-    //INPUT SECTION
+    //========================================================================================INPUT SECTION
     //=====================================================================================================
     private void setControls() {
         String keyboardName = JOptionPane.showInputDialog(null, "Pick a keyboard", "Input", JOptionPane.QUESTION_MESSAGE, null, inputMgr.getControllers().toArray(), "keyboard").toString();
@@ -595,9 +595,9 @@ public class MazeGame extends BaseGame {
 
 
             float[] behaviour = new float[3];
-            behaviour[0] = (swarmBehaviour[0]) * rand.nextFloat();
+            behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
             behaviour[1] = 0;
-            behaviour[2] = (swarmBehaviour[2]) * rand.nextFloat();
+            behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
 
             //float halfrand = (rand.nextInt(50 - 0) + 0)/100;
 
@@ -609,7 +609,7 @@ public class MazeGame extends BaseGame {
 
             pyramid1P.setLinearVelocity(behaviour);
 
-            //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
+            //playerAvatarP.setTransform(playerAvatar.getLocalTransform().getValues());
             Matrix3D mat;
             Vector3D translateVec, rotateVec;
             physicsEngine.update(100.0f);
@@ -689,7 +689,7 @@ public class MazeGame extends BaseGame {
     }
 
     public void setEarParameters() {
-        Matrix3D avDir = (Matrix3D) (playerAvatar.getWorldRotation().clone());
+        Matrix3D avDir = (Matrix3D) (playerAvatar.getLocalRotation().clone());
         //float camAz = camera1.get.getAzimuth();
         avDir.rotateY(180.0f);
         Vector3D camDir = new Vector3D(0, 0, 1);
