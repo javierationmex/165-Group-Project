@@ -192,17 +192,30 @@ public class MazeGame extends BaseGame {
         s.translate(200, 6, 200);
         s.scale(20, 50, 20);
         */
+
+        Cube rightRail = new Cube();
+        rightRail.scale(2, 2, 4000);
+        rightRail.translate(50, 0, 0);
+        addGameWorldObject(rightRail);
+
+
+        Cube leftRail = new Cube();
+        leftRail.scale(2, 2, 4000);
+        leftRail.translate(-50, 0, 0);
+        addGameWorldObject(leftRail);
+
         cube1 = new Cube();
-        cube1.translate(150, 50, 0);
+        cube1.translate(150, 1, 0);
         addGameWorldObject(cube1);
         pyramid1 = new Pyramid();
-        pyramid1.translate(-150, 50, 0);
+        pyramid1.translate(-150, 1, 0);
         addGameWorldObject(pyramid1);
 
         finish = new ChessPieceRock();
-        finish.translate(-900, 1, -900);
+        finish.translate(0, 0, -2000);
         finish.scale(5, 5, 5);
         addGameWorldObject(finish);
+
 
     }
 
@@ -240,6 +253,7 @@ public class MazeGame extends BaseGame {
         cube1P.setBounciness(5.5f);
         cube1P.setDamping(0.1f, 0.1f);
         cube1.setPhysicsObject(cube1P);
+        cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
 
 
         float cube2Size[] = {1, 1, 1};
@@ -247,7 +261,7 @@ public class MazeGame extends BaseGame {
         pyramid1P.setBounciness(5.5f);
         pyramid1P.setDamping(0.1f, 0.1f);
         pyramid1.setPhysicsObject(pyramid1P);
-
+        pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
         groundPlaneP =
@@ -516,9 +530,9 @@ public class MazeGame extends BaseGame {
             {
                 Point3D finishPoint = new Point3D(finish.getLocalTranslation().getCol(3));
                 Point3D startPoint = new Point3D(particle.getLocalTranslation().getCol(3));
-                swarmBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.01);
+                swarmBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.1);
                 swarmBehaviour[1] = 0;
-                swarmBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.01);
+                swarmBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.1);
             }
 
 
@@ -526,9 +540,9 @@ public class MazeGame extends BaseGame {
             {
                 Point3D finishPoint = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
                 Point3D startPoint = new Point3D(particle.getLocalTranslation().getCol(3));
-                particleBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.5);
+                particleBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.1);
                 particleBehaviour[1] = 0;
-                particleBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.5);
+                particleBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.1);
             }
 
 
