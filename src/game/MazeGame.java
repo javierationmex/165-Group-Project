@@ -215,15 +215,13 @@ public class MazeGame extends BaseGame {
         playerAvatar.setPhysicsObject(playerAvatarP);
         playerAvatarP.setBounciness(0.5f);
 
-<<<<<<< HEAD
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
-        playerAvatarP.setDamping(0.999999f, 0f);
-        playerAvatarP.setFriction(0.5f);
-=======
+        //playerAvatarP.setDamping(0.999999f, 0f);
+        //playerAvatarP.setFriction(0.5f);
+
         //playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         playerAvatarP.setDamping(0.99f, 0.0f);
         playerAvatarP.setFriction(0);
->>>>>>> 2b4aa95992ecd93c11c66a96e64bd72aeb1010ad
 
         float cube1Size[] = {1, 1, 1};
         cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, cube1.getWorldTransform().getValues(), cube1Size);
