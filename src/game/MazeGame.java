@@ -44,6 +44,7 @@ import sage.physics.PhysicsEngineFactory;
 import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
+import sage.scene.bounding.BoundingSphere;
 import sage.scene.shape.Cube;
 import sage.scene.shape.Rectangle;
 import sage.scene.state.RenderState;
@@ -194,22 +195,26 @@ public class MazeGame extends BaseGame {
         s.scale(20, 50, 20);
         */
 
-        rightRail = new Cube();
-        rightRail.scale(2, 2, 4000);
-        rightRail.translate(50, 0, 0);
-        addGameWorldObject(rightRail);
-
-
-        leftRail = new Cube();
-        leftRail.scale(2, 2, 4000);
-        leftRail.translate(-50, 0, 0);
-        addGameWorldObject(leftRail);
+//        rightRail = new Cube();
+//        rightRail.scale(2, 2, 4000);
+//        rightRail.translate(50, 0, 0);
+//        addGameWorldObject(rightRail);
+//        //leftRail.updateGeometricState(0,true);
+//
+//        leftRail = new Cube();
+//        leftRail.scale(2, 2, 4000);
+//        leftRail.translate(-50, 0, 0);
+//        addGameWorldObject(leftRail);
 
         NPC1 = new Pod();
-        NPC1.translate(150, 1, -2000);
+        NPC1.translate(0, 1, -2000);
         addGameWorldObject(NPC1);
+        NPC1.updateGeometricState(0, true);
+        NPC1.setShowBound(true);
+
         NPC2 = new Ship();
-        NPC2.translate(-150, 1, -2000);
+        NPC2.translate(-30, 1, -2000);
+        NPC2.updateGeometricState(0, true);
         addGameWorldObject(NPC2);
 
         finish = new ChessPieceRock();
@@ -234,6 +239,12 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(rock3);
         addGameWorldObject(rock4);
         addGameWorldObject(rock5);
+
+        rock1.updateGeometricState(0, true);
+        rock2.updateGeometricState(0, true);
+        rock3.updateGeometricState(0, true);
+        rock4.updateGeometricState(0, true);
+        rock5.updateGeometricState(0, true);
     }
 
     //=====================================================================================================
@@ -252,8 +263,9 @@ public class MazeGame extends BaseGame {
     private void createSagePhysicsWorld() {
         float mass = 500.01f;
 
-        float[] avatarsize = {1, 1, 1};
-        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), 4, 4);
+
+        BoundingSphere playerBoundingBox = (BoundingSphere) playerAvatar.getWorldBound();
+        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), playerBoundingBox.getRadius(), playerBoundingBox.getRadius());
         playerAvatar.setPhysicsObject(playerAvatarP);
         playerAvatarP.setBounciness(0.9f);
 
@@ -266,20 +278,22 @@ public class MazeGame extends BaseGame {
         playerAvatarP.setFriction(0.9f);
 
 
-        float rightRailSize[] = {2, 2, 4000};
-        rightRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, rightRail.getLocalTranslation().getValues(), rightRailSize);
-        rightRailP.setBounciness(0.0f);
-        rightRailP.getTransform()[6] = 50;
-        rightRail.setPhysicsObject(rightRailP);
+//        BoundingBox rightRailBoundingBox = (BoundingBox) rightRail.getWorldBound();
+//        float[] rightRailSize = {rightRailBoundingBox.getXExtent(), rightRailBoundingBox.getYExtent(), rightRailBoundingBox.getZExtent()};
+//        rightRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, rightRail.getLocalTranslation().getValues(), rightRailSize);
+//        rightRailP.setBounciness(0.0f);
+//        rightRailP.getTransform()[6] = 50;
+//        rightRail.setPhysicsObject(rightRailP);
+//
+//        BoundingBox leftRailBoundingBox = (BoundingBox) leftRail.getWorldBound();
+//        float[] leftRailSize = {leftRailBoundingBox.getXExtent(), leftRailBoundingBox.getYExtent(), leftRailBoundingBox.getZExtent()};
+//        leftRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, leftRail.getLocalTranslation().getValues(), leftRailSize);
+//        leftRailP.setBounciness(0.0f);
+//        leftRail.setPhysicsObject(leftRailP);
 
-        float leftRailSize[] = {2, 2, 4000};
-        leftRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, leftRail.getLocalTranslation().getValues(), leftRailSize);
-        leftRailP.setBounciness(0.0f);
-        leftRail.setPhysicsObject(leftRailP);
 
-
-        float cube1Size[] = {3, 3, 3};
-        cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, NPC1.getLocalTranslation().getValues(), cube1Size);
+        BoundingSphere NPC1BoundingBox = (BoundingSphere) NPC1.getWorldBound();
+        cube1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC1.getLocalTranslation().getValues(), NPC1BoundingBox.getRadius(), NPC1BoundingBox.getRadius());
         cube1P.setBounciness(5.5f);
         cube1P.setDamping(0.1f, 0.1f);
         NPC1.setPhysicsObject(cube1P);
@@ -508,9 +522,9 @@ public class MazeGame extends BaseGame {
 
         //playerAvatar.scale(0.2f, 0.2f, 0.2f);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
-        playerAvatar.translate(0, 5, 0);
+        playerAvatar.translate(0, 5, -2000);
         //playerAvatar.setShowBound(true);
-
+        playerAvatar.updateGeometricState(0, true);
 
         updateOldPosition();
 
@@ -577,9 +591,11 @@ public class MazeGame extends BaseGame {
             {
                 Point3D finishPoint = new Point3D(finish.getLocalTranslation().getCol(3));
                 Point3D startPoint = new Point3D(particle.getLocalTranslation().getCol(3));
-                swarmBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.1);
-                swarmBehaviour[1] = 0;
-                swarmBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.1);
+                Vector3D swarmVector = new Vector3D((finishPoint.getX() - startPoint.getX()), (finishPoint.getY() - startPoint.getY()), (finishPoint.getZ() - startPoint.getZ()));
+                swarmVector.normalize();
+                swarmBehaviour[0] = (float) (swarmVector.getX() * 0.1);
+                swarmBehaviour[1] = (float) (swarmVector.getY() * 0.1);
+                swarmBehaviour[2] = (float) (swarmVector.getZ() * 0.1);
             }
 
 
@@ -587,25 +603,27 @@ public class MazeGame extends BaseGame {
             {
                 Point3D finishPoint = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
                 Point3D startPoint = new Point3D(particle.getLocalTranslation().getCol(3));
-                particleBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.1);
-                particleBehaviour[1] = 0;
-                particleBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.1);
+                Vector3D particleVector = new Vector3D((finishPoint.getX() - startPoint.getX()), (finishPoint.getY() - startPoint.getY()), (finishPoint.getZ() - startPoint.getZ()));
+                particleVector.normalize();
+                particleBehaviour[0] = (float) (particleVector.getX() * 0.5);
+                particleBehaviour[1] = (float) (particleVector.getY() * 0.5);
+                particleBehaviour[2] = (float) (particleVector.getZ() * 0.5);
             }
 
 
             float[] behaviour = new float[3];
             behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
-            behaviour[1] = 0;
+            behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
             behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
 
             //float halfrand = (rand.nextInt(50 - 0) + 0)/100;
 
             cube1P.setLinearVelocity(behaviour);
 
-            behaviour[0] = (swarmBehaviour[0]) * rand.nextFloat();
-            behaviour[1] = 0;
-            behaviour[2] = (swarmBehaviour[2]) * rand.nextFloat();
 
+            behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
+            behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
+            behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
             pyramid1P.setLinearVelocity(behaviour);
 
             //playerAvatarP.setTransform(playerAvatar.getLocalTransform().getValues());
