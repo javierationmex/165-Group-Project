@@ -94,13 +94,13 @@ public class MazeGame extends BaseGame {
     private String oldScale;
     private boolean canProcess;
     private IPhysicsEngine physicsEngine;
-    private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, cube1P, pyramid1P;
+    private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, cube1P, pyramid1P, rock1P, rock2P, rock3P, rock4P, rock5P;
     private Rectangle groundPlane;
     private boolean isPhysicsEnabled;
     private Cube rightRail, leftRail;
     private Pod NPC1;
     private Ship NPC2;
-    private ChessPieceRock finish;
+    private ChessPieceRock finish, rock1, rock2, rock3, rock4, rock5;
 
 
     private CollisionDispatcher collDispatcher;
@@ -217,7 +217,23 @@ public class MazeGame extends BaseGame {
         finish.scale(5, 5, 5);
         addGameWorldObject(finish);
 
+        rock1 = new ChessPieceRock();
+        rock2 = new ChessPieceRock();
+        rock3 = new ChessPieceRock();
+        rock4 = new ChessPieceRock();
+        rock5 = new ChessPieceRock();
 
+        rock1.translate(2, 0, 200);
+        rock2.translate(-2, 0, 400);
+        rock3.translate(5, 0, 800);
+        rock4.translate(0, 0, 1000);
+        rock5.translate(2, 0, 1500);
+
+        addGameWorldObject(rock1);
+        addGameWorldObject(rock2);
+        addGameWorldObject(rock3);
+        addGameWorldObject(rock4);
+        addGameWorldObject(rock5);
     }
 
     //=====================================================================================================
@@ -237,7 +253,7 @@ public class MazeGame extends BaseGame {
         float mass = 500.01f;
 
         float[] avatarsize = {1, 1, 1};
-        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getWorldTransform().getValues(), 2, 2);
+        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), 2, 2);
         playerAvatar.setPhysicsObject(playerAvatarP);
         playerAvatarP.setBounciness(0.1f);
 
@@ -262,7 +278,7 @@ public class MazeGame extends BaseGame {
 
 
         float cube1Size[] = {3, 3, 3};
-        cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, NPC1.getWorldTransform().getValues(), cube1Size);
+        cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, NPC1.getLocalTranslation().getValues(), cube1Size);
         cube1P.setBounciness(5.5f);
         cube1P.setDamping(0.1f, 0.1f);
         NPC1.setPhysicsObject(cube1P);
@@ -272,7 +288,7 @@ public class MazeGame extends BaseGame {
 
 
         float cube2Size[] = {1, 1, 1};
-        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getWorldTransform().getValues(), 3f, 3f);
+        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getLocalTranslation().getValues(), 3f, 3f);
         pyramid1P.setBounciness(5.5f);
         pyramid1P.setDamping(0.1f, 0.1f);
         NPC2.setPhysicsObject(pyramid1P);
@@ -282,6 +298,25 @@ public class MazeGame extends BaseGame {
         groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), groundPlane.getLocalTranslation().getValues(), up, 0.0f);
         groundPlaneP.setBounciness(0.7f);
         groundPlane.setPhysicsObject(groundPlaneP);
+
+        float rockSize[] = {1, 1, 1};
+        rock1P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock1.getLocalTranslation().getValues(), rockSize);
+        rock2P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock2.getLocalTranslation().getValues(), rockSize);
+        rock3P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock3.getLocalTranslation().getValues(), rockSize);
+        rock4P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock4.getLocalTranslation().getValues(), rockSize);
+        rock5P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 1000, rock5.getLocalTranslation().getValues(), rockSize);
+        rock1P.setBounciness(0f);
+        rock2P.setBounciness(0f);
+        rock3P.setBounciness(0f);
+        rock4P.setBounciness(0f);
+        rock5P.setBounciness(0f);
+
+        rock1.setPhysicsObject(rock1P);
+        rock2.setPhysicsObject(rock2P);
+        rock3.setPhysicsObject(rock3P);
+        rock4.setPhysicsObject(rock4P);
+        rock5.setPhysicsObject(rock5P);
+
 
     }
 
@@ -728,11 +763,11 @@ public class MazeGame extends BaseGame {
                 player.setAvatar(new Pod().getChild());
             }
                 //radius, ???, radius*height
-                float[] halfExtents = {10, 10, 10};
-                IPhysicsObject playerP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
-                        1.0f, player.getAvatar().getWorldTransform().getValues(), halfExtents);
-                player.getAvatar().setPhysicsObject(playerP);
-                playerP.setBounciness(1.0f);
+//                float[] halfExtents = {10, 10, 10};
+//                IPhysicsObject playerP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
+//                        1.0f, player.getAvatar().getLocalTranslation().getValues(), halfExtents);
+//                player.getAvatar().setPhysicsObject(playerP);
+//                playerP.setBounciness(1.0f);
 
             player.getAvatar().translate(0, 5, 50);
             player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
