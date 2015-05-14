@@ -1,21 +1,16 @@
+// WHILE SPACE IS PRESSED reduce angular damp to drift
+//add speed up
+
+
+
 package game;
 
-import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.dispatch.CollisionConfiguration;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.SphereShape;
-import com.bulletphysics.collision.shapes.StaticPlaneShape;
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
-import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
-import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.Transform;
 import game.characters.CustomCube;
 import game.characters.CustomPyramid;
 import gameengine.CameraController;
@@ -49,6 +44,7 @@ import sage.renderer.IRenderer;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
 import sage.scene.shape.Cube;
+import sage.scene.shape.Pyramid;
 import sage.scene.shape.Rectangle;
 import sage.scene.state.RenderState;
 import sage.scene.state.TextureState;
@@ -66,20 +62,15 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.swing.*;
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
-//import objects.mushroom.*;
 
-
-/**
- * Main Class for Game initialization etc here.
- */
 public class MazeGame extends BaseGame {
     ICamera camera1;
     private Player player;
@@ -96,15 +87,17 @@ public class MazeGame extends BaseGame {
     private SceneNode rootNode;
     private ScriptEngine engine;
     private TerrainBlock imageTerrain;
+    private SkyBox skybox;
     private String oldRotation;
     private String oldTranslation;
     private String oldScale;
     private boolean canProcess;
     private IPhysicsEngine physicsEngine;
-    private IPhysicsObject playerAvatarP, groundPlaneP, cubeP;
+    private IPhysicsObject playerAvatarP, groundPlaneP, cube1P, cube2P;
     private Rectangle groundPlane;
     private boolean isPhysicsEnabled;
-    private Cube cube;
+    private Pyramid cube1;
+    private Cube cube2;
 
     private CollisionDispatcher collDispatcher;
     private BroadphaseInterface broadPhaseHandler;
@@ -123,60 +116,45 @@ public class MazeGame extends BaseGame {
         this.client.setMazeGame(this);
     }
 
-    //Please separate all the initialization of stuff into different methods.
-    //For example createPlayers(), createWalls(), etc... so that the initGame is very simple.
 
-    private void createPhysicsWorld() {
-        Transform myTransform;
-// define the broad-phase collision to be used (Sweep-and-Prune)
-        broadPhaseHandler =
-                new AxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
-// set up the narrow-phase collision handler ("dispatcher")
-        collConfig = new DefaultCollisionConfiguration();
-        collDispatcher = new CollisionDispatcher(collConfig);
-// create a constraint solver
-        solver = new SequentialImpulseConstraintSolver();
-// create a physics world utilizing the above objects
-        physicsWorld = new DiscreteDynamicsWorld(collDispatcher, broadPhaseHandler, solver, collConfig);
-        physicsWorld.setGravity(new Vector3f(0, -10, 0));
-// define physicsGround plane: normal vector = 'up', dist from origin = 1
-        CollisionShape groundShape =
-                new StaticPlaneShape(new Vector3f(0, 1, 0), 1);
-// set position and orientation of physicsGround's transform
-        myTransform = new Transform();
-        myTransform.origin.set(new Vector3f(0, -1, 0));
-        myTransform.setRotation(new Quat4f(0, 0, 0, 1));
-// define construction info for a 'physicsGround' rigid body
-        DefaultMotionState groundMotionState =
-                new DefaultMotionState(myTransform);
-        RigidBodyConstructionInfo groundCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f(0, 0, 0));
-        groundCI.restitution = 0.8f;
-// create the physicsGround rigid body and add it to the physics world
-        physicsGround = new RigidBody(groundCI);
-        physicsWorld.addRigidBody(physicsGround);
-// define a collision shape for a physicsBall
-        CollisionShape fallShape = new SphereShape(1);
-// define a transform for position and orientation of ball collision shape
-        myTransform = new Transform();
-        myTransform.origin.set(new Vector3f(0, 20, 0));
-        myTransform.setRotation(new Quat4f(0, 0, 0, 1));
-// define the parameters of the collision shape
-        DefaultMotionState fallMotionState =
-                new DefaultMotionState(myTransform);
-        float myFallMass = 1;
-        Vector3f myFallInertia = new Vector3f(0, 0, 0);
-        fallShape.calculateLocalInertia(myFallMass, myFallInertia);
-// define construction info for a 'physicsBall' rigid body
-        RigidBodyConstructionInfo fallRigidBodyCI = new RigidBodyConstructionInfo(myFallMass, fallMotionState, fallShape, myFallInertia);
-        fallRigidBodyCI.restitution = 0.8f;
-// create the physicsBall rigid body and add it to the physics world
-        physicsBall = new RigidBody(fallRigidBodyCI);
-        physicsWorld.addRigidBody(physicsBall);
-
-    }
 
     // other methods as in SAGE example.
 // for example, to create the graphics objects and scene.
+
+
+    @Override
+    protected void initSystem() {
+        display = createDisplaySystem();
+        setDisplaySystem(display);
+        IInputManager inputManager = new InputManager();
+        setInputManager(inputManager);
+        ArrayList<SceneNode> gameWorld = new ArrayList<SceneNode>();
+        setGameWorld(gameWorld);
+    }
+
+    private IDisplaySystem createDisplaySystem() {
+        IDisplaySystem displaySystem = new FullScreenDisplaySystem(700, 300, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
+        System.out.print("\nWaiting for display creation...");
+        int count = 0;
+        while (!displaySystem.isCreated()) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Display creation interrupted");
+            }
+            count++;
+            System.out.print("+");
+            if (count % 80 == 0) {
+                System.out.println();
+            }
+            if (count > 2000) // 20 seconds (approx.)
+            {
+                throw new RuntimeException("Unable to create display");
+            }
+        }
+        System.out.println();
+        return displaySystem;
+    }
     @Override
     protected void initGame() {
         eventManager = EventManager.getInstance();
@@ -190,56 +168,85 @@ public class MazeGame extends BaseGame {
         initScripting();
         setControls();
         display.setTitle("Maze Game");
-
-        isPhysicsEnabled = false;
-
-
-
+        isPhysicsEnabled = true;
     }
 
+    private void initGameObjects() {
+        IDisplaySystem display = getDisplaySystem();
+        display.setTitle("Treasure Hunt 2015");
+
+        addPlayer();
+        initTerrain();
+        drawSkyBox();
+
+/*
+        Moved to script
+        Mushroom s = new Mushroom();
+        addGameWorldObject(s);
+        s.translate(200, 6, 200);
+        s.scale(20, 50, 20);
+        */
+        cube1 = new Pyramid();
+        cube1.translate(5, 10, 0);
+        addGameWorldObject(cube1);
+        cube2 = new Cube();
+        cube2.translate(-5, 10, 0);
+        addGameWorldObject(cube2);
+    }
+
+    //=====================================================================================================
+    //===================================================================================PHYSICS SECTION
+    //=====================================================================================================
     protected void initPhysicsSystem()
     {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -400f, 0};
+        float[] gravity = {0, -98f, 0};
         physicsEngine.setGravity(gravity);
     }
 
     //PHYSICS
-    private void createSagePhysicsWorld() { // add the ball physics
-        float mass = 5.0f;
+    private void createSagePhysicsWorld() {
+        float mass = 0.01f;
 
+        float[] avatarsize = {1, 1, 1};
+        playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, playerAvatar.getWorldTransform().getValues(), avatarsize);
+        playerAvatar.setPhysicsObject(playerAvatarP);
+        playerAvatarP.setBounciness(0.5f);
 
-            //radius, ???, radius*height
-        float[] avatarsize = {5, 1, 5};
-        playerAvatarP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
-                mass, playerAvatar.getWorldTransform().getValues(), avatarsize);
-
-            playerAvatar.setPhysicsObject(playerAvatarP);
-        playerAvatarP.setBounciness(0.0f);
-
+<<<<<<< HEAD
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         playerAvatarP.setDamping(0.999999f, 0f);
         playerAvatarP.setFriction(0.5f);
+=======
+        //playerAvatarP.setSleepThresholds(0.5f, 0.5f);
+        playerAvatarP.setDamping(0.99f, 0.0f);
+        playerAvatarP.setFriction(0);
+>>>>>>> 2b4aa95992ecd93c11c66a96e64bd72aeb1010ad
 
-        float cubeSize[] = {1,1,1};
-        cubeP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0.5f, cube.getWorldTransform().getValues(), cubeSize);
-        cubeP.setBounciness(0f);
-        cube.setPhysicsObject(cubeP);
+        float cube1Size[] = {1, 1, 1};
+        cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, cube1.getWorldTransform().getValues(), cube1Size);
+        cube1P.setBounciness(0.5f);
+        cube1.setPhysicsObject(cube1P);
+
+        float cube2Size[] = {1, 1, 1};
+        cube2P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, cube2.getWorldTransform().getValues(), 1f, 1f);
+        cube2P.setBounciness(0.5f);
+        cube2.setPhysicsObject(cube1P);
 
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
         groundPlaneP =
                 physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),
-                        imageTerrain.getLocalTranslation().getValues(), up, 0.1f);
-        groundPlaneP.setBounciness(0f);
-        imageTerrain.setPhysicsObject(groundPlaneP);
-
-
+                        groundPlane.getLocalTranslation().getValues(), up, 0f);
+        groundPlaneP.setBounciness(0.0f);
+        groundPlane.setPhysicsObject(groundPlaneP);
 
     }
 
+
+    //==========================================================================================SCRIPTING SECTION
     private void initScripting() {
         ScriptEngineManager factory = new ScriptEngineManager();
 
@@ -274,6 +281,9 @@ public class MazeGame extends BaseGame {
         { System.out.println ("Null ptr exception in " + scriptFileName + e4); }
     }
 
+    //=====================================================================================================
+    //INPUT SECTION
+    //=====================================================================================================
     private void setControls() {
         String keyboardName = JOptionPane.showInputDialog(null, "Pick a keyboard", "Input", JOptionPane.QUESTION_MESSAGE, null, inputMgr.getControllers().toArray(), "keyboard").toString();
         //String keyboardName = inputMgr.getKeyboardName();
@@ -307,32 +317,13 @@ public class MazeGame extends BaseGame {
                 new TogglePhysics(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_AND_RELEASE);
     }
 
-    private void initGameObjects() {
-        IDisplaySystem display = getDisplaySystem();
-        display.setTitle("Treasure Hunt 2015");
-        //drawSkyBox();
-        addPlayer();
-        initTerrain();
-
-/*
-        Moved to script
-        Mushroom s = new Mushroom();
-        addGameWorldObject(s);
-        s.translate(200, 6, 200);
-        s.scale(20, 50, 20);
-        */
-        cube = new Cube();
-        cube.translate(0, 20, 55);
-        cube.setWorldTranslation(cube.getLocalTranslation());
-        cube.setShowBound(true);
-
-        addGameWorldObject(cube);
-    }
-
+    //=====================================================================================================
+    //============================================================================================ TERRAIN SECTION
+    //=====================================================================================================
     private void initTerrain() {
-        // create height map and terrain block
+//        // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "maze2.jpg";
+        String heightFilename = "t.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         imageTerrain = createTerBlock(myHeightMap);
@@ -340,7 +331,7 @@ public class MazeGame extends BaseGame {
         // create texture and texture state to color the terrain
         TextureState grassState;
         String heighttextureDir = "." + File.separator + "materials" + File.separator;
-        String heighttextureFilename = "green-leather-texture.jpg";
+        String heighttextureFilename = "green.jpg";
         String heighttextureFilePath = heighttextureDir + heighttextureFilename;
         Texture grassTexture = TextureManager.loadTexture2D(heighttextureFilePath);
         grassTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
@@ -349,22 +340,26 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
-        imageTerrain.translate(0, 0, 0);
-        addGameWorldObject(imageTerrain);
+
+        imageTerrain.translate(-imageTerrain.getSize() / 2, -7, -imageTerrain.getSize() / 2);
+        //imageTerrain.scale(3, 1, 3);
+        //addGameWorldObject(imageTerrain);
+
         //Floor groundPlane
 
-//        groundPlane = new Rectangle();
-//        Vector3D vec = new Vector3D(1, 0, 0);
-//        groundPlane.rotate(90, vec);
-//        groundPlane.scale(2000, 2000, 1);
-//        groundPlane.translate(0, 0, 0);
-//        groundPlane.setColor(Color.GRAY);
-//        String planetextureDir = "." + File.separator + "materials" + File.separator;
-//        String planetexturefilename = "sand.jpg";
-//        String planetexturefilepath = planetextureDir + planetexturefilename;
-//        Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
-//        groundPlane.setTexture(planetexture);
-//        addGameWorldObject(groundPlane);
+        groundPlane = new Rectangle("ground", 1000, 1000);
+        Vector3D vec = new Vector3D(1, 0, 0);
+        groundPlane.rotate(90, vec);
+        // groundPlane.scale(50000, 50000, 1);
+        //groundPlane.scale(1, 1, 1);
+        //groundPlane.translate(0, 0, 0);
+        groundPlane.setColor(Color.GRAY);
+        String planetextureDir = "." + File.separator + "materials" + File.separator;
+        String planetexturefilename = "sand.jpg";
+        String planetexturefilepath = planetextureDir + planetexturefilename;
+        Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
+        groundPlane.setTexture(planetexture);
+        addGameWorldObject(groundPlane);
 
     }
 
@@ -383,9 +378,9 @@ public class MazeGame extends BaseGame {
     }
 
     private void drawSkyBox() {
-        SkyBox skybox = new SkyBox("skybox", 500, 500, 500);
+        skybox = new SkyBox("skybox", 3000, 3000, 3000);
 
-        String textureDir = "." + File.separator + "textures" + File.separator + "canyon" + File.separator;
+        String textureDir = "." + File.separator + "materials" + File.separator + "dunes" + File.separator;
         String topFilename = "top.jpg";
         String topFilePath = textureDir + topFilename;
 
@@ -415,6 +410,7 @@ public class MazeGame extends BaseGame {
 
         skybox.translate(0, 100, 0);
 
+        skybox.setZBufferStateEnabled(false);
 
         addGameWorldObject(skybox);
 
@@ -438,7 +434,7 @@ public class MazeGame extends BaseGame {
 
         //playerAvatar.scale(0.2f, 0.2f, 0.2f);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
-        playerAvatar.translate(0, 4, 50);
+        playerAvatar.translate(0, 200, 0);
         //playerAvatar.setShowBound(true);
 
 
@@ -451,9 +447,14 @@ public class MazeGame extends BaseGame {
         }
         addGameWorldObject(playerAvatar);
         camera1 = display.getRenderer().getCamera();
-        camera1.setPerspectiveFrustum(60, 1, 1, 1000);
+        camera1.setPerspectiveFrustum(60, 1, 1, 5000);
         camera1.setLocation(new Point3D(0, 1, 50));
     }
+
+
+    //-------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------UPDATE SECTION -----------------
+    //-------------------------------------------------------------------------------------------------------
 
     private void updateOldPosition() {
         oldRotation = playerAvatar.getLocalRotation().toString();
@@ -476,13 +477,21 @@ public class MazeGame extends BaseGame {
                 e.printStackTrace();
             }
         }
+        //--------------------------------------------------------------SKYBOX FOLLOWING THE AVATAR
+        skybox.setLocalTranslation(playerAvatar.getLocalTranslation());
 
-        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
-        float x = (float) avLoc.getX();
-        float z = (float) avLoc.getZ();
-        float terHeight = imageTerrain.getHeight(x, z);
-        float desiredHeight = terHeight + (float) imageTerrain.getOrigin().getY() + 0.5f;
-        playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
+
+        // -------------------------------------------------------------APPLIES FRICTION WHEN IN IMAGETERRAIN
+//        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+//        float terHeight = imageTerrain.getHeightFromWorld(avLoc);
+//        if (avLoc.getY() < terHeight) {
+//            playerAvatarP.setFriction(0.9f);
+//            //JOptionPane.showMessageDialog(null,"COllision");
+//        } else {
+//            playerAvatarP.setFriction(0);
+//        }
+
+        //playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
 
         if (isPhysicsEnabled) {
             //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
@@ -507,7 +516,92 @@ public class MazeGame extends BaseGame {
 
 
 
-        //TODO override later
+    }
+
+
+    private boolean playerChanged() {
+        if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
+           !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
+           !oldScale.equals(playerAvatar.getLocalScale().toString())){
+            updateOldPosition();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void shutdown() {
+        super.shutdown();
+    }
+
+    @Override
+    protected void exit() {
+        super.exit();
+    }
+
+
+    public void updateGhostAvatar(UpdateAvatarInfoPacket packet) {
+
+        UUID id = packet.getClientID();
+        Matrix3D translation = new Matrix3D();
+        translation.concatenate(packet.getTranslation());
+        Matrix3D scale = new Matrix3D();
+        scale.concatenate(packet.getScale());
+        Matrix3D rotation = new Matrix3D();
+        rotation.concatenate(packet.getRotation());
+        if (!id.toString().equals(this.player.getPlayerUUID().toString())){
+            for(PlayerInfo p : this.playersInfo){
+                if(id.toString().equals(p.getClientID().toString())){
+                    p.getAvatar().setLocalTranslation(translation);
+                    p.getAvatar().setLocalScale(scale);
+                    p.getAvatar().setLocalRotation(rotation);
+                }
+            }
+        }
+    }
+
+    public void addGhostAvatar(PlayerInfo player) {
+        if(this.playersInfo == null){
+            this.playersInfo = new ArrayList<PlayerInfo>();
+        }
+        this.playersInfo.add(player);
+        if (!player.getClientID().toString().equals(this.player.getPlayerUUID().toString())) {
+
+            //Add avatar adding here
+            if(player.getCharacterID() == 0) {
+                player.setAvatar(new CustomCube("PLAYER1"));
+            }else if(player.getCharacterID() == 1){
+                player.setAvatar(new CustomPyramid("PLAYER1"));
+            }else if (player.getCharacterID() == 2){
+                player.setAvatar(new Ship().getChild());
+            }else if(player.getCharacterID() == 3) {
+                player.setAvatar(new ChessPieceRock().getChild());
+            }else if(player.getCharacterID() == 4) {
+                player.setAvatar(new Pod().getChild());
+            }
+                //radius, ???, radius*height
+                float[] halfExtents = {10, 10, 10};
+                IPhysicsObject playerP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
+                        1.0f, player.getAvatar().getWorldTransform().getValues(), halfExtents);
+                player.getAvatar().setPhysicsObject(playerP);
+                playerP.setBounciness(1.0f);
+
+            player.getAvatar().translate(0, 5, 50);
+            player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
+            addGameWorldObject(player.getAvatar());
+        }
+    }
+
+    public void togglePhysics(boolean yesno){
+        isPhysicsEnabled = yesno;
+    }
+
+    public boolean isCanProcess() {
+        return canProcess;
+    }
+
+    public void setCanProcess(boolean canProcess) {
+        this.canProcess = canProcess;
     }
 
     private void avatarCollisionCorrection() {
@@ -602,6 +696,7 @@ public class MazeGame extends BaseGame {
 //            }
 
     }
+
     private boolean collidesWithTerrain(Point3D p) {
         boolean collides = true;
 
@@ -623,119 +718,4 @@ public class MazeGame extends BaseGame {
 
         return collides;
     }
-    private boolean playerChanged() {
-        if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
-           !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
-           !oldScale.equals(playerAvatar.getLocalScale().toString())){
-            updateOldPosition();
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    protected void shutdown() {
-        super.shutdown();
-    }
-
-    @Override
-    protected void exit() {
-        super.exit();
-    }
-
-    @Override
-    protected void initSystem() {
-        display = createDisplaySystem();
-        setDisplaySystem(display);
-        IInputManager inputManager = new InputManager();
-        setInputManager(inputManager);
-        ArrayList<SceneNode> gameWorld = new ArrayList<SceneNode>();
-        setGameWorld(gameWorld);
-    }
-
-    private IDisplaySystem createDisplaySystem() {
-        IDisplaySystem displaySystem = new FullScreenDisplaySystem(700, 300, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
-        System.out.print("\nWaiting for display creation...");
-        int count = 0;
-        while (!displaySystem.isCreated())
-        {
-            try
-            { Thread.sleep(10); }
-            catch (InterruptedException e)
-            { throw new RuntimeException("Display creation interrupted"); }
-            count++;
-            System.out.print("+");
-            if (count % 80 == 0) { System.out.println(); }
-            if (count > 2000) // 20 seconds (approx.)
-            { throw new RuntimeException("Unable to create display");
-            }
-        }
-        System.out.println();
-        return displaySystem ;
-    }
-
-    public void updateGhostAvatar(UpdateAvatarInfoPacket packet) {
-
-        UUID id = packet.getClientID();
-        Matrix3D translation = new Matrix3D();
-        translation.concatenate(packet.getTranslation());
-        Matrix3D scale = new Matrix3D();
-        scale.concatenate(packet.getScale());
-        Matrix3D rotation = new Matrix3D();
-        rotation.concatenate(packet.getRotation());
-        if (!id.toString().equals(this.player.getPlayerUUID().toString())){
-            for(PlayerInfo p : this.playersInfo){
-                if(id.toString().equals(p.getClientID().toString())){
-                    p.getAvatar().setLocalTranslation(translation);
-                    p.getAvatar().setLocalScale(scale);
-                    p.getAvatar().setLocalRotation(rotation);
-                }
-            }
-        }
-    }
-
-    public void addGhostAvatar(PlayerInfo player) {
-        if(this.playersInfo == null){
-            this.playersInfo = new ArrayList<PlayerInfo>();
-        }
-        this.playersInfo.add(player);
-        if (!player.getClientID().toString().equals(this.player.getPlayerUUID().toString())) {
-
-            //Add avatar adding here
-            if(player.getCharacterID() == 0) {
-                player.setAvatar(new CustomCube("PLAYER1"));
-            }else if(player.getCharacterID() == 1){
-                player.setAvatar(new CustomPyramid("PLAYER1"));
-            }else if (player.getCharacterID() == 2){
-                player.setAvatar(new Ship().getChild());
-            }else if(player.getCharacterID() == 3) {
-                player.setAvatar(new ChessPieceRock().getChild());
-            }else if(player.getCharacterID() == 4) {
-                player.setAvatar(new Pod().getChild());
-            }
-                //radius, ???, radius*height
-                float[] halfExtents = {10, 10, 10};
-                IPhysicsObject playerP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
-                        1.0f, player.getAvatar().getWorldTransform().getValues(), halfExtents);
-                player.getAvatar().setPhysicsObject(playerP);
-                playerP.setBounciness(1.0f);
-
-            player.getAvatar().translate(0, 5, 50);
-            player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
-            addGameWorldObject(player.getAvatar());
-        }
-    }
-
-    public void togglePhysics(boolean yesno){
-        isPhysicsEnabled = yesno;
-    }
-
-    public boolean isCanProcess() {
-        return canProcess;
-    }
-
-    public void setCanProcess(boolean canProcess) {
-        this.canProcess = canProcess;
-    }
-
 }
