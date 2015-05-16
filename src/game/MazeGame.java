@@ -106,6 +106,7 @@ public class MazeGame extends BaseGame {
     private Ship NPC2;
     private Cylinder tunnel;
     private ChessPieceRock finish, rock1, rock2, rock3, rock4, rock5;
+    private TheCity city;
 
 
     private CollisionDispatcher collDispatcher;
@@ -144,7 +145,7 @@ public class MazeGame extends BaseGame {
     }
 
     private IDisplaySystem createDisplaySystem() {
-        IDisplaySystem displaySystem = new FullScreenDisplaySystem(700, 300, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
+        IDisplaySystem displaySystem = new FullScreenDisplaySystem(400, 400, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
         System.out.print("\nWaiting for display creation...");
         int count = 0;
         while (!displaySystem.isCreated()) {
@@ -233,10 +234,14 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(finish);
 
 
-        TheCity city = new TheCity();
+        CenterCity city = new CenterCity();
         addGameWorldObject(city);
-        city.translate(0, -40, 0);
-        city.scale(1f, 1f, 1f);
+        city.translate(200, 0, 0);
+        //city.scale(1f, 1f, 0f);
+        //city.rotate(90,new Vector3D(0,1,0));
+
+
+
 //        rock1 = new ChessPieceRock();
 //        rock2 = new ChessPieceRock();
 //        rock3 = new ChessPieceRock();
@@ -557,7 +562,7 @@ public class MazeGame extends BaseGame {
         }
         addGameWorldObject(playerAvatar);
         camera1 = display.getRenderer().getCamera();
-        camera1.setPerspectiveFrustum(60, 1, 1, 5000);
+        camera1.setPerspectiveFrustum(90, 1, 1, 10000);
         camera1.setLocation(new Point3D(0, 1, 50));
     }
 
