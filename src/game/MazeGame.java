@@ -24,7 +24,6 @@ import gameengine.player.MovePlayerRightAction;
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
-import javafx.scene.Scene;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import networking.Client;
@@ -211,11 +210,11 @@ public class MazeGame extends BaseGame {
 //        leftRail.translate(-50, 0, 0);
 //        addGameWorldObject(leftRail);
 
-        tunnel = new Cylinder("tunnel", 4000, 100, 100, 100);
-        //tunnel.rotate(90,new Vector3D(0,1,0));
-        tunnel.translate(0, 0, -2000);
-        addGameWorldObject(tunnel);
-        tunnel.updateGeometricState(0, true);
+//        tunnel = new Cylinder("tunnel", 4000, 100, 100, 100);
+//        //tunnel.rotate(90,new Vector3D(0,1,0));
+//        tunnel.translate(0, 0, -2000);
+//        addGameWorldObject(tunnel);
+//        tunnel.updateGeometricState(0, true);
 
         NPC1 = new Pod();
         NPC1.translate(0, 1, -2000);
@@ -233,6 +232,11 @@ public class MazeGame extends BaseGame {
         finish.scale(5, 5, 5);
         addGameWorldObject(finish);
 
+
+        TheCity city = new TheCity();
+        addGameWorldObject(city);
+        city.translate(0, -40, 0);
+        city.scale(1f, 1f, 1f);
 //        rock1 = new ChessPieceRock();
 //        rock2 = new ChessPieceRock();
 //        rock3 = new ChessPieceRock();
@@ -284,7 +288,7 @@ public class MazeGame extends BaseGame {
         BoundingSphere playerBoundingBox = (BoundingSphere) playerAvatar.getWorldBound();
         playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), playerBoundingBox.getRadius(), playerBoundingBox.getRadius());
         playerAvatar.setPhysicsObject(playerAvatarP);
-        playerAvatarP.setBounciness(9.1f);
+        playerAvatarP.setBounciness(1.1f);
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         playerAvatarP.setFriction(0.5f);
         playerAvatarP.setDamping(0.99f, 0.9f);
@@ -306,7 +310,7 @@ public class MazeGame extends BaseGame {
 
         BoundingSphere NPC1BoundingBox = (BoundingSphere) NPC1.getWorldBound();
         cube1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC1.getLocalTranslation().getValues(), NPC1BoundingBox.getRadius(), NPC1BoundingBox.getRadius());
-        cube1P.setBounciness(9.1f);
+        cube1P.setBounciness(1.1f);
         cube1P.setDamping(0.1f, 0.1f);
         NPC1.setPhysicsObject(cube1P);
         //cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
@@ -314,7 +318,7 @@ public class MazeGame extends BaseGame {
 
         float cube2Size[] = {3, 3, 3};
         pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getLocalTranslation().getValues(), 3f, 3f);
-        pyramid1P.setBounciness(9.1f);
+        pyramid1P.setBounciness(1.1f);
         pyramid1P.setDamping(0.1f, 0.1f);
         NPC2.setPhysicsObject(pyramid1P);
         //pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
