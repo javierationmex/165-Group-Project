@@ -34,7 +34,7 @@ public class Viper extends Group implements Serializable {
 
         this.addChild(viperpiece);
         child = viperpiece;
-        this.setLocalBound(new BoundingSphere(new Point3D(0, 0, 0), 2));
+        this.setLocalBound(new BoundingSphere(new Point3D(0, 0, 0), 5));
         this.scale(0.05f, 0.05f, 0.05f);
     }
 
