@@ -35,8 +35,8 @@ public class CharacterSelectionScreen {
         this.player = player;
         this.frame = frame;
         characterOptions = new Vector();
-        characterOptions.add("Cube");
-        characterOptions.add("Pyramid");
+        characterOptions.add("Viper");
+        characterOptions.add("Arc170");
         characterOptions.add("Space Ship");
         characterOptions.add("Rook");
         characterOptions.add("Space Pod");
