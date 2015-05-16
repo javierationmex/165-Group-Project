@@ -15,6 +15,7 @@ import game.characters.CustomPyramid;
 import gameengine.CameraController;
 import gameengine.FullScreenDisplaySystem;
 import gameengine.Jump;
+import gameengine.NPC.NPC;
 import gameengine.TogglePhysics;
 import gameengine.player.MovePlayerBackwardAction;
 import gameengine.player.MovePlayerForwardAction;
@@ -23,10 +24,12 @@ import gameengine.player.MovePlayerRightAction;
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
+import javafx.scene.Scene;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
+import networking.packets.ingame.NPCPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
 import sage.app.BaseGame;
 import sage.audio.*;
@@ -85,6 +88,8 @@ public class MazeGame extends BaseGame {
     private CameraController cam1Controller;
     private SceneNode playerAvatar;
     private ArrayList<PlayerInfo> playersInfo;
+    private ArrayList<NPC> npcs;
+    private ArrayList<NPCGhost> npcsGhosts;
     private float time = 0;
 
     private SceneNode rootNode;
@@ -933,5 +938,88 @@ public class MazeGame extends BaseGame {
         }
 
         return collides;
+    }
+
+    public void updateNPCGhosts(NPCPacket packet) {
+        if(this.getGameWorld() != null){
+            if(this.npcs == null){
+                this.npcs = packet.getNpcs();
+                createNPCGhosts();
+            }
+            ArrayList<NPC> tempNPCs = packet.getNpcs();
+            for(NPCGhost n : npcsGhosts){
+                for(NPC n1 : tempNPCs){
+                    if(n.getID() == n1.getID()){
+                        n.updateNPCGhost(n1);
+                    }
+                }
+            }
+        }
+    }
+
+    private void createNPCGhosts() {
+        npcsGhosts = new ArrayList<NPCGhost>();
+        for(NPC npc : npcs){
+            SceneNode npcGhost = null;
+            //Add necessary NPC types to this.
+            if(npc.getType().equals("SpaceShip")){
+                npcGhost = new Ship().getChild();
+            }else if(npc.getType().equals("SpacePod")){
+                npcGhost = new Pod().getChild();
+            }else if(npc.getType().equals("Rook")){
+                npcGhost = new ChessPieceRock().getChild();
+            }else if(npc.getType().equals("Cube")){
+                npcGhost = new CustomCube("Cube");
+            }else{
+                try {
+                    throw new Exception(String.format("Can't find this (%s) in the MazeGame createNPCGhosts().  Make sure to add it to the if statement.", npc.getType()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if(npcGhost != null){
+                npcGhost.setLocalRotation(npc.getRotation());
+                npcGhost.setLocalTranslation(npc.getTranslation());
+                npcGhost.setLocalScale(npc.getScale());
+                npcsGhosts.add(new NPCGhost(npcGhost, npc.getID(), npc.getLocation(), npc.getType()));
+                addGameWorldObject(npcGhost);
+            }
+        }
+    }
+}
+class NPCGhost{
+    private SceneNode avatar;
+    private int ID;
+    private Point3D location;
+    private String type;
+
+    public NPCGhost(SceneNode avatar, int ID, Point3D location, String type) {
+        this.avatar = avatar;
+        this.ID = ID;
+        this.location = location;
+        this.type = type;
+    }
+
+    public void updateNPCGhost(NPC npc){
+        this.avatar.setLocalTranslation(npc.getTranslation());
+        this.avatar.setLocalRotation(npc.getRotation());
+        this.avatar.setLocalScale(npc.getScale());
+        //this.location = npc.getLocation();
+    }
+
+    public SceneNode getAvatar() {
+        return avatar;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public Point3D getLocation() {
+        return location;
+    }
+
+    public String getType() {
+        return type;
     }
 }

@@ -1,5 +1,6 @@
 package networking;
 
+import gameengine.NPC.NPCcontroller;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
 import networking.packets.ingame.AddAvatarInformationPacket;
@@ -15,6 +16,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -23,7 +26,11 @@ import java.util.UUID;
 public class Server extends GameConnectionServer<UUID> {
 
     private ArrayList<PlayerInfo> players;
+    private NPCcontroller npcCtrl;
     private boolean gameStarted = false;
+    private Timer timer;
+    private UpdateNPCS updateNPCS;
+
 
     public Server(int localPort) throws IOException {
         super(localPort, ProtocolType.TCP);
@@ -81,6 +88,7 @@ public class Server extends GameConnectionServer<UUID> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            createNPCs();
         }
 
         if (packet instanceof AddAvatarInformationPacket) {
@@ -108,28 +116,42 @@ public class Server extends GameConnectionServer<UUID> {
         }
     }
 
+    private void createNPCs() {
+        npcCtrl = new NPCcontroller();
+        npcCtrl.createNPCs();
+        updateNPCS = new UpdateNPCS(this);
+        timer = new Timer();
+        timer.schedule(updateNPCS, 0, 500);
 
-    public void sendNPCinfo() {// informs clients of new NPC positions
-//        for(int i=0; i<npcCtrl.getNumOfNPCs(); i++) {
-//            try {
-//                this.sendPacketToAll();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                String message = new String("mnpc," + Integer.toString(i));
-//                message += "," + (npcCtrl.getNPC(i)).getX();
-//                message += "," + (npcCtrl.getNPC(i)).getY();
-//                message += "," + (npcCtrl.getNPC(i)).getZ();
-//                this.sendPacketToAll(message);
-//                // also additional cases for receiving messages about NPCs, such as:
-//                if (messageTokens[0].compareTo("needNPC") == 0) {
-//                    ...}
-//                if (messageTokens[0].compareTo("collide") == 0) {
-//                    ...}
-//
-//            }catch(){}
-//        }
+    }
+
+    public void updateNPCs(){
+        npcCtrl.updateNPCs();
+        sendNPCinfo();
+    }
+
+    public void sendNPCinfo() {
+        try {
+            sendPacketToAll(npcCtrl.getNPCInfoPacket());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    class UpdateNPCS extends TimerTask {
+        private Server server;
+        public UpdateNPCS(Server server) {
+            this.server = server;
+        }
+
+        /**
+         * The action to be performed by this timer task.
+         */
+        @Override
+        public void run() {
+            server.updateNPCs();
+        }
     }
 
 }

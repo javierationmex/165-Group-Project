@@ -4,6 +4,7 @@ import game.MazeGame;
 import game.Player;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
+import networking.packets.ingame.NPCPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
 import networking.packets.lobby.JoinPacket;
 import networking.packets.lobby.StartGamePacket;
@@ -57,6 +58,10 @@ public class Client extends GameConnectionClient {
 
         if(packet instanceof UpdateAvatarInfoPacket){
             mazeGame.updateGhostAvatar(((UpdateAvatarInfoPacket) packet));
+        }
+
+        if(packet instanceof NPCPacket){
+            mazeGame.updateNPCGhosts((NPCPacket) packet);
         }
     }
 
