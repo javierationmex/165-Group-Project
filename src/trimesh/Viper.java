@@ -19,19 +19,23 @@ public class Viper extends Group implements Serializable {
 
     public Viper() {
         OBJLoader loader = new OBJLoader();
-        String chesspieceDir = "." + File.separator + "materials" + File.separator;
-        String chesspieceFilename = "Viper.obj";
-        String chesspieceFilePath = chesspieceDir + chesspieceFilename;
-        TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
-        chesspiece.updateLocalBound();
+        String viperpieceDir = "." + File.separator + "materials" + File.separator;
+        String viperpieceFilename = "Viper.obj";
+        String viperpieceFilePath = viperpieceDir + viperpieceFilename;
+        TriMesh viperpiece = loader.loadModel(viperpieceFilePath);
+        viperpiece.scale(0.02f, 0.02f, 0.02f);
+        //viperpiece.setLocalBound(new BoundingSphere(new Point3D(0, 0, 0), 1));
+        viperpiece.updateLocalBound();
 
-        String chesspieceTextureFilename = "chess-texture.jpg";
-        String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
-        Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
-        chesspiece.setTexture(chesspieceTexture);
+        String viperpieceTextureFilename = "elem.jpg";
+        String viperpieceTextureFilePath = viperpieceDir + viperpieceTextureFilename;
+        Texture viperpieceTexture = TextureManager.loadTexture2D(viperpieceTextureFilePath);
+        viperpiece.setTexture(viperpieceTexture);
 
-        this.addChild(chesspiece);
-        child = chesspiece;
+        this.addChild(viperpiece);
+        child = viperpiece;
+
+
     }
 
     public TriMesh getChild() {

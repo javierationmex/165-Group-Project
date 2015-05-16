@@ -59,9 +59,7 @@ import sage.terrain.TerrainBlock;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
-import trimesh.ChessPieceRock;
-import trimesh.Pod;
-import trimesh.Ship;
+import trimesh.*;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -268,13 +266,13 @@ public class MazeGame extends BaseGame {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -980f, 0};
+        float[] gravity = {0, -98f, 0};
         physicsEngine.setGravity(gravity);
     }
 
     //PHYSICS
     private void createSagePhysicsWorld() {
-        float mass = 1000.0f;
+        float mass = 100.0f;
 
 //        BoundingSphere tunnelBoundingBox = (BoundingSphere) tunnel.getWorldBound();
 //        tunnelP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), tunnelBoundingBox.getRadius(), tunnelBoundingBox.getRadius());
@@ -286,15 +284,10 @@ public class MazeGame extends BaseGame {
         BoundingSphere playerBoundingBox = (BoundingSphere) playerAvatar.getWorldBound();
         playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), playerBoundingBox.getRadius(), playerBoundingBox.getRadius());
         playerAvatar.setPhysicsObject(playerAvatarP);
-        playerAvatarP.setBounciness(0.5f);
-
-        // playerAvatarP.setSleepThresholds(0.5f, 0.5f);
-        //playerAvatarP.setDamping(0.999999f, 0f);
-        //playerAvatarP.setFriction(0.5f);
-
-        //playerAvatarP.setSleepThresholds(0.5f, 0.5f);
+        playerAvatarP.setBounciness(9.1f);
+        playerAvatarP.setSleepThresholds(0.5f, 0.5f);
+        playerAvatarP.setFriction(0.5f);
         playerAvatarP.setDamping(0.99f, 0.9f);
-        playerAvatarP.setFriction(0.0f);
 
 
 //        BoundingBox rightRailBoundingBox = (BoundingBox) rightRail.getWorldBound();
@@ -313,7 +306,7 @@ public class MazeGame extends BaseGame {
 
         BoundingSphere NPC1BoundingBox = (BoundingSphere) NPC1.getWorldBound();
         cube1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC1.getLocalTranslation().getValues(), NPC1BoundingBox.getRadius(), NPC1BoundingBox.getRadius());
-        cube1P.setBounciness(50.5f);
+        cube1P.setBounciness(9.1f);
         cube1P.setDamping(0.1f, 0.1f);
         NPC1.setPhysicsObject(cube1P);
         //cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
@@ -321,14 +314,15 @@ public class MazeGame extends BaseGame {
 
         float cube2Size[] = {3, 3, 3};
         pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getLocalTranslation().getValues(), 3f, 3f);
-        pyramid1P.setBounciness(50.5f);
+        pyramid1P.setBounciness(9.1f);
         pyramid1P.setDamping(0.1f, 0.1f);
         NPC2.setPhysicsObject(pyramid1P);
         //pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
         groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), groundPlane.getLocalTranslation().getValues(), up, 0.0f);
-        groundPlaneP.setBounciness(0.5f);
+        groundPlaneP.setBounciness(0.1f);
+        groundPlaneP.setFriction(0);
         groundPlane.setPhysicsObject(groundPlaneP);
 
 //        float rockSize[] = {3, 3, 3};
@@ -531,10 +525,9 @@ public class MazeGame extends BaseGame {
 
     private void addPlayer() {
         if(player.getCharacterID() == 1){
-
-            playerAvatar = new CustomPyramid("PLAYER1");
+            playerAvatar = new Arc170();
         }else if(player.getCharacterID() == 0){
-            playerAvatar = new CustomCube("PLAYER1");
+            playerAvatar = new Viper();
         }else if(player.getCharacterID() == 2){
             playerAvatar = new Ship().getChild();
         }else if(player.getCharacterID() == 3){
