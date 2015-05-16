@@ -32,8 +32,12 @@ public class MovePlayerLeftAction extends BaseAbstractInputAction {
         Vector3D dir = new Vector3D(-1,0,0);
         dir = dir.mult(rot);
         dir.scale((double) (speed * time));
-        playerAvatarP.setLinearVelocity(new float[]{(float) dir.getX() * 10, 0, (float) dir.getZ() * 10});
-        //avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
+
+
+        float[] f = playerAvatarP.getLinearVelocity();
+        f[0] += (float) dir.getX() * 20;
+        f[2] += (float) dir.getZ() * 20;
+        playerAvatarP.setLinearVelocity(f);
     }
 
 }

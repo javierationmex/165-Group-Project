@@ -14,6 +14,7 @@ import game.characters.CustomCube;
 import game.characters.CustomPyramid;
 import gameengine.CameraController;
 import gameengine.FullScreenDisplaySystem;
+import gameengine.Jump;
 import gameengine.TogglePhysics;
 import gameengine.player.MovePlayerBackwardAction;
 import gameengine.player.MovePlayerForwardAction;
@@ -45,6 +46,7 @@ import sage.scene.SceneNode;
 import sage.scene.SkyBox;
 import sage.scene.bounding.BoundingSphere;
 import sage.scene.shape.Cube;
+import sage.scene.shape.Cylinder;
 import sage.scene.shape.Rectangle;
 import sage.scene.state.RenderState;
 import sage.scene.state.TextureState;
@@ -94,12 +96,13 @@ public class MazeGame extends BaseGame {
     private String oldScale;
     private boolean canProcess;
     private IPhysicsEngine physicsEngine;
-    private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, cube1P, pyramid1P, rock1P, rock2P, rock3P, rock4P, rock5P;
+    private IPhysicsObject playerAvatarP, groundPlaneP, tunnelP, rightRailP, leftRailP, cube1P, pyramid1P, rock1P, rock2P, rock3P, rock4P, rock5P;
     private Rectangle groundPlane;
     private boolean isPhysicsEnabled;
     private Cube rightRail, leftRail;
     private Pod NPC1;
     private Ship NPC2;
+    private Cylinder tunnel;
     private ChessPieceRock finish, rock1, rock2, rock3, rock4, rock5;
 
 
@@ -194,16 +197,22 @@ public class MazeGame extends BaseGame {
         s.scale(20, 50, 20);
         */
 
-        rightRail = new Cube();
-        rightRail.scale(2, 2, 4000);
-        rightRail.translate(50, 0, 0);
-        addGameWorldObject(rightRail);
-        //leftRail.updateGeometricState(0,true);
+//        rightRail = new Cube();
+//        rightRail.scale(2, 2, 4000);
+//        rightRail.translate(50, 0, 0);
+//        addGameWorldObject(rightRail);
+//        //leftRail.updateGeometricState(0,true);
+//
+//        leftRail = new Cube();
+//        leftRail.scale(2, 2, 4000);
+//        leftRail.translate(-50, 0, 0);
+//        addGameWorldObject(leftRail);
 
-        leftRail = new Cube();
-        leftRail.scale(2, 2, 4000);
-        leftRail.translate(-50, 0, 0);
-        addGameWorldObject(leftRail);
+        tunnel = new Cylinder("tunnel", 4000, 100, 100, 100);
+        //tunnel.rotate(90,new Vector3D(0,1,0));
+        tunnel.translate(0, 0, -2000);
+        addGameWorldObject(tunnel);
+        tunnel.updateGeometricState(0, true);
 
         NPC1 = new Pod();
         NPC1.translate(0, 1, -2000);
@@ -221,29 +230,29 @@ public class MazeGame extends BaseGame {
         finish.scale(5, 5, 5);
         addGameWorldObject(finish);
 
-        rock1 = new ChessPieceRock();
-        rock2 = new ChessPieceRock();
-        rock3 = new ChessPieceRock();
-        rock4 = new ChessPieceRock();
-        rock5 = new ChessPieceRock();
-
-        rock1.translate(2, 0, 400);
-        rock2.translate(-2, 0, 800);
-        rock3.translate(5, 0, 1400);
-        rock4.translate(0, 0, 1600);
-        rock5.translate(2, 0, 1800);
-
-        addGameWorldObject(rock1);
-        addGameWorldObject(rock2);
-        addGameWorldObject(rock3);
-        addGameWorldObject(rock4);
-        addGameWorldObject(rock5);
-
-        rock1.updateGeometricState(0, true);
-        rock2.updateGeometricState(0, true);
-        rock3.updateGeometricState(0, true);
-        rock4.updateGeometricState(0, true);
-        rock5.updateGeometricState(0, true);
+//        rock1 = new ChessPieceRock();
+//        rock2 = new ChessPieceRock();
+//        rock3 = new ChessPieceRock();
+//        rock4 = new ChessPieceRock();
+//        rock5 = new ChessPieceRock();
+//
+//        rock1.translate(2, 0, 400);
+//        rock2.translate(-2, 0, 800);
+//        rock3.translate(5, 0, 1400);
+//        rock4.translate(0, 0, 1600);
+//        rock5.translate(2, 0, 1800);
+//
+//        addGameWorldObject(rock1);
+//        addGameWorldObject(rock2);
+//        addGameWorldObject(rock3);
+//        addGameWorldObject(rock4);
+//        addGameWorldObject(rock5);
+//
+//        rock1.updateGeometricState(0, true);
+//        rock2.updateGeometricState(0, true);
+//        rock3.updateGeometricState(0, true);
+//        rock4.updateGeometricState(0, true);
+//        rock5.updateGeometricState(0, true);
     }
 
     //=====================================================================================================
@@ -254,27 +263,33 @@ public class MazeGame extends BaseGame {
         String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
         physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
         physicsEngine.initSystem();
-        float[] gravity = {0, -500f, 0};
+        float[] gravity = {0, -980f, 0};
         physicsEngine.setGravity(gravity);
     }
 
     //PHYSICS
     private void createSagePhysicsWorld() {
-        float mass = 100.0f;
+        float mass = 1000.0f;
+
+//        BoundingSphere tunnelBoundingBox = (BoundingSphere) tunnel.getWorldBound();
+//        tunnelP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), tunnelBoundingBox.getRadius(), tunnelBoundingBox.getRadius());
+//        tunnelP.setBounciness(0.5f);
+//        tunnel.setPhysicsObject(tunnelP);
+
 
 
         BoundingSphere playerBoundingBox = (BoundingSphere) playerAvatar.getWorldBound();
         playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), playerBoundingBox.getRadius(), playerBoundingBox.getRadius());
         playerAvatar.setPhysicsObject(playerAvatarP);
-        playerAvatarP.setBounciness(0.9f);
+        playerAvatarP.setBounciness(0.5f);
 
         // playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         //playerAvatarP.setDamping(0.999999f, 0f);
         //playerAvatarP.setFriction(0.5f);
 
         //playerAvatarP.setSleepThresholds(0.5f, 0.5f);
-        playerAvatarP.setDamping(0.99f, 0.1f);
-        playerAvatarP.setFriction(0.9f);
+        playerAvatarP.setDamping(0.99f, 0.9f);
+        playerAvatarP.setFriction(0.0f);
 
 
 //        BoundingBox rightRailBoundingBox = (BoundingBox) rightRail.getWorldBound();
@@ -308,26 +323,26 @@ public class MazeGame extends BaseGame {
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
         groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), groundPlane.getLocalTranslation().getValues(), up, 0.0f);
-        groundPlaneP.setBounciness(0.7f);
+        groundPlaneP.setBounciness(0.5f);
         groundPlane.setPhysicsObject(groundPlaneP);
 
-        float rockSize[] = {3, 3, 3};
-        rock1P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock1.getLocalTranslation().getValues(), rockSize);
-        rock2P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock2.getLocalTranslation().getValues(), rockSize);
-        rock3P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock3.getLocalTranslation().getValues(), rockSize);
-        rock4P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock4.getLocalTranslation().getValues(), rockSize);
-        rock5P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock5.getLocalTranslation().getValues(), rockSize);
-        rock1P.setBounciness(50f);
-        rock2P.setBounciness(50f);
-        rock3P.setBounciness(50f);
-        rock4P.setBounciness(50f);
-        rock5P.setBounciness(50f);
-
-        rock1.setPhysicsObject(rock1P);
-        rock2.setPhysicsObject(rock2P);
-        rock3.setPhysicsObject(rock3P);
-        rock4.setPhysicsObject(rock4P);
-        rock5.setPhysicsObject(rock5P);
+//        float rockSize[] = {3, 3, 3};
+//        rock1P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock1.getLocalTranslation().getValues(), rockSize);
+//        rock2P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock2.getLocalTranslation().getValues(), rockSize);
+//        rock3P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock3.getLocalTranslation().getValues(), rockSize);
+//        rock4P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock4.getLocalTranslation().getValues(), rockSize);
+//        rock5P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock5.getLocalTranslation().getValues(), rockSize);
+//        rock1P.setBounciness(50f);
+//        rock2P.setBounciness(50f);
+//        rock3P.setBounciness(50f);
+//        rock4P.setBounciness(50f);
+//        rock5P.setBounciness(50f);
+//
+//        rock1.setPhysicsObject(rock1P);
+//        rock2.setPhysicsObject(rock2P);
+//        rock3.setPhysicsObject(rock3P);
+//        rock4.setPhysicsObject(rock4P);
+//        rock5.setPhysicsObject(rock5P);
 
 
     }
@@ -402,15 +417,23 @@ public class MazeGame extends BaseGame {
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.F2,
                 new TogglePhysics(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_AND_RELEASE);
+        inputMgr.associateAction(
+                keyboardName, Component.Identifier.Key.SPACE, new Jump(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
     }
 
+    public void jump() {
+
+        float[] f = playerAvatarP.getLinearVelocity();
+        f[1] = f[1] + 200;
+        playerAvatarP.setLinearVelocity(f);
+    }
     //=====================================================================================================
     //============================================================================================ TERRAIN SECTION
     //=====================================================================================================
     private void initTerrain() {
 //        // create height map and terrain block
         String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "t.jpg";
+        String heightFilename = "road.jpg";
         String heightFilePath = heightDir + heightFilename;
         ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
         imageTerrain = createTerBlock(myHeightMap);
@@ -427,9 +450,8 @@ public class MazeGame extends BaseGame {
         grassState.setEnabled(true);
         // apply the texture to the terrain
         imageTerrain.setRenderState(grassState);
-
-        imageTerrain.translate(-imageTerrain.getSize() / 2, -7, -imageTerrain.getSize() / 2);
-        //imageTerrain.scale(3, 1, 3);
+        imageTerrain.scale(0.4f, 1, 10);
+        imageTerrain.translate(-50, -2, -1000);
         //addGameWorldObject(imageTerrain);
 
         //Floor groundPlane
@@ -438,8 +460,6 @@ public class MazeGame extends BaseGame {
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
         //groundPlane.scale(1, 1, 10);
-        //groundPlane.scale(1, 1, 1);
-        //groundPlane.translate(0, 0, 0);
         groundPlane.setColor(Color.GRAY);
         String planetextureDir = "." + File.separator + "materials" + File.separator;
         String planetexturefilename = "sand.jpg";
@@ -447,6 +467,7 @@ public class MazeGame extends BaseGame {
         Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
         groundPlane.setTexture(planetexture);
         addGameWorldObject(groundPlane);
+
 
     }
 
@@ -570,11 +591,13 @@ public class MazeGame extends BaseGame {
 
 
         // -------------------------------------------------------------APPLIES FRICTION WHEN IN IMAGETERRAIN
-//        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
+
+//        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+//
 //        float terHeight = imageTerrain.getHeightFromWorld(avLoc);
-//        if (avLoc.getY() < terHeight) {
-//            playerAvatarP.setFriction(0.9f);
-//            //JOptionPane.showMessageDialog(null,"COllision");
+//        if (avLoc.getY()-4 <= terHeight) {
+//            playerAvatarP.setFriction(9999.9f);
+//            JOptionPane.showMessageDialog(null,"COllision");
 //        } else {
 //            playerAvatarP.setFriction(0);
 //        }
