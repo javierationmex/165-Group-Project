@@ -218,13 +218,13 @@ public class MazeGame extends BaseGame {
 //        tunnel.updateGeometricState(0, true);
 
         NPC1 = new Pod();
-        NPC1.translate(0, 1, -2000);
+        NPC1.translate(0, 1, 0);
         addGameWorldObject(NPC1);
         NPC1.updateGeometricState(0, true);
         NPC1.setShowBound(true);
 
         NPC2 = new Ship();
-        NPC2.translate(-30, 1, -2000);
+        NPC2.translate(-30, 1, 0);
         NPC2.updateGeometricState(0, true);
         addGameWorldObject(NPC2);
 
@@ -234,11 +234,13 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(finish);
 
 
-        CenterCity city = new CenterCity();
-        addGameWorldObject(city);
-        city.translate(200, 0, 0);
-        //city.scale(1f, 1f, 0f);
-        //city.rotate(90,new Vector3D(0,1,0));
+        CenterCity[] city = new CenterCity[10];
+        for (int i = 0; i < 10; i++) {
+            city[i] = new CenterCity();
+            addGameWorldObject(city[i]);
+            city[i].translate(150, 0, i * 1000);
+        }
+
 
 
 
@@ -464,7 +466,7 @@ public class MazeGame extends BaseGame {
 
         //Floor groundPlane
 
-        groundPlane = new Rectangle("ground", 200, 10000);
+        groundPlane = new Rectangle("ground", 200, 100000);
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
         //groundPlane.scale(1, 1, 10);
@@ -549,7 +551,7 @@ public class MazeGame extends BaseGame {
 
         //playerAvatar.scale(0.2f, 0.2f, 0.2f);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
-        playerAvatar.translate(0, 5, -2000);
+        playerAvatar.translate(0, 3, 0);
         //playerAvatar.setShowBound(true);
         playerAvatar.updateGeometricState(0, true);
 
@@ -1024,4 +1026,6 @@ class NPCGhost{
     public String getType() {
         return type;
     }
+
+
 }
