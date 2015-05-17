@@ -234,8 +234,8 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(finish);
 
 
-        CenterCity[] city = new CenterCity[10];
-        for (int i = 0; i < 10; i++) {
+        CenterCity[] city = new CenterCity[6];
+        for (int i = 0; i < 6; i++) {
             city[i] = new CenterCity();
             addGameWorldObject(city[i]);
             city[i].translate(150, 0, i * 1000);
@@ -466,7 +466,7 @@ public class MazeGame extends BaseGame {
 
         //Floor groundPlane
 
-        groundPlane = new Rectangle("ground", 200, 100000);
+        groundPlane = new Rectangle("ground", 200, 10000);
         Vector3D vec = new Vector3D(1, 0, 0);
         groundPlane.rotate(90, vec);
         //groundPlane.scale(1, 1, 10);
