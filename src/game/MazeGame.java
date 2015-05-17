@@ -50,10 +50,7 @@ import sage.scene.bounding.BoundingSphere;
 import sage.scene.shape.Cube;
 import sage.scene.shape.Cylinder;
 import sage.scene.shape.Rectangle;
-import sage.scene.state.RenderState;
-import sage.scene.state.TextureState;
 import sage.terrain.AbstractHeightMap;
-import sage.terrain.ImageBasedHeightMap;
 import sage.terrain.TerrainBlock;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
@@ -75,6 +72,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class MazeGame extends BaseGame {
+
     ICamera camera1;
     private Player player;
     private Client client;
@@ -106,8 +104,7 @@ public class MazeGame extends BaseGame {
     private Ship NPC2;
     private Cylinder tunnel;
     private ChessPieceRock finish, rock1, rock2, rock3, rock4, rock5;
-    private TheCity city;
-
+    private CenterCity[] city;
 
     private CollisionDispatcher collDispatcher;
     private BroadphaseInterface broadPhaseHandler;
@@ -234,11 +231,12 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(finish);
 
 
-        CenterCity[] city = new CenterCity[6];
-        for (int i = 0; i < 6; i++) {
+        city = new CenterCity[3];
+        for (int i = 0; i < 3; i++) {
             city[i] = new CenterCity();
             addGameWorldObject(city[i]);
             city[i].translate(150, 0, i * 1000);
+            city[i].scale(1.1f, 1.1f, 1.1f);
         }
 
 
@@ -442,26 +440,26 @@ public class MazeGame extends BaseGame {
     //=====================================================================================================
     private void initTerrain() {
 //        // create height map and terrain block
-        String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "road.jpg";
-        String heightFilePath = heightDir + heightFilename;
-        ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
-        imageTerrain = createTerBlock(myHeightMap);
-
-        // create texture and texture state to color the terrain
-        TextureState grassState;
-        String heighttextureDir = "." + File.separator + "materials" + File.separator;
-        String heighttextureFilename = "green.jpg";
-        String heighttextureFilePath = heighttextureDir + heighttextureFilename;
-        Texture grassTexture = TextureManager.loadTexture2D(heighttextureFilePath);
-        grassTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
-        grassState = (TextureState) display.getRenderer().createRenderState(RenderState.RenderStateType.Texture);
-        grassState.setTexture(grassTexture, 0);
-        grassState.setEnabled(true);
-        // apply the texture to the terrain
-        imageTerrain.setRenderState(grassState);
-        imageTerrain.scale(0.4f, 1, 10);
-        imageTerrain.translate(-50, -2, -1000);
+//        String heightDir = "." + File.separator + "materials" + File.separator;
+//        String heightFilename = "road.jpg";
+//        String heightFilePath = heightDir + heightFilename;
+//        ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
+//        imageTerrain = createTerBlock(myHeightMap);
+//
+//        // create texture and texture state to color the terrain
+//        TextureState grassState;
+//        String heighttextureDir = "." + File.separator + "materials" + File.separator;
+//        String heighttextureFilename = "green.jpg";
+//        String heighttextureFilePath = heighttextureDir + heighttextureFilename;
+//        Texture grassTexture = TextureManager.loadTexture2D(heighttextureFilePath);
+//        grassTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
+//        grassState = (TextureState) display.getRenderer().createRenderState(RenderState.RenderStateType.Texture);
+//        grassState.setTexture(grassTexture, 0);
+//        grassState.setEnabled(true);
+//        // apply the texture to the terrain
+//        imageTerrain.setRenderState(grassState);
+//        imageTerrain.scale(0.4f, 1, 10);
+//        imageTerrain.translate(-50, -2, -1000);
         //addGameWorldObject(imageTerrain);
 
         //Floor groundPlane
@@ -574,12 +572,26 @@ public class MazeGame extends BaseGame {
     //-------------------------------------------------------------------------------------------------------
 
     private void updateOldPosition() {
-        oldRotation = playerAvatar.getLocalRotation().toString();
-        oldTranslation = playerAvatar.getLocalTranslation().toString();
-        oldScale = playerAvatar.getLocalScale().toString();
-        playerAvatar.setWorldRotation(playerAvatar.getLocalRotation());
-        playerAvatar.setWorldTranslation(playerAvatar.getLocalTranslation());
-        playerAvatar.setWorldScale(playerAvatar.getLocalScale());
+
+
+        //SHIFTING CITY
+        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+        for (int i = 1; i < 20; i++) {
+            if ((avLoc.getZ() > i * 1000) && (avLoc.getZ() < (i + 1) * 1000) && (city[0].getChild().getWorldTranslation().getCol(3).getZ() < i * 1000))
+                city[0].translate(0, 0, 3000);
+            if ((avLoc.getZ() > (i + 1) * 1000) && (avLoc.getZ() < (i + 2) * 1000) && (city[1].getChild().getWorldTranslation().getCol(3).getZ() < (i + 1) * 1000))
+                city[1].translate(0, 0, 3000);
+            if ((avLoc.getZ() > (i + 2) * 1000) && (avLoc.getZ() < (i + 3) * 1000) && (city[2].getChild().getWorldTranslation().getCol(3).getZ() < (i + 2) * 1000))
+                city[2].translate(0, 0, 3000);
+
+        }
+
+        oldRotation = playerAvatar.getWorldRotation().toString();
+        oldTranslation = playerAvatar.getWorldTranslation().toString();
+        oldScale = playerAvatar.getWorldScale().toString();
+        playerAvatar.setWorldRotation(playerAvatar.getWorldRotation());
+        playerAvatar.setWorldTranslation(playerAvatar.getWorldTranslation());
+        playerAvatar.setWorldScale(playerAvatar.getWorldScale());
     }
 
     @Override
@@ -763,9 +775,9 @@ public class MazeGame extends BaseGame {
     //-------------------------------------------------------------------------------------------------------
 
     private boolean playerChanged() {
-        if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
-                !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
-           !oldScale.equals(playerAvatar.getLocalScale().toString())){
+        if (!oldRotation.equals(playerAvatar.getWorldRotation().toString()) ||
+                !oldTranslation.equals(playerAvatar.getWorldTranslation().toString()) ||
+                !oldScale.equals(playerAvatar.getWorldScale().toString())) {
             updateOldPosition();
             return true;
         }
