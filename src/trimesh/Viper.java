@@ -27,7 +27,7 @@ public class Viper extends Group implements Serializable {
         //viperpiece.setLocalBound(new BoundingSphere(new Point3D(0, 0, 0), 1));
         viperpiece.updateLocalBound();
 
-        String viperpieceTextureFilename = "elem.jpg";
+        String viperpieceTextureFilename = "Xwhite.jpg";
         String viperpieceTextureFilePath = viperpieceDir + viperpieceTextureFilename;
         Texture viperpieceTexture = TextureManager.loadTexture2D(viperpieceTextureFilePath);
         viperpiece.setTexture(viperpieceTexture);

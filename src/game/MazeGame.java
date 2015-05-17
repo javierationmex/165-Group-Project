@@ -235,8 +235,8 @@ public class MazeGame extends BaseGame {
         for (int i = 0; i < 3; i++) {
             city[i] = new CenterCity();
             addGameWorldObject(city[i]);
-            city[i].translate(150, 0, i * 1000);
-            city[i].scale(1.1f, 1.1f, 1.1f);
+            city[i].translate(-100, 0, i * 1000);
+            city[i].scale(1.2f, 1.2f, 1.2f);
         }
 
 
@@ -332,7 +332,7 @@ public class MazeGame extends BaseGame {
         groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), groundPlane.getLocalTranslation().getValues(), up, 0.0f);
         groundPlaneP.setBounciness(0.1f);
         groundPlaneP.setFriction(0);
-        groundPlane.setPhysicsObject(groundPlaneP);
+        //groundPlane.setPhysicsObject(groundPlaneP);
 
 //        float rockSize[] = {3, 3, 3};
 //        rock1P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock1.getLocalTranslation().getValues(), rockSize);
@@ -574,17 +574,7 @@ public class MazeGame extends BaseGame {
     private void updateOldPosition() {
 
 
-        //SHIFTING CITY
-        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
-        for (int i = 1; i < 20; i++) {
-            if ((avLoc.getZ() > i * 1000) && (avLoc.getZ() < (i + 1) * 1000) && (city[0].getChild().getWorldTranslation().getCol(3).getZ() < i * 1000))
-                city[0].translate(0, 0, 3000);
-            if ((avLoc.getZ() > (i + 1) * 1000) && (avLoc.getZ() < (i + 2) * 1000) && (city[1].getChild().getWorldTranslation().getCol(3).getZ() < (i + 1) * 1000))
-                city[1].translate(0, 0, 3000);
-            if ((avLoc.getZ() > (i + 2) * 1000) && (avLoc.getZ() < (i + 3) * 1000) && (city[2].getChild().getWorldTranslation().getCol(3).getZ() < (i + 2) * 1000))
-                city[2].translate(0, 0, 3000);
 
-        }
 
         oldRotation = playerAvatar.getWorldRotation().toString();
         oldTranslation = playerAvatar.getWorldTranslation().toString();
@@ -697,6 +687,23 @@ public class MazeGame extends BaseGame {
         windSound.setVolume((int) (playerAvatarP.getAngularVelocity()[2] * 0.1));
         setEarParameters();
 
+
+        //SHIFTING CITY
+        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+        for (int i = 1; i < 20; i++) {
+            if ((avLoc.getZ() > i * 1000) && (avLoc.getZ() < (i + 1) * 1000) && (city[0].getChild().getWorldTranslation().getCol(3).getZ() < i * 1000))
+                city[0].translate(0, 0, 3000);
+            if ((avLoc.getZ() > (i + 1) * 1000) && (avLoc.getZ() < (i + 2) * 1000) && (city[1].getChild().getWorldTranslation().getCol(3).getZ() < (i + 1) * 1000))
+                city[1].translate(0, 0, 3000);
+            if ((avLoc.getZ() > (i + 2) * 1000) && (avLoc.getZ() < (i + 3) * 1000) && (city[2].getChild().getWorldTranslation().getCol(3).getZ() < (i + 2) * 1000))
+                city[2].translate(0, 0, 3000);
+
+        }
+        if (avLoc.getY() > 100) {
+            float[] f = playerAvatarP.getLinearVelocity();
+            f[1] -= 100;
+            playerAvatarP.setLinearVelocity(f);
+        }
 
         super.update(time);
         physicsEngine.update(time);

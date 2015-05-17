@@ -1,6 +1,6 @@
 # Blender v2.73 (sub 0) OBJ File: 'mushroom.blend'
 # www.blender.org
-#mtllib mushroom.mtl
+mtllib mushroom.mtl
 #o Mushroom_Sphere.002
 v -0.098240 0.194642 -0.026745
 v -0.088170 0.356467 -0.006095
