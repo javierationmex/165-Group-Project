@@ -97,7 +97,7 @@ public class MazeGame extends BaseGame {
     private boolean canProcess;
     private IPhysicsEngine physicsEngine;
     private IPhysicsObject playerAvatarP, groundPlaneP, tunnelP, rightRailP, leftRailP, cube1P, pyramid1P, rock1P, rock2P, rock3P, rock4P, rock5P;
-    private Rectangle groundPlane;
+    private Rectangle[] groundPlane;
     private boolean isPhysicsEnabled;
     private Cube rightRail, leftRail;
     private Pod NPC1;
@@ -197,16 +197,16 @@ public class MazeGame extends BaseGame {
         s.scale(20, 50, 20);
         */
 
-//        rightRail = new Cube();
-//        rightRail.scale(2, 2, 4000);
-//        rightRail.translate(50, 0, 0);
-//        addGameWorldObject(rightRail);
-//        //leftRail.updateGeometricState(0,true);
-//
-//        leftRail = new Cube();
-//        leftRail.scale(2, 2, 4000);
-//        leftRail.translate(-50, 0, 0);
-//        addGameWorldObject(leftRail);
+        rightRail = new Cube();
+        rightRail.scale(2, 10, 4000);
+        rightRail.translate(50, 0, 10000);
+        //addGameWorldObject(rightRail);
+        //leftRail.updateGeometricState(0,true);
+
+        leftRail = new Cube();
+        leftRail.scale(2, 10, 4000);
+        leftRail.translate(-50, 0, 10000);
+        //addGameWorldObject(leftRail);
 
 //        tunnel = new Cylinder("tunnel", 4000, 100, 100, 100);
 //        //tunnel.rotate(90,new Vector3D(0,1,0));
@@ -226,7 +226,7 @@ public class MazeGame extends BaseGame {
         addGameWorldObject(NPC2);
 
         finish = new ChessPieceRock();
-        finish.translate(0, 0, 3000);
+        finish.translate(0, 0, 20000);
         finish.scale(5, 5, 5);
         addGameWorldObject(finish);
 
@@ -235,8 +235,8 @@ public class MazeGame extends BaseGame {
         for (int i = 0; i < 3; i++) {
             city[i] = new CenterCity();
             addGameWorldObject(city[i]);
-            city[i].translate(-100, 0, i * 1000);
-            city[i].scale(1.2f, 1.2f, 1.2f);
+            city[i].translate(250, 0, i * 1000);
+            city[i].scale(1.5f, 1.0f, 1.2f);
         }
 
 
@@ -299,18 +299,17 @@ public class MazeGame extends BaseGame {
         playerAvatarP.setDamping(0.99f, 0.9f);
 
 
-//        BoundingBox rightRailBoundingBox = (BoundingBox) rightRail.getWorldBound();
-//        float[] rightRailSize = {rightRailBoundingBox.getXExtent(), rightRailBoundingBox.getYExtent(), rightRailBoundingBox.getZExtent()};
-//        rightRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, rightRail.getLocalTranslation().getValues(), rightRailSize);
-//        rightRailP.setBounciness(0.0f);
-//        rightRailP.getTransform()[6] = 50;
-//        rightRail.setPhysicsObject(rightRailP);
-//
-//        BoundingBox leftRailBoundingBox = (BoundingBox) leftRail.getWorldBound();
-//        float[] leftRailSize = {leftRailBoundingBox.getXExtent(), leftRailBoundingBox.getYExtent(), leftRailBoundingBox.getZExtent()};
-//        leftRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 10000, leftRail.getLocalTranslation().getValues(), leftRailSize);
-//        leftRailP.setBounciness(0.0f);
-//        leftRail.setPhysicsObject(leftRailP);
+        float[] rightRailSize = {10, 500, 20000};
+        rightRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rightRail.getLocalTranslation().getValues(), rightRailSize);
+        rightRailP.setBounciness(0.1f);
+        rightRailP.getTransform()[6] = 50;
+        rightRail.setPhysicsObject(rightRailP);
+
+
+        float[] leftRailSize = {10, 500, 20000};
+        leftRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, leftRail.getLocalTranslation().getValues(), leftRailSize);
+        leftRailP.setBounciness(0.1f);
+        leftRail.setPhysicsObject(leftRailP);
 
 
         BoundingSphere NPC1BoundingBox = (BoundingSphere) NPC1.getWorldBound();
@@ -329,10 +328,12 @@ public class MazeGame extends BaseGame {
         //pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
-        groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), groundPlane.getLocalTranslation().getValues(), up, 0.0f);
+        //double position[] = {0,0,0,0};
+        groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), groundPlane[0].getWorldTranslation().getValues(), up, 0.0f);
         groundPlaneP.setBounciness(0.1f);
         groundPlaneP.setFriction(0);
         //groundPlane.setPhysicsObject(groundPlaneP);
+
 
 //        float rockSize[] = {3, 3, 3};
 //        rock1P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock1.getLocalTranslation().getValues(), rockSize);
@@ -464,18 +465,20 @@ public class MazeGame extends BaseGame {
 
         //Floor groundPlane
 
-        groundPlane = new Rectangle("ground", 200, 10000);
+        String groundextureDir = "." + File.separator + "materials" + File.separator;
+        String groundexturefilename = "Asphalt.jpg";
+        String groundexturefilepath = groundextureDir + groundexturefilename;
+        Texture groundexture = TextureManager.loadTexture2D(groundexturefilepath);
         Vector3D vec = new Vector3D(1, 0, 0);
-        groundPlane.rotate(90, vec);
-        //groundPlane.scale(1, 1, 10);
-        groundPlane.setColor(Color.GRAY);
-        String planetextureDir = "." + File.separator + "materials" + File.separator;
-        String planetexturefilename = "sand.jpg";
-        String planetexturefilepath = planetextureDir + planetexturefilename;
-        Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
-        groundPlane.setTexture(planetexture);
-        addGameWorldObject(groundPlane);
-
+        groundPlane = new Rectangle[30];
+        for (int i = 0; i < 30; i++) {
+            groundPlane[i] = new Rectangle("ground", 300, 1000);
+            groundPlane[i].rotate(90, vec);
+            groundPlane[i].setColor(Color.GRAY);
+            groundPlane[i].setTexture(groundexture);
+            groundPlane[i].translate(0, 0, i * 1000);
+            addGameWorldObject(groundPlane[i]);
+        }
 
     }
 
@@ -684,7 +687,7 @@ public class MazeGame extends BaseGame {
 
         npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
         windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
-        windSound.setVolume((int) (playerAvatarP.getAngularVelocity()[2] * 0.1));
+        windSound.setVolume((int) (playerAvatarP.getAngularVelocity()[2] * 0.001));
         setEarParameters();
 
 
