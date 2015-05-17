@@ -20,7 +20,7 @@ public class CenterCity extends Group implements Serializable {
     public CenterCity() {
         OBJLoader loader = new OBJLoader();
         String viperpieceDir = "." + File.separator + "materials" + File.separator;
-        String viperpieceFilename = "CenterCity.obj";
+        String viperpieceFilename = "CentCity.obj";
         String viperpieceFilePath = viperpieceDir + viperpieceFilename;
         TriMesh viperpiece = loader.loadModel(viperpieceFilePath);
         //viperpiece.scale(0.02f, 0.02f, 0.02f);
