@@ -320,7 +320,7 @@ public class MazeGame extends BaseGame {
         //cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
 
 
-        float cube2Size[] = {3, 3, 3};
+        //float cube2Size[] = {3, 3, 3};
         pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getLocalTranslation().getValues(), 3f, 3f);
         pyramid1P.setBounciness(1.1f);
         pyramid1P.setDamping(0.1f, 0.1f);
@@ -399,9 +399,8 @@ public class MazeGame extends BaseGame {
         String keyboardName = JOptionPane.showInputDialog(null, "Pick a keyboard", "Input", JOptionPane.QUESTION_MESSAGE, null, inputMgr.getControllers().toArray(), "keyboard").toString();
         //String keyboardName = inputMgr.getKeyboardName();
         ArrayList<Controller> controllers = inputMgr.getControllers();
-        String controllerName = null;
-        if (controllers.size() > 2)
-            controllerName = controllers.get(3).getName();
+        //String controllerName;
+        //if (controllers.size() > 2)  controllerName = controllers.get(3).getName();
         IAction quitGame = new QuitGameAction(this);
 
 
@@ -492,8 +491,8 @@ public class MazeGame extends BaseGame {
         Point3D terrainOrigin = new Point3D(0, -cornerHeight, 0);
         // create a terrain block using the height map
         String name = "Terrain:" + heightMap.getClass().getSimpleName();
-        TerrainBlock tb = new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
-        return tb;
+        return new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
+
     }
 
     private void drawSkyBox() {
@@ -649,12 +648,11 @@ public class MazeGame extends BaseGame {
 
 
             float[] behaviour = new float[3];
+
+
             behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
             behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
             behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
-
-            //float halfrand = (rand.nextInt(50 - 0) + 0)/100;
-
             cube1P.setLinearVelocity(behaviour);
 
 
@@ -662,6 +660,7 @@ public class MazeGame extends BaseGame {
             behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
             behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
             pyramid1P.setLinearVelocity(behaviour);
+
 
             //playerAvatarP.setTransform(playerAvatar.getLocalTransform().getValues());
             Matrix3D mat;
@@ -918,7 +917,7 @@ public class MazeGame extends BaseGame {
 
         o = o * 3;
         float[] futurex = {0, x + o, x + o, x + o, x, x - o, x - o, x - o, x};
-        float[] futurey = {0, y, y, y, y, y, y, y, y};
+        //float[] futurey = {0, y, y, y, y, y, y, y, y};
         float[] futurez = {0, z + o, z, z - o, z - o, z - o, z, z + o, z + o};
 
         if (collition) {
@@ -945,7 +944,7 @@ public class MazeGame extends BaseGame {
     }
 
     private boolean collidesWithTerrain(Point3D p) {
-        boolean collides = true;
+        boolean collides = false;
 
         float x = (float) p.getX();
         float y = (float) p.getY();
