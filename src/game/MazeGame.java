@@ -225,7 +225,7 @@ public class MazeGame extends BaseGame {
         NPC2.updateGeometricState(0, true);
         addGameWorldObject(NPC2);
 
-        finish = new ChessPieceRock();
+        finish = new ChessPieceRock("finish");
         finish.translate(0, 0, 20000);
         finish.scale(5, 5, 5);
         addGameWorldObject(finish);
@@ -542,7 +542,7 @@ public class MazeGame extends BaseGame {
         }else if(player.getCharacterID() == 2){
             playerAvatar = new Ship().getChild();
         }else if(player.getCharacterID() == 3){
-            playerAvatar = new ChessPieceRock().getChild();
+            playerAvatar = new ChessPieceRock("avatar").getChild();
         }else if(player.getCharacterID() == 4){
             playerAvatar = new Pod().getChild();
         }
@@ -701,9 +701,9 @@ public class MazeGame extends BaseGame {
                 city[2].translate(0, 0, 3000);
 
         }
-        if (avLoc.getY() > 100) {
+        if (avLoc.getY() > 50) {
             float[] f = playerAvatarP.getLinearVelocity();
-            f[1] -= 100;
+            f[1] -= 50;
             playerAvatarP.setLinearVelocity(f);
         }
 
@@ -839,7 +839,7 @@ public class MazeGame extends BaseGame {
             }else if (player.getCharacterID() == 2){
                 player.setAvatar(new Ship().getChild());
             }else if(player.getCharacterID() == 3) {
-                player.setAvatar(new ChessPieceRock().getChild());
+                player.setAvatar(new ChessPieceRock("avatar").getChild());
             }else if(player.getCharacterID() == 4) {
                 player.setAvatar(new Pod().getChild());
             }
@@ -992,7 +992,7 @@ public class MazeGame extends BaseGame {
             }else if(npc.getType().equals("SpacePod")){
                 npcGhost = new Pod().getChild();
             }else if(npc.getType().equals("Rook")){
-                npcGhost = new ChessPieceRock().getChild();
+                npcGhost = new ChessPieceRock("avatar").getChild();
             }else if(npc.getType().equals("Cube")){
                 npcGhost = new CustomCube("Cube");
             }else{

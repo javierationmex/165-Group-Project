@@ -16,8 +16,8 @@ public class Mushroom extends Group implements Serializable {
 
     private static final long serialVersionUID = 7526472295522776147L;
 
-    public Mushroom() {
-
+    public Mushroom(String name) {
+        this.setName(name);
         OBJLoader loader = new OBJLoader();
         String mushroomDir = "." + File.separator + "materials" + File.separator;
         String mushroomFilename = "mushroom.obj";

@@ -17,7 +17,8 @@ public class ChessPieceRock extends Group implements Serializable {
 
     TriMesh child;
 
-    public ChessPieceRock() {
+    public ChessPieceRock(String name) {
+        this.setName(name);
         OBJLoader loader = new OBJLoader();
         String chesspieceDir = "." + File.separator + "materials" + File.separator;
         String chesspieceFilename = "chesspiece.obj";
