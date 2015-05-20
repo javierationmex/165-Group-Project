@@ -25,11 +25,11 @@ public class NPCcontroller {
 
     public void createNPCs(){
         //Create all default NPCS here.
-        Cube cube1 = new Cube();
+        /*Cube cube1 = new Cube();
         cube1.rotate(180, new Vector3D(0, 1, 0));
         cube1.translate(0, 5, -2000);
         cube1.updateGeometricState(0, true);
-        NPClist.add(new NPC("Cube", 1, cube1.getLocalTranslation(), cube1.getLocalRotation(), cube1.getLocalScale()));
+        NPClist.add(new NPC("Cube", 1, cube1.getLocalTranslation(), cube1.getLocalRotation(), cube1.getLocalScale()));*/
     }
 
     public void addNPC(NPC npc){

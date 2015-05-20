@@ -1,11 +1,13 @@
 package networking;
 
+import gameengine.NPC.NPC;
 import gameengine.NPC.NPCcontroller;
 import graphicslib3D.Matrix3D;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
 import networking.packets.ingame.AddAvatarInformationPacket;
 import networking.packets.ingame.AllPlayerInfoPacket;
+import networking.packets.ingame.NPCPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
 import networking.packets.lobby.ChangeCharacterPacket;
 import networking.packets.lobby.JoinPacket;
@@ -150,9 +152,9 @@ public class Server extends GameConnectionServer<UUID> {
     private void createNPCs() {
         npcCtrl = new NPCcontroller();
         npcCtrl.createNPCs();
-        updateNPCS = new UpdateNPCS(this);
+/*        updateNPCS = new UpdateNPCS(this);
         timer = new Timer();
-        timer.schedule(updateNPCS, 0, 500);
+        timer.schedule(updateNPCS, 0, 500);*/
 
     }
 
@@ -162,11 +164,15 @@ public class Server extends GameConnectionServer<UUID> {
     }
 
     public void sendNPCinfo() {
-        try {
-            sendPacketToAll(npcCtrl.getNPCInfoPacket());
-        } catch (IOException e) {
-            e.printStackTrace();
+        NPCPacket npcs = npcCtrl.getNPCInfoPacket();
+        if(!npcs.getNpcs().isEmpty()){
+            try {
+                sendPacketToAll(npcs);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     private void sendPlayerInfo() {
@@ -179,6 +185,7 @@ public class Server extends GameConnectionServer<UUID> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        updateNPCs();
     }
 
     class UpdateNPCS extends TimerTask {
