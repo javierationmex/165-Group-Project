@@ -28,6 +28,7 @@ import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
+import networking.packets.ingame.AllPlayerInfoPacket;
 import networking.packets.ingame.NPCPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
 import sage.app.BaseGame;
@@ -55,6 +56,7 @@ import sage.terrain.TerrainBlock;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
+import swingmenus.multiplayer.data.SimplePlayerInfo;
 import trimesh.*;
 
 import javax.script.ScriptEngine;
@@ -542,8 +544,6 @@ public class MazeGame extends BaseGame {
         }else if(player.getCharacterID() == 2){
             playerAvatar = new Ship().getChild();
         }else if(player.getCharacterID() == 3){
-            playerAvatar = new ChessPieceRock("avatar").getChild();
-        }else if(player.getCharacterID() == 4){
             playerAvatar = new Pod().getChild();
         }
 
@@ -804,21 +804,25 @@ public class MazeGame extends BaseGame {
     }
 
 
-    public void updateGhostAvatar(UpdateAvatarInfoPacket packet) {
-
-        UUID id = packet.getClientID();
-        Matrix3D translation = new Matrix3D();
-        translation.concatenate(packet.getTranslation());
-        Matrix3D scale = new Matrix3D();
-        scale.concatenate(packet.getScale());
-        Matrix3D rotation = new Matrix3D();
-        rotation.concatenate(packet.getRotation());
-        if (!id.toString().equals(this.player.getPlayerUUID().toString())){
-            for(PlayerInfo p : this.playersInfo){
-                if(id.toString().equals(p.getClientID().toString())){
-                    p.getAvatar().setLocalTranslation(translation);
-                    p.getAvatar().setLocalScale(scale);
-                    p.getAvatar().setLocalRotation(rotation);
+    public void updateGhostAvatars(AllPlayerInfoPacket packet) {
+        ArrayList<SimplePlayerInfo> simplePlayerInfos = packet.getSimple();
+        for(SimplePlayerInfo s : simplePlayerInfos){
+            UUID id = s.getClientID();
+            if(s.getTranslation() != null && s.getScale() != null && s.getRotation() != null){
+                Matrix3D translation = new Matrix3D();
+                translation.concatenate(s.getTranslation());
+                Matrix3D scale = new Matrix3D();
+                scale.concatenate(s.getScale());
+                Matrix3D rotation = new Matrix3D();
+                rotation.concatenate(s.getRotation());
+                if (!id.toString().equals(this.player.getPlayerUUID().toString())){
+                    for(PlayerInfo p : this.playersInfo){
+                        if(id.toString().equals(p.getClientID().toString())){
+                            p.getAvatar().setLocalScale(scale);
+                            p.getAvatar().setLocalRotation(rotation);
+                            p.getAvatar().setLocalTranslation(translation);
+                        }
+                    }
                 }
             }
         }
@@ -833,14 +837,12 @@ public class MazeGame extends BaseGame {
 
             //Add avatar adding here
             if(player.getCharacterID() == 0) {
-                player.setAvatar(new CustomCube("PLAYER1"));
+                player.setAvatar(new Viper());
             }else if(player.getCharacterID() == 1){
-                player.setAvatar(new CustomPyramid("PLAYER1"));
+                player.setAvatar(new Arc170());
             }else if (player.getCharacterID() == 2){
                 player.setAvatar(new Ship().getChild());
             }else if(player.getCharacterID() == 3) {
-                player.setAvatar(new ChessPieceRock("avatar").getChild());
-            }else if(player.getCharacterID() == 4) {
                 player.setAvatar(new Pod().getChild());
             }
 

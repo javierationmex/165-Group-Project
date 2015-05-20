@@ -35,10 +35,10 @@ public class CharacterSelectionScreen {
         this.player = player;
         this.frame = frame;
         characterOptions = new Vector();
+        //If you update this, make sure to update addGhostAvatar() in MazeGame!
         characterOptions.add("Viper");
         characterOptions.add("Arc170");
         characterOptions.add("Space Ship");
-        characterOptions.add("Rook");
         characterOptions.add("Space Pod");
         model = new DefaultComboBoxModel(characterOptions);
         this.player.setCharacterSelectionScreen(this);
@@ -94,7 +94,11 @@ public class CharacterSelectionScreen {
                         this.canStartGame = false;
                     }
                 }
-                player.sendStartGamePacket();
+                if (canStartGame) {
+                    player.sendStartGamePacket();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "All players must be ready before starting the game.");
+                }
             }
         });
     }

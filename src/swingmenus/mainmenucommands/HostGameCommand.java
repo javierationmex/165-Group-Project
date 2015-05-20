@@ -56,4 +56,8 @@ public class HostGameCommand extends AbstractAction {
             System.out.println("Already hosting a game.");
         }
     }
+
+    public void hostGame(){
+
+    }
 }

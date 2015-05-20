@@ -20,7 +20,7 @@ public class SwitchToMultiPlayerCommand extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        frame.setContentPane(new MultiplayerLobby(frame).getMainView());
+        frame.setContentPane(new MultiplayerLobby(frame).getMainView("multi"));
         frame.setVisible(true);
     }
 }

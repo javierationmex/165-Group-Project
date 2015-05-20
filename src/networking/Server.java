@@ -1,9 +1,11 @@
 package networking;
 
 import gameengine.NPC.NPCcontroller;
+import graphicslib3D.Matrix3D;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
 import networking.packets.ingame.AddAvatarInformationPacket;
+import networking.packets.ingame.AllPlayerInfoPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
 import networking.packets.lobby.ChangeCharacterPacket;
 import networking.packets.lobby.JoinPacket;
@@ -11,6 +13,7 @@ import networking.packets.lobby.StartGamePacket;
 import sage.networking.server.GameConnectionServer;
 import sage.networking.server.IClientInfo;
 import swingmenus.multiplayer.data.PlayerInfo;
+import swingmenus.multiplayer.data.SimplePlayerInfo;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -28,8 +31,10 @@ public class Server extends GameConnectionServer<UUID> {
     private ArrayList<PlayerInfo> players;
     private NPCcontroller npcCtrl;
     private boolean gameStarted = false;
-    private Timer timer;
+    private Timer timer, timer2;
     private UpdateNPCS updateNPCS;
+    private SendPlayerInfo sendPlayerInfo;
+    private boolean notSendingYet = true;
 
 
     public Server(int localPort) throws IOException {
@@ -108,11 +113,37 @@ public class Server extends GameConnectionServer<UUID> {
         }
 
         if (packet instanceof UpdateAvatarInfoPacket) {
-            try {
-                this.sendPacketToAll((Serializable) packet);
-            } catch (IOException e) {
-                e.printStackTrace();
+            updatePlayerAvatar((UpdateAvatarInfoPacket) packet);
+        }
+    }
+
+    private void startSendingPlayerInfos() {
+        if(timer2 == null) {
+            sendPlayerInfo = new SendPlayerInfo(this);
+            timer2 = new Timer();
+            timer2.schedule(sendPlayerInfo, 0, 20);
+        }
+    }
+
+    private void updatePlayerAvatar(UpdateAvatarInfoPacket packet) {
+        UUID id = packet.getClientID();
+        Matrix3D translation = new Matrix3D();
+        translation.concatenate(packet.getTranslation());
+        Matrix3D scale = new Matrix3D();
+        scale.concatenate(packet.getScale());
+        Matrix3D rotation = new Matrix3D();
+        rotation.concatenate(packet.getRotation());
+
+        for(PlayerInfo p : this.players){
+            if(id.toString().equals(p.getClientID().toString())){
+                p.setTranslation(translation);
+                p.setScale(scale);
+                p.setRotation(rotation);
             }
+        }
+        if(notSendingYet){
+            notSendingYet = false;
+            startSendingPlayerInfos();
         }
     }
 
@@ -138,6 +169,17 @@ public class Server extends GameConnectionServer<UUID> {
         }
     }
 
+    private void sendPlayerInfo() {
+        ArrayList<SimplePlayerInfo> simple = new ArrayList<SimplePlayerInfo>();
+        for(PlayerInfo p : players){
+            simple.add(p.getSimplePlayerInfo());
+        }
+        try {
+            sendPacketToAll(new AllPlayerInfoPacket(simple));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     class UpdateNPCS extends TimerTask {
         private Server server;
@@ -151,6 +193,21 @@ public class Server extends GameConnectionServer<UUID> {
         @Override
         public void run() {
             server.updateNPCs();
+        }
+    }
+
+    class SendPlayerInfo extends TimerTask {
+        private Server server;
+        public SendPlayerInfo(Server server) {
+            this.server = server;
+        }
+
+        /**
+         * The action to be performed by this timer task.
+         */
+        @Override
+        public void run() {
+            server.sendPlayerInfo();
         }
     }
 

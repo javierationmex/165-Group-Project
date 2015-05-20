@@ -1,5 +1,7 @@
 package swingmenus.mainmenucommands;
 
+import swingmenus.multiplayer.MultiplayerLobby;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
@@ -17,7 +19,7 @@ public class SwitchToSinglePlayerCommand extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        /*frame.setContentPane(new BaseCharacterSelectionMenu().getMainView());
-        frame.setVisible(true);*/
+        frame.setContentPane(new MultiplayerLobby(frame).getMainView("single"));
+        frame.setVisible(true);
     }
 }
