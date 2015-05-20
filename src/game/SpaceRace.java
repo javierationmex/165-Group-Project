@@ -73,7 +73,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
 
-public class MazeGame extends BaseGame {
+public class SpaceRace extends BaseGame {
 
     ICamera camera1;
     TextureState shipTextureState;
@@ -124,12 +124,13 @@ public class MazeGame extends BaseGame {
 
     private IAudioManager audioMgr;
     private Sound windSound, npcSound, whooshSound, floop;
+    private HUDString scoreString1, speedString, avatarName;
     //private Sound[] whooshSound;
 
-    public MazeGame(Player player) {
+    public SpaceRace(Player player) {
         this.player = player;
         this.client = player.getClient();
-        this.client.setMazeGame(this);
+        this.client.setSpaceRace(this);
     }
 
 
@@ -185,7 +186,7 @@ public class MazeGame extends BaseGame {
         initScripting();
         setControls();
         initAudio();
-        display.setTitle("Maze Game");
+        display.setTitle("Space Race");
         isPhysicsEnabled = true;
     }
 
@@ -547,14 +548,19 @@ public class MazeGame extends BaseGame {
     private void addPlayer() {
         if(player.getCharacterID() == 1){
             playerAvatar = new Arc170();
+            player.setAvatarName("Arc170");
         }else if(player.getCharacterID() == 0){
             playerAvatar = new Viper();
+            player.setAvatarName("Viper");
         }else if(player.getCharacterID() == 2){
             playerAvatar = new Ship().getChild();
+            player.setAvatarName("SpaceShip");
         }else if(player.getCharacterID() == 3){
             playerAvatar = new Pod().getChild();
+            player.setAvatarName("SpacePod");
         }else if(player.getCharacterID() == 4){
             playerAvatar = myObject;
+            player.setAvatarName("SpaceShip Animated");
         }
 
         //set the character ID here and catch it in addGhostAvatar();
@@ -576,6 +582,31 @@ public class MazeGame extends BaseGame {
         camera1 = display.getRenderer().getCamera();
         camera1.setPerspectiveFrustum(90, 1, 1, 10000);
         camera1.setLocation(new Point3D(0, 1, 50));
+
+        avatarName = new HUDString("Model: " + player.getAvatarName());
+        avatarName.setName("Player1ID");
+        avatarName.setLocation(0.47, 0.97);
+        avatarName.setRenderMode(sage.scene.SceneNode.RENDER_MODE.ORTHO);
+        avatarName.setColor(Color.black);
+        avatarName.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
+        camera1.addToHUD(avatarName);
+
+        scoreString1 = new HUDString("");
+        scoreString1.setName("Player1ID");
+        scoreString1.setLocation(0.47, 0.95);
+        scoreString1.setRenderMode(sage.scene.SceneNode.RENDER_MODE.ORTHO);
+        scoreString1.setColor(Color.black);
+        scoreString1.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
+        camera1.addToHUD(scoreString1);
+
+        speedString = new HUDString("");
+        speedString.setName("Speed");
+        speedString.setLocation(0.47, 0.93);
+        speedString.setRenderMode(sage.scene.SceneNode.RENDER_MODE.ORTHO);
+        speedString.setColor(Color.black);
+        speedString.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
+        camera1.addToHUD(speedString);
+
     }
 
 
@@ -596,8 +627,15 @@ public class MazeGame extends BaseGame {
         playerAvatar.setWorldScale(playerAvatar.getWorldScale());
     }
 
+    private void updateHUD() {
+        float[] speed = playerAvatarP.getLinearVelocity();
+        scoreString1.setText("Score: " + score);
+        speedString.setText("Speed: " + ((int) speed[2] / 10) + " mph");
+    }
+
     @Override
     protected void update(float time) {
+        updateHUD();
         this.time += time;
         cam1Controller.update(this.time);
         super.update(time);

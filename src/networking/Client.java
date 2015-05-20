@@ -1,12 +1,11 @@
 package networking;
 
-import game.MazeGame;
+import game.SpaceRace;
 import game.Player;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
 import networking.packets.ingame.AllPlayerInfoPacket;
 import networking.packets.ingame.NPCPacket;
-import networking.packets.ingame.UpdateAvatarInfoPacket;
 import networking.packets.lobby.JoinPacket;
 import networking.packets.lobby.StartGamePacket;
 import sage.networking.client.GameConnectionClient;
@@ -25,7 +24,7 @@ public class Client extends GameConnectionClient {
     private UUID id;
     private ArrayList<TriMesh> ghostAvatars;
     private Player player;
-    private MazeGame mazeGame;
+    private SpaceRace spaceRace;
 
     public Client(InetAddress remoteAddr, int remotePort, ProtocolType protocolType, Player player) throws IOException {
         super(remoteAddr, remotePort, protocolType);
@@ -54,15 +53,15 @@ public class Client extends GameConnectionClient {
         }
 
         if(packet instanceof GamePlayerInfoPacket){
-            mazeGame.addGhostAvatar(((GamePlayerInfoPacket) packet).getPlayer());
+            spaceRace.addGhostAvatar(((GamePlayerInfoPacket) packet).getPlayer());
         }
 
         if(packet instanceof AllPlayerInfoPacket){
-            mazeGame.updateGhostAvatars(((AllPlayerInfoPacket) packet));
+            spaceRace.updateGhostAvatars(((AllPlayerInfoPacket) packet));
         }
 
         if(packet instanceof NPCPacket){
-            mazeGame.updateNPCGhosts((NPCPacket) packet);
+            spaceRace.updateNPCGhosts((NPCPacket) packet);
         }
     }
 
@@ -74,12 +73,12 @@ public class Client extends GameConnectionClient {
         }
     }
 
-    public MazeGame getMazeGame() {
-        return mazeGame;
+    public SpaceRace getSpaceRace() {
+        return spaceRace;
     }
 
-    public void setMazeGame(MazeGame mazeGame) {
-        this.mazeGame = mazeGame;
+    public void setSpaceRace(SpaceRace spaceRace) {
+        this.spaceRace = spaceRace;
     }
 
     public UUID getId() {

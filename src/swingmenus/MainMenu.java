@@ -16,7 +16,7 @@ public class MainMenu extends JPanel {
     public MainMenu(JFrame frame) {
         this.frame = frame;
         this.setSize(1000, 500);
-        this.add(new JLabel("Maze Game"));
+        this.add(new JLabel("Space Race"));
 
         JButton singleplayerButton = new JButton("Single player");
         singleplayerButton.setAction(new SwitchToSinglePlayerCommand(frame));

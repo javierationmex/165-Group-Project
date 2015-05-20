@@ -30,7 +30,8 @@ public class Player {
     private ProcessPackets processPackets;
     private JFrame frame;
     private boolean inGame = false;
-    private MazeGame game;
+    private SpaceRace game;
+    private String avatarName;
 
     public Player(String playerName) {
         this.playerName = playerName;
@@ -132,7 +133,7 @@ public class Player {
     public void startGame() {
         frame.setVisible(false);
         timer.cancel();
-        game = new MazeGame(this);
+        game = new SpaceRace(this);
         inGame = true;
     }
 
@@ -140,12 +141,20 @@ public class Player {
         this.frame = frame;
     }
 
-    public MazeGame getGame() {
+    public SpaceRace getGame() {
         return game;
     }
 
     public boolean isInGame() {
         return inGame;
+    }
+
+    public void setAvatarName(String avatarName) {
+        this.avatarName = avatarName;
+    }
+
+    public String getAvatarName() {
+        return avatarName;
     }
 }
 

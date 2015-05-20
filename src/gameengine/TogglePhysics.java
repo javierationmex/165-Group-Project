@@ -1,6 +1,6 @@
 package gameengine;
 
-import game.MazeGame;
+import game.SpaceRace;
 import net.java.games.input.Event;
 import sage.input.action.AbstractInputAction;
 
@@ -9,9 +9,9 @@ import sage.input.action.AbstractInputAction;
  */
 public class TogglePhysics extends AbstractInputAction {
 
-    private MazeGame game;
+    private SpaceRace game;
 
-    public TogglePhysics(MazeGame game) {
+    public TogglePhysics(SpaceRace game) {
         this.game = game;
     }
 

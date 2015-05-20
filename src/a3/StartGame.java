@@ -50,7 +50,7 @@ public class StartGame {
     }
 
     public static void main(String[] args) {
-        frame = new JFrame("Maze Game");
+        frame = new JFrame("Space Race");
         frame.setContentPane(new StartGame().mainView);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
@@ -77,7 +77,7 @@ public class StartGame {
         mainView.setLayout(new BorderLayout(0, 0));
         final JLabel label1 = new JLabel();
         label1.setHorizontalAlignment(0);
-        label1.setText("Maze Game");
+        label1.setText("Space Race");
         mainView.add(label1, BorderLayout.CENTER);
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridBagLayout());

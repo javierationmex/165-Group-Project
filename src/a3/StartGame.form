@@ -11,7 +11,7 @@
         <constraints border-constraint="Center"/>
         <properties>
           <horizontalAlignment value="0"/>
-          <text value="Maze Game"/>
+          <text value="Space Race"/>
         </properties>
       </component>
       <grid id="6fa3d" layout-manager="GridBagLayout">

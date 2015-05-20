@@ -35,7 +35,7 @@ public class FullScreenDisplaySystem implements IDisplaySystem {
             throw new RuntimeException("Unable to find renderer '" + rName + "'");
         }
         rendererCanvas = myRenderer.getCanvas();
-        myFrame = new JFrame("Default Title");
+        myFrame = new JFrame("Space Race");
         myFrame.add(rendererCanvas);
 
         initScreen(isFullScreen);
