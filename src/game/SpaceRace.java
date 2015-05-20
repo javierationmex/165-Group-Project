@@ -284,8 +284,8 @@ public class SpaceRace extends BaseGame {
         Random rand = new Random();
 
         for (int i = 1; i < 100; i++) {
-            cube[i] = new Cube("cube");
-            cube[i].setName("cube");
+            cube[i] = new Cube("bug");
+            //cube[i].setName("cube");
             //cube[i].translate(40-rand.nextInt(80), 200-rand.nextInt(200), (1000 * i)*rand.nextFloat());
             cube[i].translate(40 - rand.nextInt(80), 8, (1000 * i) * rand.nextFloat());
             cube[i].scale(4, 4, 4);
@@ -756,7 +756,7 @@ public class SpaceRace extends BaseGame {
         }
 
         for (SceneNode s : getGameWorld()) {
-            if (s.getName().equalsIgnoreCase("cube")) {
+            if (s.getName().equalsIgnoreCase("bug")) {
                 s.rotate(20, new Vector3D(0, 1, 0));
                 //s.scale(0, 0, 0.005f);
             }
@@ -804,7 +804,7 @@ public class SpaceRace extends BaseGame {
         String windFilePath = soundDir + windFilename;
         String strongwindFilename = "StrongWind.wav";
         String strongwindFilePath = soundDir + strongwindFilename;
-        String whooshFilename = "Squash.wav";
+        String whooshFilename = "Squish.wav";
         String whooshFilePath = soundDir + whooshFilename;
         String shipFilename = "ship1.wav";
         String shipFilePath = soundDir + shipFilename;
