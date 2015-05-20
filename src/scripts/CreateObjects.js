@@ -8,6 +8,7 @@ var JavaPackages = new JavaImporter(
  Packages.sage.scene.shape.Rectangle,
  Packages.gameengine.shapes.Trapesoid,
  Packages.trimesh.Mushroom,
+ Packages.trimesh.ChessPieceRock,
  Packages.graphicslib3D.Vector3D,
  Packages.graphicslib3D.Point3D);
 
@@ -29,59 +30,57 @@ var rootNode = new Group();
 //var t1 = new Trapesoid();
 //t1.translate(-5,2,5);
 //rootNode.addChild(t1);
-
-var s = new Mushroom("bad");
-s.translate(0, 0, 200);
-s.scale(10, 40, 10);
-rootNode.addChild(s);
-
-var s = new Mushroom("bad");
-s.translate(10, 0, 600);
-s.scale(10, 40, 10);
-rootNode.addChild(s);
-
-
-
-
-    var s = new ChessPieceRock("bad");
-    s.translate(-10, 0, 500);
-    s.scale(10, 10, 10);
-    rootNode.addChild(s);
-
-   var s = new ChessPieceRock("bad");
-    s.translate(-20, 0, 1000);
-    s.scale(10, 10, 10);
-    rootNode.addChild(s);
-
-   var s = new ChessPieceRock("bad");
-    s.translate(0, 0, 2000);
-    s.scale(10, 10, 10);
-    rootNode.addChild(s);
-
-   var s = new ChessPieceRock("bad");
-    s.translate(-1, 0, 2300);
-    s.scale(10, 10, 10);
-    rootNode.addChild(s);
-
-   var s = new ChessPieceRock("bad");
-    s.translate(30, 0, 4000);
-    s.scale(10, 10, 10);
-    rootNode.addChild(s);
-
-   var s = new ChessPieceRock("bad");
-    s.translate(0, 0, 5000);
-    s.scale(10, 10, 10);
-    rootNode.addChild(s);
-
-   var s = new ChessPieceRock("bad");
-    s.translate(20, 0, 5500);
-    s.scale(10, 10, 10);
-    rootNode.addChild(s);
-
-   var s = new ChessPieceRock("bad");
-    s.translate(0, 0, 7000);
-    s.scale(10, 10, 10);
-    rootNode.addChild(s);
+//
+//var s = new Mushroom("bad");
+//s.translate(0, 0, 200);
+//s.scale(10, 40, 10);
+//rootNode.addChild(s);
+//
+//var s = new Mushroom("bad");
+//s.translate(10, 0, 600);
+//s.scale(10, 40, 10);
+//rootNode.addChild(s);
+//
+//
+//    var s = new ChessPieceRock("bad");
+//    s.translate(-10, 0, 500);
+//    s.scale(10, 10, 10);
+//    rootNode.addChild(s);
+//
+//   var s = new ChessPieceRock("bad");
+//    s.translate(-20, 0, 1000);
+//    s.scale(10, 10, 10);
+//    rootNode.addChild(s);
+//
+//   var s = new ChessPieceRock("bad");
+//    s.translate(0, 0, 2000);
+//    s.scale(10, 10, 10);
+//    rootNode.addChild(s);
+//
+//   var s = new ChessPieceRock("bad");
+//    s.translate(-1, 0, 2300);
+//    s.scale(10, 10, 10);
+//    rootNode.addChild(s);
+//
+//   var s = new ChessPieceRock("bad");
+//    s.translate(30, 0, 4000);
+//    s.scale(10, 10, 10);
+//    rootNode.addChild(s);
+//
+//   var s = new ChessPieceRock("bad");
+//    s.translate(0, 0, 5000);
+//    s.scale(10, 10, 10);
+//    rootNode.addChild(s);
+//
+//   var s = new ChessPieceRock("bad");
+//    s.translate(20, 0, 5500);
+//    s.scale(10, 10, 10);
+//    rootNode.addChild(s);
+//
+//   var s = new ChessPieceRock("bad");
+//    s.translate(0, 0, 7000);
+//    s.scale(10, 10, 10);
+//    rootNode.addChild(s);
 
 //Floor plane
 //var plane = new Rectangle();

@@ -11,7 +11,6 @@ import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import game.characters.CustomCube;
-import game.characters.CustomPyramid;
 import gameengine.CameraController;
 import gameengine.FullScreenDisplaySystem;
 import gameengine.Jump;
@@ -45,11 +44,11 @@ import sage.physics.IPhysicsEngine;
 import sage.physics.IPhysicsObject;
 import sage.physics.PhysicsEngineFactory;
 import sage.renderer.IRenderer;
+import sage.scene.RotationController;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
 import sage.scene.bounding.BoundingSphere;
 import sage.scene.shape.Cube;
-import sage.scene.shape.Cylinder;
 import sage.scene.shape.Rectangle;
 import sage.terrain.AbstractHeightMap;
 import sage.terrain.TerrainBlock;
@@ -88,6 +87,7 @@ public class MazeGame extends BaseGame {
     private ArrayList<NPC> npcs;
     private ArrayList<NPCGhost> npcsGhosts;
     private float time = 0;
+    private int score = 0;
 
     private SceneNode rootNode;
     private ScriptEngine engine;
@@ -98,16 +98,16 @@ public class MazeGame extends BaseGame {
     private String oldScale;
     private boolean canProcess;
     private IPhysicsEngine physicsEngine;
-    private IPhysicsObject playerAvatarP, groundPlaneP, tunnelP, rightRailP, leftRailP, cube1P, pyramid1P, rock1P, rock2P, rock3P, rock4P, rock5P;
+    private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, cube1P, pyramid1P;
     private Rectangle[] groundPlane;
     private boolean isPhysicsEnabled;
-    private Cube rightRail, leftRail;
+    private Cube rightRail, leftRail, finish;
     private Pod NPC1;
     private Ship NPC2;
-    private Cylinder tunnel;
-    private ChessPieceRock finish, rock1, rock2, rock3, rock4, rock5;
-    private CenterCity[] city;
+    private Cube[] cube;
 
+    private CenterCity[] city;
+    private RotationController rotate;
     private CollisionDispatcher collDispatcher;
     private BroadphaseInterface broadPhaseHandler;
     private ConstraintSolver solver;
@@ -168,6 +168,7 @@ public class MazeGame extends BaseGame {
     }
     @Override
     protected void initGame() {
+
         eventManager = EventManager.getInstance();
         inputMgr = getInputManager();
         renderer = display.getRenderer();
@@ -191,13 +192,6 @@ public class MazeGame extends BaseGame {
         initTerrain();
         drawSkyBox();
 
-/*
-        Moved to script
-        Mushroom s = new Mushroom();
-        addGameWorldObject(s);
-        s.translate(200, 6, 200);
-        s.scale(20, 50, 20);
-        */
 
         rightRail = new Cube();
         rightRail.scale(2, 10, 4000);
@@ -210,11 +204,6 @@ public class MazeGame extends BaseGame {
         leftRail.translate(-50, 0, 10000);
         //addGameWorldObject(leftRail);
 
-//        tunnel = new Cylinder("tunnel", 4000, 100, 100, 100);
-//        //tunnel.rotate(90,new Vector3D(0,1,0));
-//        tunnel.translate(0, 0, -2000);
-//        addGameWorldObject(tunnel);
-//        tunnel.updateGeometricState(0, true);
 
         NPC1 = new Pod();
         NPC1.translate(0, 1, 0);
@@ -227,7 +216,7 @@ public class MazeGame extends BaseGame {
         NPC2.updateGeometricState(0, true);
         addGameWorldObject(NPC2);
 
-        finish = new ChessPieceRock("finish");
+        finish = new Cube("finish");
         finish.translate(0, 0, 20000);
         finish.scale(5, 5, 5);
         addGameWorldObject(finish);
@@ -237,36 +226,29 @@ public class MazeGame extends BaseGame {
         for (int i = 0; i < 3; i++) {
             city[i] = new CenterCity();
             addGameWorldObject(city[i]);
-            city[i].translate(250, 0, i * 1000);
+            city[i].translate(235, 0, i * 1000);
             city[i].scale(1.5f, 1.0f, 1.2f);
         }
 
 
+        rotate = new RotationController(50, new Vector3D(1, 1, 1));
+
+        cube = new Cube[100];
+
+        Random rand = new Random();
+
+        for (int i = 1; i < 100; i++) {
+            cube[i] = new Cube("cube");
+            cube[i].setName("cube");
+            //cube[i].translate(40-rand.nextInt(80), 200-rand.nextInt(200), (1000 * i)*rand.nextFloat());
+            cube[i].translate(40 - rand.nextInt(80), 8, (1000 * i) * rand.nextFloat());
+            cube[i].scale(4, 4, 4);
+            cube[i].rotate(45, new Vector3D(1, 1, 1));
+            cube[i].addController(rotate);
+            addGameWorldObject(cube[i]);
 
 
-//        rock1 = new ChessPieceRock();
-//        rock2 = new ChessPieceRock();
-//        rock3 = new ChessPieceRock();
-//        rock4 = new ChessPieceRock();
-//        rock5 = new ChessPieceRock();
-//
-//        rock1.translate(2, 0, 400);
-//        rock2.translate(-2, 0, 800);
-//        rock3.translate(5, 0, 1400);
-//        rock4.translate(0, 0, 1600);
-//        rock5.translate(2, 0, 1800);
-//
-//        addGameWorldObject(rock1);
-//        addGameWorldObject(rock2);
-//        addGameWorldObject(rock3);
-//        addGameWorldObject(rock4);
-//        addGameWorldObject(rock5);
-//
-//        rock1.updateGeometricState(0, true);
-//        rock2.updateGeometricState(0, true);
-//        rock3.updateGeometricState(0, true);
-//        rock4.updateGeometricState(0, true);
-//        rock5.updateGeometricState(0, true);
+        }
     }
 
     //=====================================================================================================
@@ -335,25 +317,6 @@ public class MazeGame extends BaseGame {
         groundPlaneP.setBounciness(0.1f);
         groundPlaneP.setFriction(0);
         //groundPlane.setPhysicsObject(groundPlaneP);
-
-
-//        float rockSize[] = {3, 3, 3};
-//        rock1P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock1.getLocalTranslation().getValues(), rockSize);
-//        rock2P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock2.getLocalTranslation().getValues(), rockSize);
-//        rock3P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock3.getLocalTranslation().getValues(), rockSize);
-//        rock4P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock4.getLocalTranslation().getValues(), rockSize);
-//        rock5P = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rock5.getLocalTranslation().getValues(), rockSize);
-//        rock1P.setBounciness(50f);
-//        rock2P.setBounciness(50f);
-//        rock3P.setBounciness(50f);
-//        rock4P.setBounciness(50f);
-//        rock5P.setBounciness(50f);
-//
-//        rock1.setPhysicsObject(rock1P);
-//        rock2.setPhysicsObject(rock2P);
-//        rock3.setPhysicsObject(rock3P);
-//        rock4.setPhysicsObject(rock4P);
-//        rock5.setPhysicsObject(rock5P);
 
 
     }
@@ -706,6 +669,26 @@ public class MazeGame extends BaseGame {
             f[1] -= 50;
             playerAvatarP.setLinearVelocity(f);
         }
+
+        for (SceneNode s : getGameWorld()) {
+            if (s.getName().equalsIgnoreCase("cube")) {
+                s.rotate(20, new Vector3D(0, 1, 0));
+                //s.scale(0, 0, 0.005f);
+            }
+            if (s.getWorldBound() != null)
+                if (s.getWorldBound().contains(avLoc) && s.getName().equalsIgnoreCase("cube")) {
+                    score++;
+                    System.out.println("COLLISION SCORE" + score);
+                    removeGameWorldObject(s);
+                    break;
+                }
+        }
+
+        // update the HUD
+//        scoreString.setText("Score = " + score);
+//        time += elapsedTimeMS;
+//        DecimalFormat df = new DecimalFormat("0.0"); timeString.setText("Time = " + df.format(time/1000));
+//
 
         super.update(time);
         physicsEngine.update(time);
