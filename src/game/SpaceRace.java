@@ -749,7 +749,7 @@ public class SpaceRace extends BaseGame {
                 city[2].translate(0, 0, 3000);
 
         }
-        if (avLoc.getY() > 50) {
+        if (avLoc.getY() > 10) {
             float[] f = playerAvatarP.getLinearVelocity();
             f[1] -= 50;
             playerAvatarP.setLinearVelocity(f);
@@ -761,7 +761,7 @@ public class SpaceRace extends BaseGame {
                 //s.scale(0, 0, 0.005f);
             }
             if (s.getWorldBound() != null)
-                if (s.getWorldBound().contains(avLoc) && s.getName().equalsIgnoreCase("cube")) {
+                if (s.getWorldBound().intersects(playerAvatar.getWorldBound()) && s.getName().equalsIgnoreCase("cube")) {
                     whooshSound.setLocation(avLoc);
                     whooshSound.play();
                     score++;
@@ -804,7 +804,7 @@ public class SpaceRace extends BaseGame {
         String windFilePath = soundDir + windFilename;
         String strongwindFilename = "StrongWind.wav";
         String strongwindFilePath = soundDir + strongwindFilename;
-        String whooshFilename = "Whoosh.wav";
+        String whooshFilename = "Squash.wav";
         String whooshFilePath = soundDir + whooshFilename;
         String shipFilename = "ship1.wav";
         String shipFilePath = soundDir + shipFilename;
@@ -840,9 +840,9 @@ public class SpaceRace extends BaseGame {
         windSound.setMaxDistance(200);
         windSound.setMinDistance(50.0f);
         windSound.setRollOff(5.0f);
-        whooshSound.setMaxDistance(200);
-        whooshSound.setMinDistance(50.0f);
-        whooshSound.setRollOff(5.0f);
+        whooshSound.setMaxDistance(10);
+        whooshSound.setMinDistance(10.0f);
+        whooshSound.setRollOff(1.0f);
 
 
         npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
@@ -852,7 +852,7 @@ public class SpaceRace extends BaseGame {
         setEarParameters();
         npcSound.play();
         windSound.play();
-        whooshSound.play();
+        //whooshSound.play();
 
 
     }
