@@ -23,8 +23,10 @@ import gameengine.player.MovePlayerRightAction;
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
+import javafx.scene.shape.Cylinder;
+import net.java.games.input.*;
 import net.java.games.input.Component;
-import net.java.games.input.Controller;
+import net.java.games.input.Event;
 import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
@@ -35,12 +37,16 @@ import sage.event.EventManager;
 import sage.event.IEventManager;
 import sage.input.IInputManager;
 import sage.input.InputManager;
+import sage.input.action.AbstractInputAction;
 import sage.input.action.IAction;
 import sage.input.action.QuitGameAction;
+import sage.model.loader.ogreXML.OgreXMLParser;
 import sage.physics.IPhysicsEngine;
 import sage.physics.IPhysicsObject;
 import sage.physics.PhysicsEngineFactory;
 import sage.renderer.IRenderer;
+import sage.scene.Group;
+import sage.scene.Model3DTriMesh;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
 import sage.scene.shape.Cube;
@@ -112,6 +118,10 @@ public class MazeGame extends BaseGame {
     private Vector3f worldAabbMax = new Vector3f(10000, 10000, 10000);
     private DynamicsWorld physicsWorld;
 
+    TextureState shipTextureState;
+    private Group model;
+    private Model3DTriMesh myObject;
+
 
     public MazeGame(Player player) {
         this.player = player;
@@ -177,6 +187,46 @@ public class MazeGame extends BaseGame {
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
         display.setTitle("Treasure Hunt 2015");
+
+        //Animated Object
+        OgreXMLParser loader = new OgreXMLParser();
+        try
+        {
+            model = loader.loadModel("." + File.separator + "materials" + File.separator + "Sphere.010.mesh.xml",
+                    "." + File.separator + "materials" + File.separator + "Material.001.material",
+                    "." + File.separator + "materials" + File.separator +"Sphere.010.skeleton.xml");
+            model.updateGeometricState(0, true);
+            java.util.Iterator<SceneNode> modelIterator = model.iterator();
+            myObject = (Model3DTriMesh) modelIterator.next();
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        myObject.translate(1f,1f, 1f);
+
+        String shipDir = "." + File.separator + "materials" + File.separator;
+        String shipTextureFilename = "oracleTexturingFlipped.png";
+        String shipTextureFilePath = shipDir + shipTextureFilename;
+
+        Texture shipTexture = TextureManager.loadTexture2D(shipTextureFilePath);
+        shipTexture.setApplyMode(Texture.ApplyMode.Replace);
+        shipTextureState = (TextureState) display.getRenderer().createRenderState(RenderState.RenderStateType.Texture);
+        shipTextureState.setTexture(shipTexture, 0);
+        shipTextureState.setEnabled(true);
+        myObject.setRenderState(shipTextureState);
+        //myObject.rotate(180, new Vector3D(0,1,0));
+        //myObject.translate(0f, 5f, 0f);
+
+        //myObject.setTexture(shipTexture);
+        myObject.updateRenderStates();
+
+        myObject.startAnimation("my_animation");
+
+
 
         addPlayer();
         initTerrain();
@@ -433,7 +483,8 @@ public class MazeGame extends BaseGame {
         }else if(player.getCharacterID() == 0){
             playerAvatar = new CustomCube("PLAYER1");
         }else if(player.getCharacterID() == 2){
-            playerAvatar = new Ship().getChild();
+            //playerAvatar = new Ship().getChild();
+            playerAvatar = myObject;
         }else if(player.getCharacterID() == 3){
             playerAvatar = new ChessPieceRock().getChild();
         }else if(player.getCharacterID() == 4){
@@ -480,6 +531,7 @@ public class MazeGame extends BaseGame {
         this.time += time;
         cam1Controller.update(this.time);
         super.update(time);
+        myObject.updateAnimation(time);
         if(playerChanged()){
             try {
                 client.sendPacket(new UpdateAvatarInfoPacket(client.getId(), playerAvatar.getLocalTranslation(), playerAvatar.getLocalScale(), playerAvatar.getLocalRotation()));
@@ -620,7 +672,8 @@ public class MazeGame extends BaseGame {
             }else if(player.getCharacterID() == 1){
                 player.setAvatar(new CustomPyramid("PLAYER1"));
             }else if (player.getCharacterID() == 2){
-                player.setAvatar(new Ship().getChild());
+                player.setAvatar(myObject);
+                //player.setAvatar(new Ship().getChild());
             }else if(player.getCharacterID() == 3) {
                 player.setAvatar(new ChessPieceRock().getChild());
             }else if(player.getCharacterID() == 4) {
