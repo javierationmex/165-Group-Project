@@ -40,6 +40,7 @@ public class CharacterSelectionScreen {
         characterOptions.add("Arc170");
         characterOptions.add("Space Ship");
         characterOptions.add("Space Pod");
+        characterOptions.add("Space Ship Animated");
         model = new DefaultComboBoxModel(characterOptions);
         this.player.setCharacterSelectionScreen(this);
         $$$setupUI$$$();

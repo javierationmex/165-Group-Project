@@ -561,10 +561,11 @@ public class MazeGame extends BaseGame {
         }else if(player.getCharacterID() == 0){
             playerAvatar = new Viper();
         }else if(player.getCharacterID() == 2){
-            //playerAvatar = new Ship().getChild();
-            playerAvatar = myObject;
+            playerAvatar = new Ship().getChild();
         }else if(player.getCharacterID() == 3){
             playerAvatar = new Pod().getChild();
+        }else if(player.getCharacterID() == 4){
+            playerAvatar = myObject;
         }
 
         //set the character ID here and catch it in addGhostAvatar();
@@ -881,10 +882,11 @@ public class MazeGame extends BaseGame {
             }else if(player.getCharacterID() == 1){
                 player.setAvatar(new Arc170());
             }else if (player.getCharacterID() == 2){
-                player.setAvatar(myObject);
-                //player.setAvatar(new Ship().getChild());
+                player.setAvatar(new Ship().getChild());
             }else if(player.getCharacterID() == 3) {
                 player.setAvatar(new Pod().getChild());
+            }else if(player.getCharacterID() == 4) {
+                player.setAvatar(myObject);
             }
 
 
