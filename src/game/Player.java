@@ -165,5 +165,4 @@ class ProcessPackets extends TimerTask {
             player.getGame().start();
         }
     }
-
 }

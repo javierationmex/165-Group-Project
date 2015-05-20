@@ -3,8 +3,6 @@ package trimesh;
 import sage.model.loader.OBJLoader;
 import sage.scene.Group;
 import sage.scene.TriMesh;
-import sage.texture.Texture;
-import sage.texture.TextureManager;
 
 import java.io.File;
 import java.io.Serializable;
@@ -23,10 +21,10 @@ public class Smaug extends Group implements Serializable {
         TriMesh chesspiece = loader.loadModel(chesspieceFilePath);
         chesspiece.updateLocalBound();
 
-        String chesspieceTextureFilename = "chess-texture.jpg";
-        String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
-        Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
-        chesspiece.setTexture(chesspieceTexture);
+//        String chesspieceTextureFilename = "chess-texture.jpg";
+//        String chesspieceTextureFilePath = chesspieceDir + chesspieceTextureFilename;
+//        Texture chesspieceTexture = TextureManager.loadTexture2D(chesspieceTextureFilePath);
+//        chesspiece.setTexture(chesspieceTexture);
 
         this.addChild(chesspiece);
     }

@@ -14,6 +14,8 @@
       <root url="jar://$PROJECT_DIR$/libs/Java Gaming/sagetest.jar!/" />
       <root url="jar://$PROJECT_DIR$/libs/Java Gaming/vecmath.jar!/" />
       <root url="file://$PROJECT_DIR$/libs/Java Gaming/lib" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/joal-test.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/joal.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="file://$PROJECT_DIR$/libs/Java Gaming/javadocs/GraphicsLib3D" />
@@ -24,6 +26,7 @@
       <root url="file://$PROJECT_DIR$/libs/Java Gaming/lib" />
       <root url="jar://$PROJECT_DIR$/libs/Java Gaming/gluegen-rt-natives-windows-amd64.jar!/" />
       <root url="jar://$PROJECT_DIR$/libs/Java Gaming/jogl-all-natives-windows-amd64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Java Gaming/joal-natives-windows-amd64.jar!/" />
     </NATIVE>
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/libs/Java Gaming/luaj-sources-3.0.jar!/" />

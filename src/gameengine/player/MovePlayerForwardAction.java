@@ -37,7 +37,7 @@ public class MovePlayerForwardAction extends BaseAbstractInputAction {
         Vector3D projectedDirection = new Vector3D(0, 0, -1);
 //        projectedDirection = projectedDirection.mult(rot);
 //        //projectedDirection.scale(2);
-//        projectedDirection.add(avatar.getWorldTranslation().getCol(3));
+//        projectedDirection.add(avatar.getLocalTranslation().getCol(3));
 //
 //        float projectedx = (float) projectedDirection.getX();
 //        float projectedy = (float) projectedDirection.getY();
@@ -50,7 +50,11 @@ public class MovePlayerForwardAction extends BaseAbstractInputAction {
             //avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
         //}
 
-        playerAvatarP.setLinearVelocity(new float[]{(float) dir.getX() * 100, 0, (float) dir.getZ() * 100});
+        float[] f = playerAvatarP.getLinearVelocity();
+        f[0] += (float) dir.getX() * 20;
+        f[2] += (float) dir.getZ() * 20;
+        playerAvatarP.setLinearVelocity(f);
+
         //playerAvatarP.setFriction(100000);
         //playerAvatarP.setSleepThresholds(1,1);
 //        //CHECKING HEIGHTS

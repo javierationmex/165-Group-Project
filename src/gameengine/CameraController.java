@@ -29,7 +29,7 @@ public class CameraController {
         worldUpVec = new Vector3D(0, 1, 0);
         cameraDistanceFromTarget = 50.0f;
         cameraAzimuth = 180;
-        cameraElevation = 20.0f;
+        cameraElevation = 40.0f;
         update(0.0f);
         setupInput(inputMgr, controllerName);
         //this.client = client;
@@ -42,7 +42,7 @@ public class CameraController {
     }
 
     private void updateTarget() {
-        targetPos = new Point3D(target.getWorldTranslation().getCol(3));
+        targetPos = new Point3D(target.getLocalTranslation().getCol(3));
     }
 
     private void updateCameraPosition() {

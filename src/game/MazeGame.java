@@ -1,5 +1,4 @@
-// WHILE SPACE IS PRESSED reduce angular damp to drift
-//add speed up
+//AWESOME NAMELESS GAME
 
 
 
@@ -12,9 +11,10 @@ import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import game.characters.CustomCube;
-import game.characters.CustomPyramid;
 import gameengine.CameraController;
 import gameengine.FullScreenDisplaySystem;
+import gameengine.Jump;
+import gameengine.NPC.NPC;
 import gameengine.TogglePhysics;
 import gameengine.player.MovePlayerBackwardAction;
 import gameengine.player.MovePlayerForwardAction;
@@ -29,8 +29,11 @@ import net.java.games.input.Component;
 import net.java.games.input.Event;
 import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
+import networking.packets.ingame.AllPlayerInfoPacket;
+import networking.packets.ingame.NPCPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
 import sage.app.BaseGame;
+import sage.audio.*;
 import sage.camera.ICamera;
 import sage.display.IDisplaySystem;
 import sage.event.EventManager;
@@ -45,24 +48,25 @@ import sage.physics.IPhysicsEngine;
 import sage.physics.IPhysicsObject;
 import sage.physics.PhysicsEngineFactory;
 import sage.renderer.IRenderer;
+
 import sage.scene.Group;
 import sage.scene.Model3DTriMesh;
+
+import sage.scene.RotationController;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
+import sage.scene.bounding.BoundingSphere;
 import sage.scene.shape.Cube;
-import sage.scene.shape.Pyramid;
 import sage.scene.shape.Rectangle;
 import sage.scene.state.RenderState;
 import sage.scene.state.TextureState;
 import sage.terrain.AbstractHeightMap;
-import sage.terrain.ImageBasedHeightMap;
 import sage.terrain.TerrainBlock;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
 import swingmenus.multiplayer.data.PlayerInfo;
-import trimesh.ChessPieceRock;
-import trimesh.Pod;
-import trimesh.Ship;
+import swingmenus.multiplayer.data.SimplePlayerInfo;
+import trimesh.*;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -79,6 +83,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class MazeGame extends BaseGame {
+
     ICamera camera1;
     private Player player;
     private Client client;
@@ -89,7 +94,10 @@ public class MazeGame extends BaseGame {
     private CameraController cam1Controller;
     private SceneNode playerAvatar;
     private ArrayList<PlayerInfo> playersInfo;
+    private ArrayList<NPC> npcs;
+    private ArrayList<NPCGhost> npcsGhosts;
     private float time = 0;
+    private int score = 0;
 
     private SceneNode rootNode;
     private ScriptEngine engine;
@@ -100,13 +108,16 @@ public class MazeGame extends BaseGame {
     private String oldScale;
     private boolean canProcess;
     private IPhysicsEngine physicsEngine;
-    private IPhysicsObject playerAvatarP, groundPlaneP, cube1P, pyramid1P;
-    private Rectangle groundPlane;
+    private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, cube1P, pyramid1P;
+    private Rectangle[] groundPlane;
     private boolean isPhysicsEnabled;
-    private Cube cube1;
-    private Pyramid pyramid1;
-    private ChessPieceRock finish;
+    private Cube rightRail, leftRail, finish;
+    private Pod NPC1;
+    private Ship NPC2;
+    private Cube[] cube;
 
+    private CenterCity[] city;
+    private RotationController rotate;
     private CollisionDispatcher collDispatcher;
     private BroadphaseInterface broadPhaseHandler;
     private ConstraintSolver solver;
@@ -122,6 +133,9 @@ public class MazeGame extends BaseGame {
     private Group model;
     private Model3DTriMesh myObject;
 
+
+    private IAudioManager audioMgr;
+    private Sound windSound, npcSound, whooshSound;
 
     public MazeGame(Player player) {
         this.player = player;
@@ -146,7 +160,7 @@ public class MazeGame extends BaseGame {
     }
 
     private IDisplaySystem createDisplaySystem() {
-        IDisplaySystem displaySystem = new FullScreenDisplaySystem(700, 300, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
+        IDisplaySystem displaySystem = new FullScreenDisplaySystem(400, 400, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
         System.out.print("\nWaiting for display creation...");
         int count = 0;
         while (!displaySystem.isCreated()) {
@@ -170,6 +184,7 @@ public class MazeGame extends BaseGame {
     }
     @Override
     protected void initGame() {
+
         eventManager = EventManager.getInstance();
         inputMgr = getInputManager();
         renderer = display.getRenderer();
@@ -180,6 +195,7 @@ public class MazeGame extends BaseGame {
 
         initScripting();
         setControls();
+        initAudio();
         display.setTitle("Maze Game");
         isPhysicsEnabled = true;
     }
@@ -232,25 +248,63 @@ public class MazeGame extends BaseGame {
         initTerrain();
         drawSkyBox();
 
-/*
-        Moved to script
-        Mushroom s = new Mushroom();
-        addGameWorldObject(s);
-        s.translate(200, 6, 200);
-        s.scale(20, 50, 20);
-        */
-        cube1 = new Cube();
-        cube1.translate(5, 10, 0);
-        addGameWorldObject(cube1);
-        pyramid1 = new Pyramid();
-        pyramid1.translate(-5, 50, 0);
-        addGameWorldObject(pyramid1);
 
-        finish = new ChessPieceRock();
-        finish.translate(-900, 1, -900);
+        rightRail = new Cube();
+        rightRail.scale(2, 10, 4000);
+        rightRail.translate(50, 0, 10000);
+        //addGameWorldObject(rightRail);
+        //leftRail.updateGeometricState(0,true);
+
+        leftRail = new Cube();
+        leftRail.scale(2, 10, 4000);
+        leftRail.translate(-50, 0, 10000);
+        //addGameWorldObject(leftRail);
+
+
+        NPC1 = new Pod();
+        NPC1.translate(0, 1, 0);
+        addGameWorldObject(NPC1);
+        NPC1.updateGeometricState(0, true);
+        NPC1.setShowBound(true);
+
+        NPC2 = new Ship();
+        NPC2.translate(-30, 1, 0);
+        NPC2.updateGeometricState(0, true);
+        addGameWorldObject(NPC2);
+
+        finish = new Cube("finish");
+        finish.translate(0, 0, 20000);
         finish.scale(5, 5, 5);
         addGameWorldObject(finish);
 
+
+        city = new CenterCity[3];
+        for (int i = 0; i < 3; i++) {
+            city[i] = new CenterCity();
+            addGameWorldObject(city[i]);
+            city[i].translate(235, 0, i * 1000);
+            city[i].scale(1.5f, 1.0f, 1.2f);
+        }
+
+
+        rotate = new RotationController(50, new Vector3D(1, 1, 1));
+
+        cube = new Cube[100];
+
+        Random rand = new Random();
+
+        for (int i = 1; i < 100; i++) {
+            cube[i] = new Cube("cube");
+            cube[i].setName("cube");
+            //cube[i].translate(40-rand.nextInt(80), 200-rand.nextInt(200), (1000 * i)*rand.nextFloat());
+            cube[i].translate(40 - rand.nextInt(80), 8, (1000 * i) * rand.nextFloat());
+            cube[i].scale(4, 4, 4);
+            cube[i].rotate(45, new Vector3D(1, 1, 1));
+            cube[i].addController(rotate);
+            addGameWorldObject(cube[i]);
+
+
+        }
     }
 
     //=====================================================================================================
@@ -267,41 +321,59 @@ public class MazeGame extends BaseGame {
 
     //PHYSICS
     private void createSagePhysicsWorld() {
-        float mass = 0.01f;
+        float mass = 100.0f;
 
-        float[] avatarsize = {1, 1, 1};
-        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getWorldTransform().getValues(), 1, 1);
+//        BoundingSphere tunnelBoundingBox = (BoundingSphere) tunnel.getWorldBound();
+//        tunnelP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), tunnelBoundingBox.getRadius(), tunnelBoundingBox.getRadius());
+//        tunnelP.setBounciness(0.5f);
+//        tunnel.setPhysicsObject(tunnelP);
+
+
+
+        BoundingSphere playerBoundingBox = (BoundingSphere) playerAvatar.getWorldBound();
+        playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), playerBoundingBox.getRadius(), playerBoundingBox.getRadius());
         playerAvatar.setPhysicsObject(playerAvatarP);
-        playerAvatarP.setBounciness(0.5f);
-
+        playerAvatarP.setBounciness(1.1f);
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
-        //playerAvatarP.setDamping(0.999999f, 0f);
-        //playerAvatarP.setFriction(0.5f);
+        playerAvatarP.setFriction(0.5f);
+        playerAvatarP.setDamping(0.99f, 0.9f);
 
-        //playerAvatarP.setSleepThresholds(0.5f, 0.5f);
-        playerAvatarP.setDamping(0.99f, 0.0f);
-        playerAvatarP.setFriction(0);
 
-        float cube1Size[] = {1, 1, 1};
-        cube1P = physicsEngine.addCylinderObject(physicsEngine.nextUID(), mass, cube1.getWorldTransform().getValues(), cube1Size);
-        cube1P.setBounciness(0.5f);
+        float[] rightRailSize = {10, 500, 20000};
+        rightRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, rightRail.getLocalTranslation().getValues(), rightRailSize);
+        rightRailP.setBounciness(0.1f);
+        rightRailP.getTransform()[6] = 50;
+        rightRail.setPhysicsObject(rightRailP);
+
+
+        float[] leftRailSize = {10, 500, 20000};
+        leftRailP = physicsEngine.addBoxObject(physicsEngine.nextUID(), 0, leftRail.getLocalTranslation().getValues(), leftRailSize);
+        leftRailP.setBounciness(0.1f);
+        leftRail.setPhysicsObject(leftRailP);
+
+
+        BoundingSphere NPC1BoundingBox = (BoundingSphere) NPC1.getWorldBound();
+        cube1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC1.getLocalTranslation().getValues(), NPC1BoundingBox.getRadius(), NPC1BoundingBox.getRadius());
+        cube1P.setBounciness(1.1f);
         cube1P.setDamping(0.1f, 0.1f);
-        cube1.setPhysicsObject(cube1P);
+        NPC1.setPhysicsObject(cube1P);
+        //cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
 
 
-        float cube2Size[] = {1, 1, 1};
-        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, pyramid1.getWorldTransform().getValues(), 1f, 1f);
-        pyramid1P.setBounciness(0.5f);
+        //float cube2Size[] = {3, 3, 3};
+        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getLocalTranslation().getValues(), 3f, 3f);
+        pyramid1P.setBounciness(1.1f);
         pyramid1P.setDamping(0.1f, 0.1f);
-        pyramid1.setPhysicsObject(pyramid1P);
-
+        NPC2.setPhysicsObject(pyramid1P);
+        //pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
-        groundPlaneP =
-                physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),
-                        groundPlane.getLocalTranslation().getValues(), up, 0f);
-        groundPlaneP.setBounciness(0.0f);
-        groundPlane.setPhysicsObject(groundPlaneP);
+        //double position[] = {0,0,0,0};
+        groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), groundPlane[0].getWorldTranslation().getValues(), up, 0.0f);
+        groundPlaneP.setBounciness(0.1f);
+        groundPlaneP.setFriction(0);
+        //groundPlane.setPhysicsObject(groundPlaneP);
+
 
     }
 
@@ -342,15 +414,14 @@ public class MazeGame extends BaseGame {
     }
 
     //=====================================================================================================
-    //INPUT SECTION
+    //========================================================================================INPUT SECTION
     //=====================================================================================================
     private void setControls() {
         String keyboardName = JOptionPane.showInputDialog(null, "Pick a keyboard", "Input", JOptionPane.QUESTION_MESSAGE, null, inputMgr.getControllers().toArray(), "keyboard").toString();
         //String keyboardName = inputMgr.getKeyboardName();
         ArrayList<Controller> controllers = inputMgr.getControllers();
-        String controllerName = null;
-        if (controllers.size() > 2)
-            controllerName = controllers.get(3).getName();
+        //String controllerName;
+        //if (controllers.size() > 2)  controllerName = controllers.get(3).getName();
         IAction quitGame = new QuitGameAction(this);
 
 
@@ -368,58 +439,66 @@ public class MazeGame extends BaseGame {
                 new MovePlayerBackwardAction(playerAvatar, imageTerrain, client, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.A,
-                new MovePlayerLeftAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerLeftAction(playerAvatar, imageTerrain, client, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.D,
-                new MovePlayerRightAction(playerAvatar, imageTerrain, client), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+                new MovePlayerRightAction(playerAvatar, imageTerrain, client, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.F2,
                 new TogglePhysics(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_AND_RELEASE);
+        inputMgr.associateAction(
+                keyboardName, Component.Identifier.Key.SPACE, new Jump(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
     }
 
+    public void jump() {
+
+        float[] f = playerAvatarP.getLinearVelocity();
+        f[1] = f[1] + 200;
+        playerAvatarP.setLinearVelocity(f);
+    }
     //=====================================================================================================
     //============================================================================================ TERRAIN SECTION
     //=====================================================================================================
     private void initTerrain() {
 //        // create height map and terrain block
-        String heightDir = "." + File.separator + "materials" + File.separator;
-        String heightFilename = "t.jpg";
-        String heightFilePath = heightDir + heightFilename;
-        ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
-        imageTerrain = createTerBlock(myHeightMap);
-
-        // create texture and texture state to color the terrain
-        TextureState grassState;
-        String heighttextureDir = "." + File.separator + "materials" + File.separator;
-        String heighttextureFilename = "green.jpg";
-        String heighttextureFilePath = heighttextureDir + heighttextureFilename;
-        Texture grassTexture = TextureManager.loadTexture2D(heighttextureFilePath);
-        grassTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
-        grassState = (TextureState) display.getRenderer().createRenderState(RenderState.RenderStateType.Texture);
-        grassState.setTexture(grassTexture, 0);
-        grassState.setEnabled(true);
-        // apply the texture to the terrain
-        imageTerrain.setRenderState(grassState);
-
-        imageTerrain.translate(-imageTerrain.getSize() / 2, -7, -imageTerrain.getSize() / 2);
-        //imageTerrain.scale(3, 1, 3);
+//        String heightDir = "." + File.separator + "materials" + File.separator;
+//        String heightFilename = "road.jpg";
+//        String heightFilePath = heightDir + heightFilename;
+//        ImageBasedHeightMap myHeightMap = new ImageBasedHeightMap(heightFilePath);
+//        imageTerrain = createTerBlock(myHeightMap);
+//
+//        // create texture and texture state to color the terrain
+//        TextureState grassState;
+//        String heighttextureDir = "." + File.separator + "materials" + File.separator;
+//        String heighttextureFilename = "green.jpg";
+//        String heighttextureFilePath = heighttextureDir + heighttextureFilename;
+//        Texture grassTexture = TextureManager.loadTexture2D(heighttextureFilePath);
+//        grassTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
+//        grassState = (TextureState) display.getRenderer().createRenderState(RenderState.RenderStateType.Texture);
+//        grassState.setTexture(grassTexture, 0);
+//        grassState.setEnabled(true);
+//        // apply the texture to the terrain
+//        imageTerrain.setRenderState(grassState);
+//        imageTerrain.scale(0.4f, 1, 10);
+//        imageTerrain.translate(-50, -2, -1000);
         //addGameWorldObject(imageTerrain);
 
         //Floor groundPlane
 
-        groundPlane = new Rectangle("ground", 5000, 5000);
+        String groundextureDir = "." + File.separator + "materials" + File.separator;
+        String groundexturefilename = "Asphalt.jpg";
+        String groundexturefilepath = groundextureDir + groundexturefilename;
+        Texture groundexture = TextureManager.loadTexture2D(groundexturefilepath);
         Vector3D vec = new Vector3D(1, 0, 0);
-        groundPlane.rotate(90, vec);
-        groundPlane.scale(5, 1, 1);
-        //groundPlane.scale(1, 1, 1);
-        //groundPlane.translate(0, 0, 0);
-        groundPlane.setColor(Color.GRAY);
-        String planetextureDir = "." + File.separator + "materials" + File.separator;
-        String planetexturefilename = "sand.jpg";
-        String planetexturefilepath = planetextureDir + planetexturefilename;
-        Texture planetexture = TextureManager.loadTexture2D(planetexturefilepath);
-        groundPlane.setTexture(planetexture);
-        addGameWorldObject(groundPlane);
+        groundPlane = new Rectangle[30];
+        for (int i = 0; i < 30; i++) {
+            groundPlane[i] = new Rectangle("ground", 300, 1000);
+            groundPlane[i].rotate(90, vec);
+            groundPlane[i].setColor(Color.GRAY);
+            groundPlane[i].setTexture(groundexture);
+            groundPlane[i].translate(0, 0, i * 1000);
+            addGameWorldObject(groundPlane[i]);
+        }
 
     }
 
@@ -433,8 +512,8 @@ public class MazeGame extends BaseGame {
         Point3D terrainOrigin = new Point3D(0, -cornerHeight, 0);
         // create a terrain block using the height map
         String name = "Terrain:" + heightMap.getClass().getSimpleName();
-        TerrainBlock tb = new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
-        return tb;
+        return new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
+
     }
 
     private void drawSkyBox() {
@@ -478,16 +557,13 @@ public class MazeGame extends BaseGame {
 
     private void addPlayer() {
         if(player.getCharacterID() == 1){
-
-            playerAvatar = new CustomPyramid("PLAYER1");
+            playerAvatar = new Arc170();
         }else if(player.getCharacterID() == 0){
-            playerAvatar = new CustomCube("PLAYER1");
+            playerAvatar = new Viper();
         }else if(player.getCharacterID() == 2){
             //playerAvatar = new Ship().getChild();
             playerAvatar = myObject;
         }else if(player.getCharacterID() == 3){
-            playerAvatar = new ChessPieceRock().getChild();
-        }else if(player.getCharacterID() == 4){
             playerAvatar = new Pod().getChild();
         }
 
@@ -495,9 +571,9 @@ public class MazeGame extends BaseGame {
 
         //playerAvatar.scale(0.2f, 0.2f, 0.2f);
         playerAvatar.rotate(180, new Vector3D(0, 1, 0));
-        playerAvatar.translate(0, 5, 0);
+        playerAvatar.translate(0, 3, 0);
         //playerAvatar.setShowBound(true);
-
+        playerAvatar.updateGeometricState(0, true);
 
         updateOldPosition();
 
@@ -508,7 +584,7 @@ public class MazeGame extends BaseGame {
         }
         addGameWorldObject(playerAvatar);
         camera1 = display.getRenderer().getCamera();
-        camera1.setPerspectiveFrustum(60, 1, 1, 5000);
+        camera1.setPerspectiveFrustum(90, 1, 1, 10000);
         camera1.setLocation(new Point3D(0, 1, 50));
     }
 
@@ -518,12 +594,16 @@ public class MazeGame extends BaseGame {
     //-------------------------------------------------------------------------------------------------------
 
     private void updateOldPosition() {
-        oldRotation = playerAvatar.getLocalRotation().toString();
-        oldTranslation = playerAvatar.getLocalTranslation().toString();
-        oldScale = playerAvatar.getLocalScale().toString();
-        playerAvatar.setWorldRotation(playerAvatar.getLocalRotation());
-        playerAvatar.setWorldTranslation(playerAvatar.getLocalTranslation());
-        playerAvatar.setWorldScale(playerAvatar.getLocalScale());
+
+
+
+
+        oldRotation = playerAvatar.getWorldRotation().toString();
+        oldTranslation = playerAvatar.getWorldTranslation().toString();
+        oldScale = playerAvatar.getWorldScale().toString();
+        playerAvatar.setWorldRotation(playerAvatar.getWorldRotation());
+        playerAvatar.setWorldTranslation(playerAvatar.getWorldTranslation());
+        playerAvatar.setWorldScale(playerAvatar.getWorldScale());
     }
 
     @Override
@@ -544,11 +624,13 @@ public class MazeGame extends BaseGame {
 
 
         // -------------------------------------------------------------APPLIES FRICTION WHEN IN IMAGETERRAIN
+
 //        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+//
 //        float terHeight = imageTerrain.getHeightFromWorld(avLoc);
-//        if (avLoc.getY() < terHeight) {
-//            playerAvatarP.setFriction(0.9f);
-//            //JOptionPane.showMessageDialog(null,"COllision");
+//        if (avLoc.getY()-4 <= terHeight) {
+//            playerAvatarP.setFriction(9999.9f);
+//            JOptionPane.showMessageDialog(null,"COllision");
 //        } else {
 //            playerAvatarP.setFriction(0);
 //        }
@@ -559,44 +641,51 @@ public class MazeGame extends BaseGame {
 
             Random rand = new Random();
             float ranfdomFloat = rand.nextFloat();
-            SceneNode particle = cube1;
+            SceneNode particle = NPC1;
 
             float[] swarmBehaviour = new float[3];
             {
-                Point3D finishPoint = new Point3D(finish.getWorldTranslation().getCol(3));
-                Point3D startPoint = new Point3D(particle.getWorldTranslation().getCol(3));
-                swarmBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.01);
-                swarmBehaviour[1] = 0;
-                swarmBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.01);
+                Point3D finishPoint = new Point3D(finish.getLocalTranslation().getCol(3));
+                Point3D startPoint = new Point3D(particle.getLocalTranslation().getCol(3));
+                Vector3D swarmVector = new Vector3D((finishPoint.getX() - startPoint.getX()), (finishPoint.getY() - startPoint.getY()), (finishPoint.getZ() - startPoint.getZ()));
+                swarmVector.normalize();
+                swarmBehaviour[0] = (float) (swarmVector.getX() * 0.1);
+                swarmBehaviour[1] = (float) (swarmVector.getY() * 0.1);
+                swarmBehaviour[2] = (float) (swarmVector.getZ() * 0.1);
             }
 
 
             float[] particleBehaviour = new float[3];
             {
-                Point3D finishPoint = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
-                Point3D startPoint = new Point3D(particle.getWorldTranslation().getCol(3));
-                particleBehaviour[0] = (float) ((finishPoint.getX() - startPoint.getX()) * 0.1);
-                particleBehaviour[1] = 0;
-                particleBehaviour[2] = (float) ((finishPoint.getZ() - startPoint.getZ()) * 0.1);
+                Point3D finishPoint = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
+                Point3D startPoint = new Point3D(particle.getLocalTranslation().getCol(3));
+                Vector3D particleVector = new Vector3D((finishPoint.getX() - startPoint.getX()), (finishPoint.getY() - startPoint.getY()), (finishPoint.getZ() - startPoint.getZ()));
+                particleVector.normalize();
+                particleBehaviour[0] = (float) (particleVector.getX() * 0.5);
+                particleBehaviour[1] = (float) (particleVector.getY() * 0.5);
+                particleBehaviour[2] = (float) (particleVector.getZ() * 0.5);
             }
 
 
             float[] behaviour = new float[3];
+
+
             behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
-            behaviour[1] = 0;
+            behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
             behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
-
-            //float halfrand = (rand.nextInt(50 - 0) + 0)/100;
-
             cube1P.setLinearVelocity(behaviour);
 
 
+            behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
+            behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
+            behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
             pyramid1P.setLinearVelocity(behaviour);
 
-            //playerAvatarP.setTransform(playerAvatar.getWorldTransform().getValues());
+
+            //playerAvatarP.setTransform(playerAvatar.getLocalTransform().getValues());
             Matrix3D mat;
             Vector3D translateVec, rotateVec;
-            physicsEngine.update(20.0f);
+
             for (SceneNode s : getGameWorld()){
                 if (s.getPhysicsObject() != null){
                     mat = new Matrix3D(s.getPhysicsObject().getTransform());
@@ -606,6 +695,7 @@ public class MazeGame extends BaseGame {
                     //s.getLocalRotation().setCol(3,rotateVec);
                 }
             }
+
         }
 
 
@@ -614,14 +704,129 @@ public class MazeGame extends BaseGame {
         }
 
 
+        npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
+        windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
+        windSound.setVolume((int) (playerAvatarP.getAngularVelocity()[2] * 0.001));
+        setEarParameters();
+
+
+        //SHIFTING CITY
+        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+        for (int i = 1; i < 20; i++) {
+            if ((avLoc.getZ() > i * 1000) && (avLoc.getZ() < (i + 1) * 1000) && (city[0].getChild().getWorldTranslation().getCol(3).getZ() < i * 1000))
+                city[0].translate(0, 0, 3000);
+            if ((avLoc.getZ() > (i + 1) * 1000) && (avLoc.getZ() < (i + 2) * 1000) && (city[1].getChild().getWorldTranslation().getCol(3).getZ() < (i + 1) * 1000))
+                city[1].translate(0, 0, 3000);
+            if ((avLoc.getZ() > (i + 2) * 1000) && (avLoc.getZ() < (i + 3) * 1000) && (city[2].getChild().getWorldTranslation().getCol(3).getZ() < (i + 2) * 1000))
+                city[2].translate(0, 0, 3000);
+
+        }
+        if (avLoc.getY() > 50) {
+            float[] f = playerAvatarP.getLinearVelocity();
+            f[1] -= 50;
+            playerAvatarP.setLinearVelocity(f);
+        }
+
+        for (SceneNode s : getGameWorld()) {
+            if (s.getName().equalsIgnoreCase("cube")) {
+                s.rotate(20, new Vector3D(0, 1, 0));
+                //s.scale(0, 0, 0.005f);
+            }
+            if (s.getWorldBound() != null)
+                if (s.getWorldBound().contains(avLoc) && s.getName().equalsIgnoreCase("cube")) {
+                    score++;
+                    System.out.println("COLLISION SCORE" + score);
+                    removeGameWorldObject(s);
+                    break;
+                }
+        }
+
+        // update the HUD
+//        scoreString.setText("Score = " + score);
+//        time += elapsedTimeMS;
+//        DecimalFormat df = new DecimalFormat("0.0"); timeString.setText("Time = " + df.format(time/1000));
+//
+
+        super.update(time);
+        physicsEngine.update(time);
+
+//        if (playerAvatar.getWorldBound().intersects(finish.getWorldBound())) {
+//            finish.translate(0, 0, 100);
+//            playerAvatar.scale(10, 10, 10);
+//
+//            JOptionPane.showMessageDialog(null, "YOU WIN!!!!!!");
+//        }
+    }
+
+    //-------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------SOUND SECTION -----------------
+    //-------------------------------------------------------------------------------------------------------
+
+    public void initAudio() {
+        AudioResource resource1, resource2, resource3;
+        audioMgr = AudioManagerFactory.createAudioManager("sage.audio.joal.JOALAudioManager");
+        if (!audioMgr.initialize()) {
+            System.out.println("Audio Manager failed to initialize!");
+            return;
+        }
+        String soundDir = "." + File.separator + "materials" + File.separator + "sounds" + File.separator;
+        String windFilename = "Wind.wav";
+        String windFilePath = soundDir + windFilename;
+        String strongwindFilename = "StrongWind.wav";
+        String strongwindFilePath = soundDir + strongwindFilename;
+        String whooshFilename = "Whoosh.wav";
+        String whooshFilePath = soundDir + whooshFilename;
+        String shipFilename = "ship1.wav";
+        String shipFilePath = soundDir + shipFilename;
+
+        resource1 = audioMgr.createAudioResource(shipFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource2 = audioMgr.createAudioResource(whooshFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource3 = audioMgr.createAudioResource(windFilePath, AudioResourceType.AUDIO_SAMPLE);
+        npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 100, true);
+        whooshSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
+        windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 20, true);
+
+        npcSound.initialize(audioMgr);
+        windSound.initialize(audioMgr);
+        whooshSound.initialize(audioMgr);
+        npcSound.setMaxDistance(200);
+        npcSound.setMinDistance(50.0f);
+        npcSound.setRollOff(5.0f);
+        windSound.setMaxDistance(200);
+        windSound.setMinDistance(50.0f);
+        windSound.setRollOff(5.0f);
+        whooshSound.setMaxDistance(200);
+        whooshSound.setMinDistance(50.0f);
+        whooshSound.setRollOff(5.0f);
+
+        npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
+        windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
+        whooshSound.setLocation(new Point3D(finish.getLocalTranslation().getCol(3)));
+        setEarParameters();
+        npcSound.play();
+        windSound.play();
+        whooshSound.play();
 
     }
 
+    public void setEarParameters() {
+        Matrix3D avDir = (Matrix3D) (playerAvatar.getLocalRotation().clone());
+        //float camAz = camera1.get.getAzimuth();
+        avDir.rotateY(180.0f);
+        Vector3D camDir = new Vector3D(0, 0, 1);
+        camDir = camDir.mult(avDir);
+        audioMgr.getEar().setLocation(camera1.getLocation());
+        audioMgr.getEar().setOrientation(camDir, new Vector3D(0, 1, 0));
+    }
+
+    //-------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------player? SECTION -----------------
+    //-------------------------------------------------------------------------------------------------------
 
     private boolean playerChanged() {
-        if(!oldRotation.equals(playerAvatar.getLocalRotation().toString()) ||
-           !oldTranslation.equals(playerAvatar.getLocalTranslation().toString()) ||
-           !oldScale.equals(playerAvatar.getLocalScale().toString())){
+        if (!oldRotation.equals(playerAvatar.getWorldRotation().toString()) ||
+                !oldTranslation.equals(playerAvatar.getWorldTranslation().toString()) ||
+                !oldScale.equals(playerAvatar.getWorldScale().toString())) {
             updateOldPosition();
             return true;
         }
@@ -639,21 +844,25 @@ public class MazeGame extends BaseGame {
     }
 
 
-    public void updateGhostAvatar(UpdateAvatarInfoPacket packet) {
-
-        UUID id = packet.getClientID();
-        Matrix3D translation = new Matrix3D();
-        translation.concatenate(packet.getTranslation());
-        Matrix3D scale = new Matrix3D();
-        scale.concatenate(packet.getScale());
-        Matrix3D rotation = new Matrix3D();
-        rotation.concatenate(packet.getRotation());
-        if (!id.toString().equals(this.player.getPlayerUUID().toString())){
-            for(PlayerInfo p : this.playersInfo){
-                if(id.toString().equals(p.getClientID().toString())){
-                    p.getAvatar().setLocalTranslation(translation);
-                    p.getAvatar().setLocalScale(scale);
-                    p.getAvatar().setLocalRotation(rotation);
+    public void updateGhostAvatars(AllPlayerInfoPacket packet) {
+        ArrayList<SimplePlayerInfo> simplePlayerInfos = packet.getSimple();
+        for(SimplePlayerInfo s : simplePlayerInfos){
+            UUID id = s.getClientID();
+            if(s.getTranslation() != null && s.getScale() != null && s.getRotation() != null){
+                Matrix3D translation = new Matrix3D();
+                translation.concatenate(s.getTranslation());
+                Matrix3D scale = new Matrix3D();
+                scale.concatenate(s.getScale());
+                Matrix3D rotation = new Matrix3D();
+                rotation.concatenate(s.getRotation());
+                if (!id.toString().equals(this.player.getPlayerUUID().toString())){
+                    for(PlayerInfo p : this.playersInfo){
+                        if(id.toString().equals(p.getClientID().toString())){
+                            p.getAvatar().setLocalScale(scale);
+                            p.getAvatar().setLocalRotation(rotation);
+                            p.getAvatar().setLocalTranslation(translation);
+                        }
+                    }
                 }
             }
         }
@@ -668,25 +877,18 @@ public class MazeGame extends BaseGame {
 
             //Add avatar adding here
             if(player.getCharacterID() == 0) {
-                player.setAvatar(new CustomCube("PLAYER1"));
+                player.setAvatar(new Viper());
             }else if(player.getCharacterID() == 1){
-                player.setAvatar(new CustomPyramid("PLAYER1"));
+                player.setAvatar(new Arc170());
             }else if (player.getCharacterID() == 2){
                 player.setAvatar(myObject);
                 //player.setAvatar(new Ship().getChild());
             }else if(player.getCharacterID() == 3) {
-                player.setAvatar(new ChessPieceRock().getChild());
-            }else if(player.getCharacterID() == 4) {
                 player.setAvatar(new Pod().getChild());
             }
-                //radius, ???, radius*height
-                float[] halfExtents = {10, 10, 10};
-                IPhysicsObject playerP = physicsEngine.addCylinderObject(physicsEngine.nextUID(),
-                        1.0f, player.getAvatar().getWorldTransform().getValues(), halfExtents);
-                player.getAvatar().setPhysicsObject(playerP);
-                playerP.setBounciness(1.0f);
 
-            player.getAvatar().translate(0, 5, 50);
+
+            player.getAvatar().translate(0, 5, -1000);
             player.getAvatar().rotate(180, new Vector3D(0, 1, 0));
             addGameWorldObject(player.getAvatar());
         }
@@ -723,7 +925,7 @@ public class MazeGame extends BaseGame {
         //8 x   ,y ,z++
 
 
-        Point3D avLoc = new Point3D(playerAvatar.getWorldTranslation().getCol(3));
+        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
         float x = (float) avLoc.getX();
         float y = (float) avLoc.getY();
         float z = (float) avLoc.getZ();
@@ -758,7 +960,7 @@ public class MazeGame extends BaseGame {
 
         o = o * 3;
         float[] futurex = {0, x + o, x + o, x + o, x, x - o, x - o, x - o, x};
-        float[] futurey = {0, y, y, y, y, y, y, y, y};
+        //float[] futurey = {0, y, y, y, y, y, y, y, y};
         float[] futurez = {0, z + o, z, z - o, z - o, z - o, z, z + o, z + o};
 
         if (collition) {
@@ -781,24 +983,11 @@ public class MazeGame extends BaseGame {
 
         }
 
-//            if (newy1 >= newterHeight1) {
-//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx1);
-//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz1);
-//            } else if (newy2 >= newterHeight3) {
-//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx2);
-//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz2);
-//            } else if (newy3 >= newterHeight2) {
-//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx3);
-//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz3);
-//            } else if (newy4 >= newterHeight4) {
-//                playerAvatar.getLocalTranslation().setElementAt(0, 3, newx4);
-//                playerAvatar.getLocalTranslation().setElementAt(2, 3, newz4);
-//            }
 
     }
 
     private boolean collidesWithTerrain(Point3D p) {
-        boolean collides = true;
+        boolean collides = false;
 
         float x = (float) p.getX();
         float y = (float) p.getY();
@@ -818,4 +1007,89 @@ public class MazeGame extends BaseGame {
 
         return collides;
     }
+
+    public void updateNPCGhosts(NPCPacket packet) {
+        if(this.getGameWorld() != null){
+            if(this.npcs == null){
+                this.npcs = packet.getNpcs();
+                createNPCGhosts();
+            }
+            ArrayList<NPC> tempNPCs = packet.getNpcs();
+            for(NPCGhost n : npcsGhosts){
+                for(NPC n1 : tempNPCs){
+                    if(n.getID() == n1.getID()){
+                        n.updateNPCGhost(n1);
+                    }
+                }
+            }
+        }
+    }
+
+    private void createNPCGhosts() {
+        npcsGhosts = new ArrayList<NPCGhost>();
+        for(NPC npc : npcs){
+            SceneNode npcGhost = null;
+            //Add necessary NPC types to this.
+            if(npc.getType().equals("SpaceShip")){
+                npcGhost = new Ship().getChild();
+            }else if(npc.getType().equals("SpacePod")){
+                npcGhost = new Pod().getChild();
+            }else if(npc.getType().equals("Rook")){
+                npcGhost = new ChessPieceRock("avatar").getChild();
+            }else if(npc.getType().equals("Cube")){
+                npcGhost = new CustomCube("Cube");
+            }else{
+                try {
+                    throw new Exception(String.format("Can't find this (%s) in the MazeGame createNPCGhosts().  Make sure to add it to the if statement.", npc.getType()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if(npcGhost != null){
+                npcGhost.setLocalRotation(npc.getRotation());
+                npcGhost.setLocalTranslation(npc.getTranslation());
+                npcGhost.setLocalScale(npc.getScale());
+                npcsGhosts.add(new NPCGhost(npcGhost, npc.getID(), npc.getLocation(), npc.getType()));
+                addGameWorldObject(npcGhost);
+            }
+        }
+    }
+}
+class NPCGhost{
+    private SceneNode avatar;
+    private int ID;
+    private Point3D location;
+    private String type;
+
+    public NPCGhost(SceneNode avatar, int ID, Point3D location, String type) {
+        this.avatar = avatar;
+        this.ID = ID;
+        this.location = location;
+        this.type = type;
+    }
+
+    public void updateNPCGhost(NPC npc){
+        this.avatar.setLocalTranslation(npc.getTranslation());
+        this.avatar.setLocalRotation(npc.getRotation());
+        this.avatar.setLocalScale(npc.getScale());
+        //this.location = npc.getLocation();
+    }
+
+    public SceneNode getAvatar() {
+        return avatar;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public Point3D getLocation() {
+        return location;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+
 }

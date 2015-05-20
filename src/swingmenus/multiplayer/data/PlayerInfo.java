@@ -1,5 +1,6 @@
 package swingmenus.multiplayer.data;
 
+import graphicslib3D.Matrix3D;
 import networking.packets.IPacket;
 import sage.scene.SceneNode;
 
@@ -15,6 +16,7 @@ public class PlayerInfo implements IPacket {
     private boolean ready;
     private SceneNode avatar;
     private boolean loaded;
+    private Matrix3D scale, rotation, translation;
 
     public PlayerInfo(UUID clientID, String playerName) {
         this.clientID = clientID;
@@ -54,7 +56,29 @@ public class PlayerInfo implements IPacket {
         this.avatar = avatar;
     }
 
+    public Matrix3D getScale() {
+        return scale;
+    }
 
+    public void setScale(Matrix3D scale) {
+        this.scale = scale;
+    }
+
+    public Matrix3D getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(Matrix3D rotation) {
+        this.rotation = rotation;
+    }
+
+    public Matrix3D getTranslation() {
+        return translation;
+    }
+
+    public void setTranslation(Matrix3D translation) {
+        this.translation = translation;
+    }
 
     public boolean isLoaded() {
         return loaded;
@@ -62,5 +86,9 @@ public class PlayerInfo implements IPacket {
 
     public void setLoaded(boolean loaded) {
         this.loaded = loaded;
+    }
+
+    public SimplePlayerInfo getSimplePlayerInfo(){
+        return new SimplePlayerInfo(clientID, scale,rotation,translation);
     }
 }

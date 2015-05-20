@@ -69,7 +69,10 @@ public class MultiplayerLobby {
         this.useDefaultCheckBox.setSelected(checked);
     }
 
-    public JPanel getMainView() {
+    public JPanel getMainView(String single) {
+        if (single.equals("single")) {
+            joinGameButton.setEnabled(false);
+        }
         return mainView;
     }
 

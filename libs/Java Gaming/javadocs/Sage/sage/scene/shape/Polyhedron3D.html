@@ -319,7 +319,51 @@ extends <a href="../../../sage/scene/Leaf.html" title="class in sage.scene">Leaf
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;sage.scene.<a href="../../../sage/scene/SceneNode.html" title="class in sage.scene">SceneNode</a></h3>
-<code><a href="../../../sage/scene/SceneNode.html#addController-sage.scene.Controller-">addController</a>, <a href="../../../sage/scene/SceneNode.html#clearRenderState-sage.scene.state.RenderState.RenderStateType-">clearRenderState</a>, <a href="../../../sage/scene/SceneNode.html#getControllers--">getControllers</a>, <a href="../../../sage/scene/SceneNode.html#getCullMode--">getCullMode</a>, <a href="../../../sage/scene/SceneNode.html#getIsTransformSpaceParent--">getIsTransformSpaceParent</a>, <a href="../../../sage/scene/SceneNode.html#getLocalRotation--">getLocalRotation</a>, <a href="../../../sage/scene/SceneNode.html#getLocalScale--">getLocalScale</a>, <a href="../../../sage/scene/SceneNode.html#getLocalTranslation--">getLocalTranslation</a>, <a href="../../../sage/scene/SceneNode.html#getName--">getName</a>, <a href="../../../sage/scene/SceneNode.html#getParent--">getParent</a>, <a href="../../../sage/scene/SceneNode.html#getPhysicsObject--">getPhysicsObject</a>, <a href="../../../sage/scene/SceneNode.html#getRenderMode--">getRenderMode</a>, <a href="../../../sage/scene/SceneNode.html#getRenderState-sage.scene.state.RenderState.RenderStateType-">getRenderState</a>, <a href="../../../sage/scene/SceneNode.html#getRenderStates--">getRenderStates</a>, <a href="../../../sage/scene/SceneNode.html#getWorldBound--">getWorldBound</a>, <a href="../../../sage/scene/SceneNode.html#getWorldRotation--">getWorldRotation</a>, <a href="../../../sage/scene/SceneNode.html#getWorldScale--">getWorldScale</a>, <a href="../../../sage/scene/SceneNode.html#getWorldTransform--">getWorldTransform</a>, <a href="../../../sage/scene/SceneNode.html#getWorldTranslation--">getWorldTranslation</a>, <a href="../../../sage/scene/SceneNode.html#isShowBound--">isShowBound</a>, <a href="../../../sage/scene/SceneNode.html#propagateBoundToRoot--">propagateBoundToRoot</a>, <a href="../../../sage/scene/SceneNode.html#removeController-sage.scene.Controller-">removeController</a>, <a href="../../../sage/scene/SceneNode.html#rotate-float-graphicslib3D.Vector3D-">rotate</a>, <a href="../../../sage/scene/SceneNode.html#scale-float-float-float-">scale</a>, <a href="../../../sage/scene/SceneNode.html#setCullMode-sage.scene.SceneNode.CULL_MODE-">setCullMode</a>, <a href="../../../sage/scene/SceneNode.html#setIsTransformSpaceParent-boolean-">setIsTransformSpaceParent</a>, <a href="../../../sage/scene/SceneNode.html#setLocalRotation-graphicslib3D.Matrix3D-">setLocalRotation</a>, <a href="../../../sage/scene/SceneNode.html#setLocalScale-graphicslib3D.Matrix3D-">setLocalScale</a>, <a href="../../../sage/scene/SceneNode.html#setLocalTranslation-graphicslib3D.Matrix3D-">setLocalTranslation</a>, <a href="../../../sage/scene/SceneNode.html#setName-java.lang.String-">setName</a>, <a href="../../../sage/scene/SceneNode.html#setParent-sage.scene.SceneNode-">setParent</a>, <a href="../../../sage/scene/SceneNode.html#setPhysicsObject-sage.physics.IPhysicsObject-">setPhysicsObject</a>, <a href="../../../sage/scene/SceneNode.html#setRenderMode-sage.scene.SceneNode.RENDER_MODE-">setRenderMode</a>, <a href="../../../sage/scene/SceneNode.html#setRenderState-sage.scene.state.RenderState-">setRenderState</a>, <a href="../../../sage/scene/SceneNode.html#setShowBound-boolean-">setShowBound</a>, <a href="../../../sage/scene/SceneNode.html#setWorldRotation-graphicslib3D.Matrix3D-">setWorldRotation</a>, <a href="../../../sage/scene/SceneNode.html#setWorldScale-graphicslib3D.Matrix3D-">setWorldScale</a>, <a href="../../../sage/scene/SceneNode.html#setWorldTranslation-graphicslib3D.Matrix3D-">setWorldTranslation</a>, <a href="../../../sage/scene/SceneNode.html#toString--">toString</a>, <a href="../../../sage/scene/SceneNode.html#translate-float-float-float-">translate</a>, <a href="../../../sage/scene/SceneNode.html#updateGeometricState-double-boolean-">updateGeometricState</a>, <a href="../../../sage/scene/SceneNode.html#updateRenderStates--">updateRenderStates</a>, <a href="../../../sage/scene/SceneNode.html#updateRenderStates-java.util.Stack:A-">updateRenderStates</a>, <a href="../../../sage/scene/SceneNode.html#updateTransforms-double-">updateTransforms</a>, <a href="../../../sage/scene/SceneNode.html#updateWorldTransforms--">updateWorldTransforms</a></code></li>
+    <code><a href="../../../sage/scene/SceneNode.html#addController-sage.scene.Controller-">addController</a>, <a
+            href="../../../sage/scene/SceneNode.html#clearRenderState-sage.scene.state.RenderState.RenderStateType-">clearRenderState</a>,
+        <a href="../../../sage/scene/SceneNode.html#getControllers--">getControllers</a>, <a
+                href="../../../sage/scene/SceneNode.html#getCullMode--">getCullMode</a>, <a
+                href="../../../sage/scene/SceneNode.html#getIsTransformSpaceParent--">getIsTransformSpaceParent</a>, <a
+                href="../../../sage/scene/SceneNode.html#getLocalRotation--">getLocalRotation</a>, <a
+                href="../../../sage/scene/SceneNode.html#getLocalScale--">getLocalScale</a>, <a
+                href="../../../sage/scene/SceneNode.html#getLocalTranslation--">getLocalTranslation</a>, <a
+                href="../../../sage/scene/SceneNode.html#getName--">getName</a>, <a
+                href="../../../sage/scene/SceneNode.html#getParent--">getParent</a>, <a
+                href="../../../sage/scene/SceneNode.html#getPhysicsObject--">getPhysicsObject</a>, <a
+                href="../../../sage/scene/SceneNode.html#getRenderMode--">getRenderMode</a>, <a
+                href="../../../sage/scene/SceneNode.html#getRenderState-sage.scene.state.RenderState.RenderStateType-">getRenderState</a>,
+        <a href="../../../sage/scene/SceneNode.html#getRenderStates--">getRenderStates</a>, <a
+                href="../../../sage/scene/SceneNode.html#getWorldBound--">getWorldBound</a>, <a
+                href="../../../sage/scene/SceneNode.html#getWorldRotation--">getWorldRotation</a>, <a
+                href="../../../sage/scene/SceneNode.html#getWorldScale--">getWorldScale</a>, <a
+                href="../../../sage/scene/SceneNode.html#getWorldTransform--">getWorldTransform</a>, <a
+                href="../../../sage/scene/SceneNode.html#getLocalTranslation--">getLocalTranslation</a>, <a
+                href="../../../sage/scene/SceneNode.html#isShowBound--">isShowBound</a>, <a
+                href="../../../sage/scene/SceneNode.html#propagateBoundToRoot--">propagateBoundToRoot</a>, <a
+                href="../../../sage/scene/SceneNode.html#removeController-sage.scene.Controller-">removeController</a>,
+        <a href="../../../sage/scene/SceneNode.html#rotate-float-graphicslib3D.Vector3D-">rotate</a>, <a
+                href="../../../sage/scene/SceneNode.html#scale-float-float-float-">scale</a>, <a
+                href="../../../sage/scene/SceneNode.html#setCullMode-sage.scene.SceneNode.CULL_MODE-">setCullMode</a>,
+        <a href="../../../sage/scene/SceneNode.html#setIsTransformSpaceParent-boolean-">setIsTransformSpaceParent</a>,
+        <a href="../../../sage/scene/SceneNode.html#setLocalRotation-graphicslib3D.Matrix3D-">setLocalRotation</a>, <a
+                href="../../../sage/scene/SceneNode.html#setLocalScale-graphicslib3D.Matrix3D-">setLocalScale</a>, <a
+                href="../../../sage/scene/SceneNode.html#setLocalTranslation-graphicslib3D.Matrix3D-">setLocalTranslation</a>,
+        <a href="../../../sage/scene/SceneNode.html#setName-java.lang.String-">setName</a>, <a
+                href="../../../sage/scene/SceneNode.html#setParent-sage.scene.SceneNode-">setParent</a>, <a
+                href="../../../sage/scene/SceneNode.html#setPhysicsObject-sage.physics.IPhysicsObject-">setPhysicsObject</a>,
+        <a href="../../../sage/scene/SceneNode.html#setRenderMode-sage.scene.SceneNode.RENDER_MODE-">setRenderMode</a>,
+        <a href="../../../sage/scene/SceneNode.html#setRenderState-sage.scene.state.RenderState-">setRenderState</a>, <a
+                href="../../../sage/scene/SceneNode.html#setShowBound-boolean-">setShowBound</a>, <a
+                href="../../../sage/scene/SceneNode.html#setWorldRotation-graphicslib3D.Matrix3D-">setWorldRotation</a>,
+        <a href="../../../sage/scene/SceneNode.html#setWorldScale-graphicslib3D.Matrix3D-">setWorldScale</a>, <a
+                href="../../../sage/scene/SceneNode.html#setWorldTranslation-graphicslib3D.Matrix3D-">setWorldTranslation</a>,
+        <a href="../../../sage/scene/SceneNode.html#toString--">toString</a>, <a
+                href="../../../sage/scene/SceneNode.html#translate-float-float-float-">translate</a>, <a
+                href="../../../sage/scene/SceneNode.html#updateGeometricState-double-boolean-">updateGeometricState</a>,
+        <a href="../../../sage/scene/SceneNode.html#updateRenderStates--">updateRenderStates</a>, <a
+                href="../../../sage/scene/SceneNode.html#updateRenderStates-java.util.Stack:A-">updateRenderStates</a>,
+        <a href="../../../sage/scene/SceneNode.html#updateTransforms-double-">updateTransforms</a>, <a
+                href="../../../sage/scene/SceneNode.html#updateWorldTransforms--">updateWorldTransforms</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">

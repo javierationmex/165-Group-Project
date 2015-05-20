@@ -1,8 +1,13 @@
 package networking;
 
+import gameengine.NPC.NPC;
+import gameengine.NPC.NPCcontroller;
+import graphicslib3D.Matrix3D;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
 import networking.packets.ingame.AddAvatarInformationPacket;
+import networking.packets.ingame.AllPlayerInfoPacket;
+import networking.packets.ingame.NPCPacket;
 import networking.packets.ingame.UpdateAvatarInfoPacket;
 import networking.packets.lobby.ChangeCharacterPacket;
 import networking.packets.lobby.JoinPacket;
@@ -10,11 +15,14 @@ import networking.packets.lobby.StartGamePacket;
 import sage.networking.server.GameConnectionServer;
 import sage.networking.server.IClientInfo;
 import swingmenus.multiplayer.data.PlayerInfo;
+import swingmenus.multiplayer.data.SimplePlayerInfo;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -23,7 +31,13 @@ import java.util.UUID;
 public class Server extends GameConnectionServer<UUID> {
 
     private ArrayList<PlayerInfo> players;
+    private NPCcontroller npcCtrl;
     private boolean gameStarted = false;
+    private Timer timer, timer2;
+    private UpdateNPCS updateNPCS;
+    private SendPlayerInfo sendPlayerInfo;
+    private boolean notSendingYet = true;
+
 
     public Server(int localPort) throws IOException {
         super(localPort, ProtocolType.TCP);
@@ -81,6 +95,7 @@ public class Server extends GameConnectionServer<UUID> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            createNPCs();
         }
 
         if (packet instanceof AddAvatarInformationPacket) {
@@ -100,36 +115,107 @@ public class Server extends GameConnectionServer<UUID> {
         }
 
         if (packet instanceof UpdateAvatarInfoPacket) {
+            updatePlayerAvatar((UpdateAvatarInfoPacket) packet);
+        }
+    }
+
+    private void startSendingPlayerInfos() {
+        if(timer2 == null) {
+            sendPlayerInfo = new SendPlayerInfo(this);
+            timer2 = new Timer();
+            timer2.schedule(sendPlayerInfo, 0, 20);
+        }
+    }
+
+    private void updatePlayerAvatar(UpdateAvatarInfoPacket packet) {
+        UUID id = packet.getClientID();
+        Matrix3D translation = new Matrix3D();
+        translation.concatenate(packet.getTranslation());
+        Matrix3D scale = new Matrix3D();
+        scale.concatenate(packet.getScale());
+        Matrix3D rotation = new Matrix3D();
+        rotation.concatenate(packet.getRotation());
+
+        for(PlayerInfo p : this.players){
+            if(id.toString().equals(p.getClientID().toString())){
+                p.setTranslation(translation);
+                p.setScale(scale);
+                p.setRotation(rotation);
+            }
+        }
+        if(notSendingYet){
+            notSendingYet = false;
+            startSendingPlayerInfos();
+        }
+    }
+
+    private void createNPCs() {
+        npcCtrl = new NPCcontroller();
+        npcCtrl.createNPCs();
+/*        updateNPCS = new UpdateNPCS(this);
+        timer = new Timer();
+        timer.schedule(updateNPCS, 0, 500);*/
+
+    }
+
+    public void updateNPCs(){
+        npcCtrl.updateNPCs();
+        sendNPCinfo();
+    }
+
+    public void sendNPCinfo() {
+        NPCPacket npcs = npcCtrl.getNPCInfoPacket();
+        if(!npcs.getNpcs().isEmpty()){
             try {
-                this.sendPacketToAll((Serializable) packet);
+                sendPacketToAll(npcs);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
     }
 
+    private void sendPlayerInfo() {
+        ArrayList<SimplePlayerInfo> simple = new ArrayList<SimplePlayerInfo>();
+        for(PlayerInfo p : players){
+            simple.add(p.getSimplePlayerInfo());
+        }
+        try {
+            sendPacketToAll(new AllPlayerInfoPacket(simple));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        updateNPCs();
+    }
 
-    public void sendNPCinfo() {// informs clients of new NPC positions
-//        for(int i=0; i<npcCtrl.getNumOfNPCs(); i++) {
-//            try {
-//                this.sendPacketToAll();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                String message = new String("mnpc," + Integer.toString(i));
-//                message += "," + (npcCtrl.getNPC(i)).getX();
-//                message += "," + (npcCtrl.getNPC(i)).getY();
-//                message += "," + (npcCtrl.getNPC(i)).getZ();
-//                this.sendPacketToAll(message);
-//                // also additional cases for receiving messages about NPCs, such as:
-//                if (messageTokens[0].compareTo("needNPC") == 0) {
-//                    ...}
-//                if (messageTokens[0].compareTo("collide") == 0) {
-//                    ...}
-//
-//            }catch(){}
-//        }
+    class UpdateNPCS extends TimerTask {
+        private Server server;
+        public UpdateNPCS(Server server) {
+            this.server = server;
+        }
+
+        /**
+         * The action to be performed by this timer task.
+         */
+        @Override
+        public void run() {
+            server.updateNPCs();
+        }
+    }
+
+    class SendPlayerInfo extends TimerTask {
+        private Server server;
+        public SendPlayerInfo(Server server) {
+            this.server = server;
+        }
+
+        /**
+         * The action to be performed by this timer task.
+         */
+        @Override
+        public void run() {
+            server.sendPlayerInfo();
+        }
     }
 
 }

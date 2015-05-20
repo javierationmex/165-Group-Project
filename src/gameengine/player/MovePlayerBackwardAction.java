@@ -37,7 +37,7 @@ public class MovePlayerBackwardAction extends BaseAbstractInputAction {
 //        Vector3D projectedDirection = new Vector3D(0, 0, 1);
 //        projectedDirection = projectedDirection.mult(rot);
 //        projectedDirection.scale(2);
-//        projectedDirection.add(avatar.getWorldTranslation().getCol(3));
+//        projectedDirection.add(avatar.getLocalTranslation().getCol(3));
 //
 //        float projectedx = (float) projectedDirection.getX();
 //        float projectedy = (float) projectedDirection.getX();
@@ -46,8 +46,10 @@ public class MovePlayerBackwardAction extends BaseAbstractInputAction {
         // if (projectedy > terrainHeight) {
             // avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
         //}
-        playerAvatarP.setLinearVelocity(new float[]{(float) dir.getX() * 50, 0, (float) dir.getZ() * 50});
-        playerAvatarP.setFriction(5f);
+        float[] f = playerAvatarP.getLinearVelocity();
+        f[0] += (float) dir.getX() * 20;
+        f[2] += (float) dir.getZ() * 20;
+        playerAvatarP.setLinearVelocity(f);
     }
 
 }
