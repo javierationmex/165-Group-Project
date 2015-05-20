@@ -23,10 +23,8 @@ import gameengine.player.MovePlayerRightAction;
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
-import javafx.scene.shape.Cylinder;
-import net.java.games.input.*;
 import net.java.games.input.Component;
-import net.java.games.input.Event;
+import net.java.games.input.Controller;
 import networking.Client;
 import networking.packets.ingame.AddAvatarInformationPacket;
 import networking.packets.ingame.AllPlayerInfoPacket;
@@ -40,7 +38,6 @@ import sage.event.EventManager;
 import sage.event.IEventManager;
 import sage.input.IInputManager;
 import sage.input.InputManager;
-import sage.input.action.AbstractInputAction;
 import sage.input.action.IAction;
 import sage.input.action.QuitGameAction;
 import sage.model.loader.ogreXML.OgreXMLParser;
@@ -48,13 +45,7 @@ import sage.physics.IPhysicsEngine;
 import sage.physics.IPhysicsObject;
 import sage.physics.PhysicsEngineFactory;
 import sage.renderer.IRenderer;
-
-import sage.scene.Group;
-import sage.scene.Model3DTriMesh;
-
-import sage.scene.RotationController;
-import sage.scene.SceneNode;
-import sage.scene.SkyBox;
+import sage.scene.*;
 import sage.scene.bounding.BoundingSphere;
 import sage.scene.shape.Cube;
 import sage.scene.shape.Rectangle;
@@ -85,6 +76,7 @@ import java.util.UUID;
 public class MazeGame extends BaseGame {
 
     ICamera camera1;
+    TextureState shipTextureState;
     private Player player;
     private Client client;
     private IDisplaySystem display;
@@ -98,7 +90,6 @@ public class MazeGame extends BaseGame {
     private ArrayList<NPCGhost> npcsGhosts;
     private float time = 0;
     private int score = 0;
-
     private SceneNode rootNode;
     private ScriptEngine engine;
     private TerrainBlock imageTerrain;
@@ -115,7 +106,6 @@ public class MazeGame extends BaseGame {
     private Pod NPC1;
     private Ship NPC2;
     private Cube[] cube;
-
     private CenterCity[] city;
     private RotationController rotate;
     private CollisionDispatcher collDispatcher;
@@ -128,14 +118,13 @@ public class MazeGame extends BaseGame {
     private Vector3f worldAabbMin = new Vector3f(-10000, -10000, -10000);
     private Vector3f worldAabbMax = new Vector3f(10000, 10000, 10000);
     private DynamicsWorld physicsWorld;
-
-    TextureState shipTextureState;
     private Group model;
     private Model3DTriMesh myObject;
 
 
     private IAudioManager audioMgr;
-    private Sound windSound, npcSound, whooshSound;
+    private Sound windSound, npcSound, whooshSound, floop;
+    //private Sound[] whooshSound;
 
     public MazeGame(Player player) {
         this.player = player;
@@ -486,7 +475,7 @@ public class MazeGame extends BaseGame {
         //Floor groundPlane
 
         String groundextureDir = "." + File.separator + "materials" + File.separator;
-        String groundexturefilename = "Asphalt.jpg";
+        String groundexturefilename = "sand.jpg";
         String groundexturefilepath = groundextureDir + groundexturefilename;
         Texture groundexture = TextureManager.loadTexture2D(groundexturefilepath);
         Vector3D vec = new Vector3D(1, 0, 0);
@@ -734,6 +723,8 @@ public class MazeGame extends BaseGame {
             }
             if (s.getWorldBound() != null)
                 if (s.getWorldBound().contains(avLoc) && s.getName().equalsIgnoreCase("cube")) {
+                    whooshSound.setLocation(avLoc);
+                    whooshSound.play();
                     score++;
                     System.out.println("COLLISION SCORE" + score);
                     removeGameWorldObject(s);
@@ -778,17 +769,32 @@ public class MazeGame extends BaseGame {
         String whooshFilePath = soundDir + whooshFilename;
         String shipFilename = "ship1.wav";
         String shipFilePath = soundDir + shipFilename;
-
+        String floopFilename = "floop.wav";
+        String floopFilePath = soundDir + floopFilename;
         resource1 = audioMgr.createAudioResource(shipFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource2 = audioMgr.createAudioResource(whooshFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource3 = audioMgr.createAudioResource(windFilePath, AudioResourceType.AUDIO_SAMPLE);
         npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 100, true);
-        whooshSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, true);
-        windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 20, true);
+        whooshSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, false);
+        windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 40, true);
+
+
+//        whooshSound = new Sound[40];
+//        for(int i =0;i<40;i++){
+//        whooshSound[i] = new Sound(resource2, SoundType.SOUND_EFFECT, 100, false);
+//            whooshSound[i].initialize(audioMgr);
+//            whooshSound[i].setMaxDistance(200);
+//            whooshSound[i].setMinDistance(50.0f);
+//            whooshSound[i].setRollOff(5.0f);
+//            whooshSound[i].setLocation(new Point3D(cube[i].getLocalTranslation().getCol(3)));
+//        }
+
 
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
         whooshSound.initialize(audioMgr);
+
+
         npcSound.setMaxDistance(200);
         npcSound.setMinDistance(50.0f);
         npcSound.setRollOff(5.0f);
@@ -799,13 +805,16 @@ public class MazeGame extends BaseGame {
         whooshSound.setMinDistance(50.0f);
         whooshSound.setRollOff(5.0f);
 
+
         npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
         windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
-        whooshSound.setLocation(new Point3D(finish.getLocalTranslation().getCol(3)));
+        whooshSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
+
         setEarParameters();
         npcSound.play();
         windSound.play();
         whooshSound.play();
+
 
     }
 
