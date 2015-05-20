@@ -1,8 +1,10 @@
 package trimesh;
 
+import graphicslib3D.Point3D;
 import sage.model.loader.OBJLoader;
 import sage.scene.Group;
 import sage.scene.TriMesh;
+import sage.scene.bounding.BoundingSphere;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
 
@@ -25,6 +27,7 @@ public class Viper extends Group implements Serializable {
         TriMesh viperpiece = loader.loadModel(viperpieceFilePath);
         viperpiece.scale(0.02f, 0.02f, 0.02f);
         //viperpiece.setLocalBound(new BoundingSphere(new Point3D(0, 0, 0), 1));
+        viperpiece.setLocalBound(new BoundingSphere(new Point3D(0, 0, 0), 2));
         viperpiece.updateLocalBound();
 
         String viperpieceTextureFilename = "elem.jpg";

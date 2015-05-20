@@ -1,13 +1,15 @@
 package trimesh;
 
 
-import graphicslib3D.Vector3D;
+import graphicslib3D.Point3D;
 import sage.model.loader.OBJLoader;
 import sage.scene.Group;
 import sage.scene.TriMesh;
-import sage.texture.TextureManager;
-import java.io.File;
+import sage.scene.bounding.BoundingSphere;
 import sage.texture.Texture;
+import sage.texture.TextureManager;
+
+import java.io.File;
 import java.io.Serializable;
 /**
  * Created by Javier G on 4/21/2015.
@@ -23,6 +25,7 @@ public class Ship extends Group implements Serializable{
         String shipFilename = "Ship2.obj";
         String shipFilePath = shipDir + shipFilename;
         TriMesh ship = loader.loadModel(shipFilePath);
+        ship.setLocalBound(new BoundingSphere(new Point3D(0, 0, 0), 2));
         ship.updateLocalBound();
 
         String shipTextureFilename = "ship-texture6.jpg";
@@ -33,6 +36,8 @@ public class Ship extends Group implements Serializable{
         ship.translate(0,1,0);
         this.addChild(ship);
         child = ship;
+
+
     }
 
     public TriMesh getChild() {

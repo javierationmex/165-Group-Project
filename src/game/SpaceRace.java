@@ -282,16 +282,20 @@ public class SpaceRace extends BaseGame {
         cube = new Cube[100];
 
         Random rand = new Random();
-
+        String materialDir = "." + File.separator + "materials" + File.separator;
+        String textureFilename = "elem.jpg";
+        String textureFilePath = materialDir + textureFilename;
+        Texture texture = TextureManager.loadTexture2D(textureFilePath);
         for (int i = 1; i < 100; i++) {
             cube[i] = new Cube("bug");
             //cube[i].setName("cube");
             //cube[i].translate(40-rand.nextInt(80), 200-rand.nextInt(200), (1000 * i)*rand.nextFloat());
-            cube[i].translate(40 - rand.nextInt(80), 8, (1000 * i) * rand.nextFloat());
-            cube[i].scale(4, 4, 4);
+            cube[i].translate(40 - rand.nextInt(80), 50 - rand.nextInt(45), (1000 * i) * rand.nextFloat());
+            cube[i].scale(5, 5, 5);
             cube[i].rotate(45, new Vector3D(1, 1, 1));
             cube[i].addController(rotate);
             addGameWorldObject(cube[i]);
+            cube[i].setTexture(texture);
 
 
         }
@@ -761,7 +765,7 @@ public class SpaceRace extends BaseGame {
                 //s.scale(0, 0, 0.005f);
             }
             if (s.getWorldBound() != null)
-                if (s.getWorldBound().intersects(playerAvatar.getWorldBound()) && s.getName().equalsIgnoreCase("cube")) {
+                if (s.getWorldBound().intersects(playerAvatar.getWorldBound()) && s.getName().equalsIgnoreCase("bug")) {
                     whooshSound.setLocation(avLoc);
                     whooshSound.play();
                     score++;
@@ -804,7 +808,7 @@ public class SpaceRace extends BaseGame {
         String windFilePath = soundDir + windFilename;
         String strongwindFilename = "StrongWind.wav";
         String strongwindFilePath = soundDir + strongwindFilename;
-        String whooshFilename = "Squish.wav";
+        String whooshFilename = "s.wav";
         String whooshFilePath = soundDir + whooshFilename;
         String shipFilename = "ship1.wav";
         String shipFilePath = soundDir + shipFilename;

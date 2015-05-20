@@ -1,8 +1,10 @@
 package trimesh;
 
+import graphicslib3D.Point3D;
 import sage.model.loader.OBJLoader;
 import sage.scene.Group;
 import sage.scene.TriMesh;
+import sage.scene.bounding.BoundingSphere;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
 
@@ -23,6 +25,7 @@ public class Pod extends Group implements Serializable{
         String podFilename = "Pod2.obj";
         String podFilePath = podDir + podFilename;
         TriMesh pod = loader.loadModel(podFilePath);
+        pod.setLocalBound(new BoundingSphere(new Point3D(0, 0, 0), 2));
         pod.updateLocalBound();
 
         String podTextureFilename = "pod-texture-done3.jpg";
@@ -33,6 +36,8 @@ public class Pod extends Group implements Serializable{
         pod.translate(0,1,0);
         this.addChild(pod);
         child = pod;
+
+
     }
 
     public TriMesh getChild() {
