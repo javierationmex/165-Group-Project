@@ -647,7 +647,7 @@ public class SpaceRace extends BaseGame {
         avatarName.setName("Player1ID");
         avatarName.setLocation(0.47, 0.97);
         avatarName.setRenderMode(sage.scene.SceneNode.RENDER_MODE.ORTHO);
-        avatarName.setColor(Color.black);
+        avatarName.setColor(Color.white);
         avatarName.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
         camera1.addToHUD(avatarName);
 
@@ -655,7 +655,7 @@ public class SpaceRace extends BaseGame {
         scoreString1.setName("Player1ID");
         scoreString1.setLocation(0.47, 0.95);
         scoreString1.setRenderMode(sage.scene.SceneNode.RENDER_MODE.ORTHO);
-        scoreString1.setColor(Color.black);
+        scoreString1.setColor(Color.white);
         scoreString1.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
         camera1.addToHUD(scoreString1);
 
@@ -663,7 +663,7 @@ public class SpaceRace extends BaseGame {
         speedString.setName("Speed");
         speedString.setLocation(0.47, 0.93);
         speedString.setRenderMode(sage.scene.SceneNode.RENDER_MODE.ORTHO);
-        speedString.setColor(Color.black);
+        speedString.setColor(Color.white);
         speedString.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
         camera1.addToHUD(speedString);
 
@@ -862,7 +862,7 @@ public class SpaceRace extends BaseGame {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    //removeGameWorldObject(s);
+                    removeGameWorldObject(s);
 
                     break;
                 }
