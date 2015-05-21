@@ -1,6 +1,5 @@
 package networking;
 
-import gameengine.NPC.NPC;
 import gameengine.NPC.NPCcontroller;
 import graphicslib3D.Matrix3D;
 import networking.packets.EndScore;
@@ -12,12 +11,10 @@ import networking.packets.lobby.JoinPacket;
 import networking.packets.lobby.StartGamePacket;
 import sage.networking.server.GameConnectionServer;
 import sage.networking.server.IClientInfo;
-import sage.scene.shape.Cube;
 import swingmenus.multiplayer.data.PlayerInfo;
 import swingmenus.multiplayer.data.SimplePlayerInfo;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.*;
 
@@ -139,8 +136,8 @@ public class Server extends GameConnectionServer<UUID> {
             locations = new float[cubeCount * 3];
             for (int i = 0; i < cubeCount * 3; i += 3) {
                 locations[i] = 40 - rand.nextInt(80);
-                locations[i + 1] = 10;
-                locations[i + 2] = (1000 * i) * rand.nextFloat();
+                locations[i + 1] = 8;//+ rand.nextInt(20);
+                locations[i + 2] = (200 * (i - 2)) * rand.nextFloat();
             }
             try {
                 sendPacketToAll(new CubeLocationsPacket(locations));
