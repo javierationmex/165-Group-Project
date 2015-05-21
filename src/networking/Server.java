@@ -136,7 +136,7 @@ public class Server extends GameConnectionServer<UUID> {
             locations = new float[cubeCount * 3];
             for (int i = 0; i < cubeCount * 3; i += 3) {
                 locations[i] = 40 - rand.nextInt(80);
-                locations[i + 1] = 8;//+ rand.nextInt(20);
+                locations[i + 1] = 8 + rand.nextInt(20);
                 locations[i + 2] = (200 * (i - 2)) * rand.nextFloat();
             }
             try {
