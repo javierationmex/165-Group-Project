@@ -16,10 +16,7 @@ import gameengine.FullScreenDisplaySystem;
 import gameengine.Jump;
 import gameengine.NPC.NPC;
 import gameengine.TogglePhysics;
-import gameengine.player.MovePlayerBackwardAction;
-import gameengine.player.MovePlayerForwardAction;
-import gameengine.player.MovePlayerLeftAction;
-import gameengine.player.MovePlayerRightAction;
+import gameengine.player.*;
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
@@ -461,6 +458,27 @@ public class SpaceRace extends BaseGame {
                 new TogglePhysics(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_AND_RELEASE);
         inputMgr.associateAction(
                 keyboardName, Component.Identifier.Key.SPACE, new Jump(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
+
+        if (keyboardName.equals("Controller (XBOX 360 For Windows)")){
+
+//            inputMgr.associateAction(keyboardName, Component.Identifier.Axis.RX, new OrbitAroundHorizAction(), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+//            inputMgr.associateAction(keyboardName, Component.Identifier.Axis.RY, new OrbitAroundVertAction(), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+//            inputMgr.associateAction(keyboardName, Component.Identifier.Axis.Z, new Zoom(), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+//            im.associateAction(cn, Component.Identifier.Button._9, new OrbitResetAction(), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
+//            inputMgr.associateAction(keyboardName, Component.Identifier.Button._4, new TurnLeftAction(), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+//            inputMgr.associateAction(keyboardName, Component.Identifier.Button._5, new TurnRightAction(), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+
+
+            inputMgr.associateAction(keyboardName,
+                    Component.Identifier.Axis.X,
+                    new MoveXAxis(playerAvatar, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+            inputMgr.associateAction(keyboardName,
+                    Component.Identifier.Axis.Y,
+                    new MoveYAxis(playerAvatar, playerAvatarP), IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+            inputMgr.associateAction(
+                    keyboardName, Component.Identifier.Button._0, new Jump(this), IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
+        }
+
     }
 
     public void jump() {
