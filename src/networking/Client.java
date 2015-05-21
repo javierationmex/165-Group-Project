@@ -4,9 +4,7 @@ import game.SpaceRace;
 import game.Player;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
-import networking.packets.ingame.AllFinishedPacket;
-import networking.packets.ingame.AllPlayerInfoPacket;
-import networking.packets.ingame.NPCPacket;
+import networking.packets.ingame.*;
 import networking.packets.lobby.JoinPacket;
 import networking.packets.lobby.StartGamePacket;
 import sage.networking.client.GameConnectionClient;
@@ -67,6 +65,14 @@ public class Client extends GameConnectionClient {
 
         if(packet instanceof AllFinishedPacket){
             spaceRace.allFinishedGame((AllFinishedPacket) packet);
+        }
+
+        if(packet instanceof CubeLocationsPacket){
+            spaceRace.setCubeLocations(((CubeLocationsPacket) packet).getCubeLocations());
+        }
+
+        if(packet instanceof HitCubePacket){
+            spaceRace.removeCube(((HitCubePacket) packet).getID());
         }
     }
 
