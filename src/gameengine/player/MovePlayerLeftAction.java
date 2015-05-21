@@ -35,8 +35,8 @@ public class MovePlayerLeftAction extends BaseAbstractInputAction {
 
 
         float[] f = playerAvatarP.getLinearVelocity();
-        f[0] += (float) dir.getX() * 20;
-        f[2] += (float) dir.getZ() * 20;
+        f[0] += (float) dir.getX() * 10;
+        f[2] += (float) dir.getZ() * 10;
         playerAvatarP.setLinearVelocity(f);
     }
 

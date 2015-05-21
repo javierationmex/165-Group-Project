@@ -102,7 +102,8 @@ public class SpaceRace extends BaseGame {
     private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, cube1P, pyramid1P;
     private Rectangle[] groundPlane;
     private boolean isPhysicsEnabled;
-    private Cube rightRail, leftRail, finish;
+    private Cube rightRail, leftRail;
+    private Cube finish;
     private Pod NPC1;
     private Ship NPC2;
     private Cube[] cube;
@@ -120,6 +121,7 @@ public class SpaceRace extends BaseGame {
     private DynamicsWorld physicsWorld;
     private Group model;
     private Model3DTriMesh myObject;
+    private boolean gameover = false;
 
 
     private IAudioManager audioMgr;
@@ -192,7 +194,7 @@ public class SpaceRace extends BaseGame {
 
     private void initGameObjects() {
         IDisplaySystem display = getDisplaySystem();
-        display.setTitle("Treasure Hunt 2015");
+        display.setTitle("Space Race");
 
         //Animated Object
         OgreXMLParser loader = new OgreXMLParser();
@@ -262,9 +264,18 @@ public class SpaceRace extends BaseGame {
         NPC2.updateGeometricState(0, true);
         addGameWorldObject(NPC2);
 
+
+        String materialDir = "." + File.separator + "materials" + File.separator;
+        String finishtextureFilename = "finish.jpg";
+        String finishtextureFilePath = materialDir + finishtextureFilename;
+        Texture finishtexture = TextureManager.loadTexture2D(finishtextureFilePath);
         finish = new Cube("finish");
-        finish.translate(0, 0, 20000);
-        finish.scale(5, 5, 5);
+
+        finish.translate(0, 40, 21000);
+        finish.rotate(180, new Vector3D(0, 1, 0));
+        finish.rotate(180, new Vector3D(0, 0, 1));
+        finish.scale(80, 40, 1);
+        finish.setTexture(finishtexture);
         addGameWorldObject(finish);
 
 
@@ -282,15 +293,14 @@ public class SpaceRace extends BaseGame {
         cube = new Cube[100];
 
         Random rand = new Random();
-        String materialDir = "." + File.separator + "materials" + File.separator;
+        //String materialDir = "." + File.separator + "materials" + File.separator;
         String textureFilename = "elem.jpg";
         String textureFilePath = materialDir + textureFilename;
         Texture texture = TextureManager.loadTexture2D(textureFilePath);
         for (int i = 1; i < 100; i++) {
             cube[i] = new Cube("bug");
-            //cube[i].setName("cube");
-            //cube[i].translate(40-rand.nextInt(80), 200-rand.nextInt(200), (1000 * i)*rand.nextFloat());
-            cube[i].translate(40 - rand.nextInt(80), 50 - rand.nextInt(45), (1000 * i) * rand.nextFloat());
+            cube[i].translate(40 - rand.nextInt(80), 10, (1000 * i) * rand.nextFloat());
+            //cube[i].translate(40 - rand.nextInt(80), 50 - rand.nextInt(45), (1000 * i) * rand.nextFloat());
             cube[i].scale(5, 5, 5);
             cube[i].rotate(45, new Vector3D(1, 1, 1));
             cube[i].addController(rotate);
@@ -331,6 +341,8 @@ public class SpaceRace extends BaseGame {
         playerAvatarP.setSleepThresholds(0.5f, 0.5f);
         playerAvatarP.setFriction(0.5f);
         playerAvatarP.setDamping(0.99f, 0.9f);
+        float[] f = {0, 0, 100};
+        playerAvatarP.setLinearVelocity(f);
 
 
         float[] rightRailSize = {10, 500, 20000};
@@ -447,7 +459,7 @@ public class SpaceRace extends BaseGame {
     public void jump() {
 
         float[] f = playerAvatarP.getLinearVelocity();
-        f[1] = f[1] + 200;
+        f[1] = f[1] + 300;
         playerAvatarP.setLinearVelocity(f);
     }
     //=====================================================================================================
@@ -511,11 +523,14 @@ public class SpaceRace extends BaseGame {
     }
 
     private void drawSkyBox() {
-        skybox = new SkyBox("skybox", 1000, 1000, 1000);
+        skybox = new SkyBox("skybox", 2000, 2000, 2000);
 
-        String textureDir = "." + File.separator + "materials" + File.separator + "dunes" + File.separator;
+        String textureDir = "." + File.separator + "materials" + File.separator + "city" + File.separator;
         String topFilename = "top.jpg";
         String topFilePath = textureDir + topFilename;
+
+        String bottomFilename = "bottom.jpg";
+        String bottomFilePath = textureDir + bottomFilename;
 
         String frontFilename = "front.jpg";
         String frontFilePath = textureDir + frontFilename;
@@ -531,7 +546,8 @@ public class SpaceRace extends BaseGame {
 
         Texture top = TextureManager.loadTexture2D(topFilePath);
         skybox.setTexture(SkyBox.Face.Up, top);
-        skybox.setTexture(SkyBox.Face.Down, top);
+        Texture bottom = TextureManager.loadTexture2D(bottomFilePath);
+        skybox.setTexture(SkyBox.Face.Down, bottom);
         Texture front = TextureManager.loadTexture2D(frontFilePath);
         skybox.setTexture(SkyBox.Face.North, front);
         Texture back = TextureManager.loadTexture2D(backFilePath);
@@ -541,10 +557,10 @@ public class SpaceRace extends BaseGame {
         Texture right = TextureManager.loadTexture2D(rightFilePath);
         skybox.setTexture(SkyBox.Face.East, right);
 
-        skybox.translate(0, 100, 0);
+        //skybox.translate(0, 500, 0);
 
         skybox.setZBufferStateEnabled(false);
-
+        // skybox.rotate(-45,new Vector3D(0,1,0));
         addGameWorldObject(skybox);
 
     }
@@ -619,8 +635,6 @@ public class SpaceRace extends BaseGame {
     //-------------------------------------------------------------------------------------------------------
 
     private void updateOldPosition() {
-
-
 
 
         oldRotation = playerAvatar.getWorldRotation().toString();
@@ -764,16 +778,24 @@ public class SpaceRace extends BaseGame {
                 s.rotate(20, new Vector3D(0, 1, 0));
                 //s.scale(0, 0, 0.005f);
             }
-            if (s.getWorldBound() != null)
+            if (s.getWorldBound() != null) {
                 if (s.getWorldBound().intersects(playerAvatar.getWorldBound()) && s.getName().equalsIgnoreCase("bug")) {
                     whooshSound.setLocation(avLoc);
                     whooshSound.play();
-                    score++;
+                    score += 10;
                     System.out.println("COLLISION SCORE" + score);
+                    float[] f = playerAvatarP.getLinearVelocity();
+                    f[0] = f[0] * 0.5f;
+                    f[2] = f[2] * 0.5f;
+                    playerAvatarP.setLinearVelocity(f);
                     removeGameWorldObject(s);
                     break;
                 }
+
+            }
         }
+
+        if (!gameover & finish.getWorldBound().intersects(playerAvatar.getWorldBound())) gameOver();
 
         // update the HUD
 //        scoreString.setText("Score = " + score);
@@ -796,6 +818,19 @@ public class SpaceRace extends BaseGame {
     // ----------------------------------------------------------------------SOUND SECTION -----------------
     //-------------------------------------------------------------------------------------------------------
 
+    public void gameOver() {
+        gameover = true;
+        float[] f = {0, 100, 0};
+        playerAvatarP.setLinearVelocity(f);
+        playerAvatarP.setDamping(0, 0);
+        f = new float[]{0, 3000, 0};
+        physicsEngine.setGravity(f);
+
+        //playerAvatar.scale(10,10,10);
+        removeGameWorldObject(finish);
+        JOptionPane.showMessageDialog(null, "GAME OVER your score is:  " + score + 50);
+    }
+
     public void initAudio() {
         AudioResource resource1, resource2, resource3;
         audioMgr = AudioManagerFactory.createAudioManager("sage.audio.joal.JOALAudioManager");
@@ -817,9 +852,9 @@ public class SpaceRace extends BaseGame {
         resource1 = audioMgr.createAudioResource(shipFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource2 = audioMgr.createAudioResource(whooshFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource3 = audioMgr.createAudioResource(windFilePath, AudioResourceType.AUDIO_SAMPLE);
-        npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 100, true);
+        npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 10, true);
         whooshSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, false);
-        windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 40, true);
+        windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 100, true);
 
 
 //        whooshSound = new Sound[40];
@@ -959,107 +994,6 @@ public class SpaceRace extends BaseGame {
         this.canProcess = canProcess;
     }
 
-    private void avatarCollisionCorrection() {
-
-        // if (avLoc.getY() < terHeight) {
-        // System.out.println("collision");
-        //  Z Z Z
-        //  7 8 1   x
-        //  6 X 2   x
-        //  5 4 3   x
-        //
-        //1 x++ ,y ,z++
-        //2 x++ ,y ,z
-        //3 x++ ,y ,z--
-        //4 x   ,y ,z--
-        //5 x-- ,y ,z--
-        //6 x-- ,y ,z
-        //7 x-- ,y ,z++
-        //8 x   ,y ,z++
-
-
-        Point3D avLoc = new Point3D(playerAvatar.getLocalTranslation().getCol(3));
-        float x = (float) avLoc.getX();
-        float y = (float) avLoc.getY();
-        float z = (float) avLoc.getZ();
-
-        int o = 2;
-        float[] newx = {0, x + o, x + o, x + o, x, x - o, x - o, x - o, x};
-        float[] newy = {0, y, y, y, y, y, y, y, y};
-        float[] newz = {0, z + o, z, z - o, z - o, z - o, z, z + o, z + o};
-
-
-        Point3D[] newloc = new Point3D[9];
-        float[] newterHeight = new float[9];
-        boolean[] colidesWithTerrian = new boolean[9];
-        for (int i = 0; i < 9; i++) {
-            newloc[i] = new Point3D(newx[i], newy[i], newz[i]);
-            newterHeight[i] = imageTerrain.getHeightFromWorld(newloc[i]);
-            colidesWithTerrian[i] = newterHeight[i] >= newy[i];
-        }
-//        System.out.println();
-//        System.out.print(colidesWithTerrian[7]);
-//        System.out.print(colidesWithTerrian[8]);
-//        System.out.println(colidesWithTerrian[1]);
-//        System.out.print(colidesWithTerrian[6]);
-//        System.out.print(colidesWithTerrian[0]);
-//        System.out.println(colidesWithTerrian[2]);
-//        System.out.print(colidesWithTerrian[5]);
-//        System.out.print(colidesWithTerrian[4]);
-//        System.out.println(colidesWithTerrian[3]);
-
-        boolean collition = false;
-        for (int i = 1; i < 9; i++) if (colidesWithTerrian[i]) collition = true;
-
-        o = o * 3;
-        float[] futurex = {0, x + o, x + o, x + o, x, x - o, x - o, x - o, x};
-        //float[] futurey = {0, y, y, y, y, y, y, y, y};
-        float[] futurez = {0, z + o, z, z - o, z - o, z - o, z, z + o, z + o};
-
-        if (collition) {
-            if (colidesWithTerrian[1] || colidesWithTerrian[2] || colidesWithTerrian[3]) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, futurex[7]);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, futurez[7]);
-            }
-            if (colidesWithTerrian[5] || colidesWithTerrian[6] || colidesWithTerrian[7]) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, futurex[1]);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, futurez[1]);
-            }
-            if (colidesWithTerrian[8]) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, futurex[4]);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, futurez[4]);
-            }
-            if (colidesWithTerrian[4]) {
-                playerAvatar.getLocalTranslation().setElementAt(0, 3, futurex[8]);
-                playerAvatar.getLocalTranslation().setElementAt(2, 3, futurez[8]);
-            }
-
-        }
-
-
-    }
-
-    private boolean collidesWithTerrain(Point3D p) {
-        boolean collides = false;
-
-        float x = (float) p.getX();
-        float y = (float) p.getY();
-        float z = (float) p.getZ();
-        float[] newx = {0, x + 1, x + 1, x + 1, x, x - 1, x - 1, x - 1, x};
-        float[] newy = {0, y, y, y, y, y, y, y, y};
-        float[] newz = {0, z + 1, z, z - 1, z - 1, z - 1, z, z + 1, z + 1};
-
-        Point3D[] newloc = new Point3D[9];
-        float[] newterHeight = new float[9];
-        // boolean[] colidesWithTerrian = new boolean[9];
-        for (int i = 0; i < 9; i++) {
-            newloc[i] = new Point3D(newx[i], newy[i], newz[i]);
-            newterHeight[i] = imageTerrain.getHeightFromWorld(newloc[i]);
-            if (newterHeight[i] >= newy[i]) collides = true;
-        }
-
-        return collides;
-    }
 
     public void updateNPCGhosts(NPCPacket packet) {
         if(this.getGameWorld() != null){

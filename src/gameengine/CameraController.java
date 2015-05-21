@@ -20,7 +20,7 @@ public class CameraController {
     private float cameraDistanceFromTarget;
     private Point3D targetPos;
     private Vector3D worldUpVec;
-    private float speed = 0.1f;
+    private float speed = 0.01f;
     // private final Client client;
 
     public CameraController(ICamera cam, SceneNode target, IInputManager inputMgr, String controllerName) {
@@ -29,7 +29,7 @@ public class CameraController {
         worldUpVec = new Vector3D(0, 1, 0);
         cameraDistanceFromTarget = 50.0f;
         cameraAzimuth = 180;
-        cameraElevation = 40.0f;
+        cameraElevation = 30.0f;
         update(0.0f);
         setupInput(inputMgr, controllerName);
         //this.client = client;
