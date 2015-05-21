@@ -122,7 +122,7 @@ public class SpaceRace extends BaseGame {
 
     private Random rand = new Random();
     private IAudioManager audioMgr;
-    private Sound windSound, npcSound, whooshSound, floop;
+    private Sound windSound, npcSound, whooshSound, musicSound;
     private HUDString scoreString1, speedString, avatarName;
     private int cubeCount;
     private float[] cubeLocations;
@@ -241,12 +241,12 @@ public class SpaceRace extends BaseGame {
 
         //inviisible rails
         rightRail = new Cube();
-        rightRail.scale(2, 10, 4000);
+        rightRail.scale(2, 20, 4000);
         rightRail.translate(50, 0, 5000);
 
 
         leftRail = new Cube();
-        leftRail.scale(2, 10, 4000);
+        leftRail.scale(2, 20, 4000);
         leftRail.translate(-50, 0, 5000);
 
 
@@ -810,7 +810,7 @@ public class SpaceRace extends BaseGame {
             client.processPackets();
         }
 
-
+        musicSound.setLocation(camera1.getLocation());
         npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
         windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
         windSound.setVolume((int) (playerAvatarP.getLinearVelocity()[2] * 0.05));
@@ -875,6 +875,8 @@ public class SpaceRace extends BaseGame {
         }
 
         if (!gameover & finish.getWorldBound().intersects(playerAvatar.getWorldBound())) gameOver();
+        if (gameover) playerAvatar.rotate(-10, new Vector3D(0, 1, 0));
+
 
         // update the HUD
 //        scoreString.setText("Score = " + score);
@@ -926,13 +928,15 @@ public class SpaceRace extends BaseGame {
     }
 
     public void initAudio() {
-        AudioResource resource1, resource2, resource3;
+        AudioResource resource0, resource1, resource2, resource3;
         audioMgr = AudioManagerFactory.createAudioManager("sage.audio.joal.JOALAudioManager");
         if (!audioMgr.initialize()) {
             System.out.println("Audio Manager failed to initialize!");
             return;
         }
         String soundDir = "." + File.separator + "materials" + File.separator + "sounds" + File.separator;
+        String musicFilename = "dnb.wav";
+        String musicFilePath = soundDir + musicFilename;
         String windFilename = "Wind.wav";
         String windFilePath = soundDir + windFilename;
         String strongwindFilename = "StrongWind.wav";
@@ -943,28 +947,26 @@ public class SpaceRace extends BaseGame {
         String shipFilePath = soundDir + shipFilename;
         String floopFilename = "floop.wav";
         String floopFilePath = soundDir + floopFilename;
+        resource0 = audioMgr.createAudioResource(musicFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource1 = audioMgr.createAudioResource(shipFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource2 = audioMgr.createAudioResource(whooshFilePath, AudioResourceType.AUDIO_SAMPLE);
-        resource3 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource3 = audioMgr.createAudioResource(windFilePath, AudioResourceType.AUDIO_SAMPLE);
+        musicSound = new Sound(resource0, SoundType.SOUND_MUSIC, 10, true);
         npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 10, true);
         whooshSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, false);
         windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 100, true);
 
 
-//        whooshSound = new Sound[40];
-//        for(int i =0;i<40;i++){
-//        whooshSound[i] = new Sound(resource2, SoundType.SOUND_EFFECT, 100, false);
-//            whooshSound[i].initialize(audioMgr);
-//            whooshSound[i].setMaxDistance(200);
-//            whooshSound[i].setMinDistance(50.0f);
-//            whooshSound[i].setRollOff(5.0f);
-//            whooshSound[i].setLocation(new Point3D(cube[i].getLocalTranslation().getCol(3)));
-//        }
-
-
+        musicSound.initialize(audioMgr);
         npcSound.initialize(audioMgr);
         windSound.initialize(audioMgr);
         whooshSound.initialize(audioMgr);
+
+
+        musicSound.setLocation(camera1.getLocation());
+        npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
+        windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
+        whooshSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
 
 
         npcSound.setMaxDistance(200);
@@ -976,16 +978,16 @@ public class SpaceRace extends BaseGame {
         whooshSound.setMaxDistance(10);
         whooshSound.setMinDistance(10.0f);
         whooshSound.setRollOff(1.0f);
+//        musicSound.setMaxDistance(10);
+//        musicSound.setMinDistance(10.0f);
+//        musicSound.setRollOff(1.0f);
 
-
-        npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
-        windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
-        whooshSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
 
         setEarParameters();
         npcSound.play();
         windSound.play();
-        //whooshSound.play();
+        musicSound.play();
+        whooshSound.play();
 
 
     }
