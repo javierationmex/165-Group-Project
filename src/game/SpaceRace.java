@@ -511,7 +511,7 @@ public class SpaceRace extends BaseGame {
         //Floor groundPlane
 
         String groundextureDir = "." + File.separator + "materials" + File.separator;
-        String groundexturefilename = "sand.jpg";
+        String groundexturefilename = "Asphalt.jpg";
         String groundexturefilepath = groundextureDir + groundexturefilename;
         Texture groundexture = TextureManager.loadTexture2D(groundexturefilepath);
         Vector3D vec = new Vector3D(1, 0, 0);
@@ -791,7 +791,7 @@ public class SpaceRace extends BaseGame {
 
         npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
         windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
-        windSound.setVolume((int) (playerAvatarP.getAngularVelocity()[2] * 0.001));
+        windSound.setVolume((int) (playerAvatarP.getLinearVelocity()[2] * 0.05));
         setEarParameters();
 
 
@@ -923,7 +923,7 @@ public class SpaceRace extends BaseGame {
         String floopFilePath = soundDir + floopFilename;
         resource1 = audioMgr.createAudioResource(shipFilePath, AudioResourceType.AUDIO_SAMPLE);
         resource2 = audioMgr.createAudioResource(whooshFilePath, AudioResourceType.AUDIO_SAMPLE);
-        resource3 = audioMgr.createAudioResource(windFilePath, AudioResourceType.AUDIO_SAMPLE);
+        resource3 = audioMgr.createAudioResource(strongwindFilePath, AudioResourceType.AUDIO_SAMPLE);
         npcSound = new Sound(resource1, SoundType.SOUND_EFFECT, 10, true);
         whooshSound = new Sound(resource2, SoundType.SOUND_EFFECT, 100, false);
         windSound = new Sound(resource3, SoundType.SOUND_EFFECT, 100, true);
