@@ -525,7 +525,7 @@ public class SpaceRace extends BaseGame {
     private void drawSkyBox() {
         skybox = new SkyBox("skybox", 2000, 2000, 2000);
 
-        String textureDir = "." + File.separator + "materials" + File.separator + "city" + File.separator;
+        String textureDir = "." + File.separator + "materials" + File.separator + "red" + File.separator;
         String topFilename = "top.jpg";
         String topFilePath = textureDir + topFilename;
 
@@ -777,7 +777,7 @@ public class SpaceRace extends BaseGame {
         }
         if (avLoc.getY() > 10) {
             float[] f = playerAvatarP.getLinearVelocity();
-            f[1] -= 50;
+            f[1] -= 100;
             playerAvatarP.setLinearVelocity(f);
         }
 
@@ -793,8 +793,8 @@ public class SpaceRace extends BaseGame {
                     score += 10;
                     System.out.println("COLLISION SCORE" + score);
                     float[] f = playerAvatarP.getLinearVelocity();
-                    f[0] = f[0] * 0.5f;
-                    f[2] = f[2] * 0.5f;
+                    f[0] = f[0] * 1.1f;
+                    f[2] = f[2] * 1.1f;
                     playerAvatarP.setLinearVelocity(f);
                     removeGameWorldObject(s);
                     break;
