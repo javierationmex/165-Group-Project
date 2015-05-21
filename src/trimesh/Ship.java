@@ -34,6 +34,7 @@ public class Ship extends Group implements Serializable{
         ship.setTexture(shipTexture);
 
         ship.translate(0,1,0);
+        ship.scale(1.5f,1.5f,1.5f);
         this.addChild(ship);
         child = ship;
 

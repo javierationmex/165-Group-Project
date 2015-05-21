@@ -212,11 +212,11 @@ public class SpaceRace extends BaseGame {
             e.printStackTrace();
             System.exit(1);
         }
-
+        myObject.scale(1.5f, 1.5f, 1.5f);
         myObject.translate(1f,1f, 1f);
 
         String shipDir = "." + File.separator + "materials" + File.separator;
-        String shipTextureFilename = "oracleTexturingFlipped.png";
+        String shipTextureFilename = "oracleTexturingFlipped3.png";
         String shipTextureFilePath = shipDir + shipTextureFilename;
 
         Texture shipTexture = TextureManager.loadTexture2D(shipTextureFilePath);
@@ -253,21 +253,25 @@ public class SpaceRace extends BaseGame {
         //NPC model adding
         NPC1 = new Pod();
         NPC1.translate(-10, 5, -800);
+        NPC1.scale(1.5f, 1.5f, 1.5f);
         NPC1.updateGeometricState(0, true);
         addGameWorldObject(NPC1);
 
         NPC2 = new Ship();
         NPC2.translate(-5, 5, -800);
+        NPC2.scale(1.5f, 1.5f, 1.5f);
         NPC2.updateGeometricState(0, true);
         addGameWorldObject(NPC2);
 
         NPC3 = new Arc170();
         NPC3.translate(5, 5, -800);
+        NPC3.scale(1.5f, 1.5f, 1.5f);
         NPC3.updateGeometricState(0, true);
         addGameWorldObject(NPC3);
 
         NPC4 = new Viper();
         NPC4.translate(10, 5, -800);
+        NPC4.scale(1.5f, 1.5f, 1.5f);
         NPC4.updateGeometricState(0, true);
         addGameWorldObject(NPC4);
 

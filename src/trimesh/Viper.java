@@ -35,6 +35,7 @@ public class Viper extends Group implements Serializable {
         Texture viperpieceTexture = TextureManager.loadTexture2D(viperpieceTextureFilePath);
         viperpiece.setTexture(viperpieceTexture);
 
+        viperpiece.scale(1.5f,1.5f,1.5f);
         this.addChild(viperpiece);
         child = viperpiece;
 

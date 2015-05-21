@@ -34,6 +34,7 @@ public class Pod extends Group implements Serializable{
         pod.setTexture(podTexture);
 
         pod.translate(0,1,0);
+        pod.scale(1.5f,1.5f,1.5f);
         this.addChild(pod);
         child = pod;
 
