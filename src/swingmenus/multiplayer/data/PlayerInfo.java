@@ -12,10 +12,10 @@ import java.util.UUID;
 public class PlayerInfo implements IPacket {
     private UUID clientID;
     private String playerName;
-    private int characterID = 0;
+    private int characterID = 0, score;
     private boolean ready;
     private SceneNode avatar;
-    private boolean loaded;
+    private boolean loaded, finished = false;
     private Matrix3D scale, rotation, translation;
 
     public PlayerInfo(UUID clientID, String playerName) {
@@ -90,5 +90,21 @@ public class PlayerInfo implements IPacket {
 
     public SimplePlayerInfo getSimplePlayerInfo(){
         return new SimplePlayerInfo(clientID, scale,rotation,translation);
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }

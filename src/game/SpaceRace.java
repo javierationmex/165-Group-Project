@@ -26,10 +26,8 @@ import graphicslib3D.Vector3D;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import networking.Client;
-import networking.packets.ingame.AddAvatarInformationPacket;
-import networking.packets.ingame.AllPlayerInfoPacket;
-import networking.packets.ingame.NPCPacket;
-import networking.packets.ingame.UpdateAvatarInfoPacket;
+import networking.packets.EndScore;
+import networking.packets.ingame.*;
 import sage.app.BaseGame;
 import sage.audio.*;
 import sage.camera.ICamera;
@@ -836,7 +834,22 @@ public class SpaceRace extends BaseGame {
 
         //playerAvatar.scale(10,10,10);
         removeGameWorldObject(finish);
-        JOptionPane.showMessageDialog(null, "GAME OVER your score is:  " + score + 50);
+        try {
+            client.sendPacket(new FinishedPacket(score, client.getId(), player.getPlayerName()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void allFinishedGame(AllFinishedPacket packet){
+        StringBuilder stringBuilder = new StringBuilder();
+        ArrayList<EndScore> endScores = packet.getEndScores();
+        stringBuilder.append("\t\tFinal Score:\nPlayer Name          Score\n");
+        for(int i = 0; i<endScores.size(); i++){
+            EndScore e = endScores.get(i);
+            stringBuilder.append((i+1)+") "+e.getPlayerName()+"      "+e.getScore()+"\n");
+        }
+        JOptionPane.showMessageDialog(null, stringBuilder.toString());
     }
 
     public void initAudio() {

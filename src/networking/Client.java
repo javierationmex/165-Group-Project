@@ -4,6 +4,7 @@ import game.SpaceRace;
 import game.Player;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
+import networking.packets.ingame.AllFinishedPacket;
 import networking.packets.ingame.AllPlayerInfoPacket;
 import networking.packets.ingame.NPCPacket;
 import networking.packets.lobby.JoinPacket;
@@ -62,6 +63,10 @@ public class Client extends GameConnectionClient {
 
         if(packet instanceof NPCPacket){
             spaceRace.updateNPCGhosts((NPCPacket) packet);
+        }
+
+        if(packet instanceof AllFinishedPacket){
+            spaceRace.allFinishedGame((AllFinishedPacket) packet);
         }
     }
 

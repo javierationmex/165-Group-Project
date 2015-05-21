@@ -3,12 +3,10 @@ package networking;
 import gameengine.NPC.NPC;
 import gameengine.NPC.NPCcontroller;
 import graphicslib3D.Matrix3D;
+import networking.packets.EndScore;
 import networking.packets.GamePlayerInfoPacket;
 import networking.packets.ServerPlayerInfoPacket;
-import networking.packets.ingame.AddAvatarInformationPacket;
-import networking.packets.ingame.AllPlayerInfoPacket;
-import networking.packets.ingame.NPCPacket;
-import networking.packets.ingame.UpdateAvatarInfoPacket;
+import networking.packets.ingame.*;
 import networking.packets.lobby.ChangeCharacterPacket;
 import networking.packets.lobby.JoinPacket;
 import networking.packets.lobby.StartGamePacket;
@@ -20,10 +18,7 @@ import swingmenus.multiplayer.data.SimplePlayerInfo;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Max on 3/22/2015.
@@ -37,6 +32,7 @@ public class Server extends GameConnectionServer<UUID> {
     private UpdateNPCS updateNPCS;
     private SendPlayerInfo sendPlayerInfo;
     private boolean notSendingYet = true;
+    private int finishedCount = 0;
 
 
     public Server(int localPort) throws IOException {
@@ -116,6 +112,39 @@ public class Server extends GameConnectionServer<UUID> {
 
         if (packet instanceof UpdateAvatarInfoPacket) {
             updatePlayerAvatar((UpdateAvatarInfoPacket) packet);
+        }
+
+        if (packet instanceof FinishedPacket) {
+            addFinishedPlayer((FinishedPacket) packet);
+        }
+    }
+
+    private void addFinishedPlayer(FinishedPacket packet) {
+        UUID id = packet.getClientID();
+        for(PlayerInfo p : this.players){
+            if(id.toString().equals(p.getClientID().toString())){
+                p.setFinished(true);
+                p.setScore(packet.getScore());
+                finishedCount++;
+            }
+        }
+        if(finishedCount == players.size()){
+            sendAllFinishedPacket();
+        }
+
+    }
+
+    private void sendAllFinishedPacket() {
+        ArrayList<EndScore> endScores = new ArrayList<EndScore>();
+        for(PlayerInfo p : this.players){
+            endScores.add(new EndScore(p.getPlayerName(), p.getScore()));
+        }
+        Collections.sort(endScores, new ScoreComparator());
+
+        try {
+            sendPacketToAll(new AllFinishedPacket(endScores));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -218,4 +247,15 @@ public class Server extends GameConnectionServer<UUID> {
         }
     }
 
+    class ScoreComparator implements Comparator<EndScore>{
+
+        @Override
+        public int compare(EndScore e1, EndScore e2) {
+            if(e1.getScore() < e2.getScore()){
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+    }
 }
