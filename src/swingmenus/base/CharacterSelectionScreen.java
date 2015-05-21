@@ -36,7 +36,7 @@ public class CharacterSelectionScreen {
         this.frame = frame;
         characterOptions = new Vector();
         //If you update this, make sure to update addGhostAvatar() in MazeGame!
-        characterOptions.add("Viper");
+        //characterOptions.add("Viper");
         characterOptions.add("Arc170");
         characterOptions.add("Space Ship");
         characterOptions.add("Space Pod");
