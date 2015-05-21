@@ -20,7 +20,7 @@ public class CameraController {
     private float cameraDistanceFromTarget;
     private Point3D targetPos;
     private Vector3D worldUpVec;
-    private float speed = 0.1f;
+    private float speed = 0.01f;
     // private final Client client;
 
     public CameraController(ICamera cam, SceneNode target, IInputManager inputMgr, String controllerName) {
