@@ -15,6 +15,7 @@ var JavaPackages = new JavaImporter(
 with (JavaPackages)
 {
 var rootNode = new Group();
+var cubeCount = 100;
 
 ////Sphere
 //var t1 = new Sphere(2,50,50,java.awt.Color.green);

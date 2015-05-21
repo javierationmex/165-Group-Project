@@ -57,6 +57,7 @@ import swingmenus.multiplayer.data.PlayerInfo;
 import swingmenus.multiplayer.data.SimplePlayerInfo;
 import trimesh.*;
 
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -104,7 +105,7 @@ public class SpaceRace extends BaseGame {
     private Cube finish;
     private Pod NPC1;
     private Ship NPC2;
-    private Cube[] cube;
+    private CustomCube[] cube;
     private CenterCity[] city;
     private RotationController rotate;
     private CollisionDispatcher collDispatcher;
@@ -125,6 +126,8 @@ public class SpaceRace extends BaseGame {
     private IAudioManager audioMgr;
     private Sound windSound, npcSound, whooshSound, floop;
     private HUDString scoreString1, speedString, avatarName;
+    private int cubeCount;
+    private float[] cubeLocations;
     //private Sound[] whooshSound;
 
     public SpaceRace(Player player) {
@@ -178,12 +181,11 @@ public class SpaceRace extends BaseGame {
         eventManager = EventManager.getInstance();
         inputMgr = getInputManager();
         renderer = display.getRenderer();
-
+        initScripting();
         initGameObjects();
         initPhysicsSystem();
         createSagePhysicsWorld();
 
-        initScripting();
         setControls();
         initAudio();
         display.setTitle("Space Race");
@@ -288,17 +290,18 @@ public class SpaceRace extends BaseGame {
 
         rotate = new RotationController(50, new Vector3D(1, 1, 1));
 
-        cube = new Cube[100];
+        cube = new CustomCube[cubeCount];
 
-        Random rand = new Random();
+        while(cubeLocations == null){
+            client.processPackets();
+        }
         //String materialDir = "." + File.separator + "materials" + File.separator;
         String textureFilename = "elem.jpg";
         String textureFilePath = materialDir + textureFilename;
         Texture texture = TextureManager.loadTexture2D(textureFilePath);
-        for (int i = 1; i < 100; i++) {
-            cube[i] = new Cube("bug");
-            cube[i].translate(40 - rand.nextInt(80), 10, (1000 * i) * rand.nextFloat());
-            //cube[i].translate(40 - rand.nextInt(80), 50 - rand.nextInt(45), (1000 * i) * rand.nextFloat());
+        for (int i = 0; i < 100; i++) {
+            cube[i] = new CustomCube("bug", i);
+            cube[i].translate(cubeLocations[i], cubeLocations[i+1], cubeLocations[i+2]);
             cube[i].scale(5, 5, 5);
             cube[i].rotate(45, new Vector3D(1, 1, 1));
             cube[i].addController(rotate);
@@ -396,9 +399,15 @@ public class SpaceRace extends BaseGame {
 
         // run the script
         executeScript(engine, CreateObjectsScriptPath);
+        //rootNode = (SceneNode) engine.get("rootNode");
+        cubeCount = Integer.decode(engine.get("cubeCount").toString());
 
-        rootNode = (SceneNode) engine.get("rootNode");
-        addGameWorldObject(rootNode);
+        try {
+            client.sendPacket(new CubeCountPacket(cubeCount));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //addGameWorldObject(rootNode);
     }
 
     private void executeScript(ScriptEngine engine, String scriptFileName) {
@@ -791,10 +800,16 @@ public class SpaceRace extends BaseGame {
                     score += 10;
                     System.out.println("COLLISION SCORE" + score);
                     float[] f = playerAvatarP.getLinearVelocity();
-                    f[0] = f[0] * 0.5f;
-                    f[2] = f[2] * 0.5f;
+                    f[0] = f[0] * 1.2f;
+                    f[2] = f[2] * 1.2f;
                     playerAvatarP.setLinearVelocity(f);
-                    removeGameWorldObject(s);
+                    try {
+                        client.sendPacket(new HitCubePacket(((CustomCube) s).getID()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    //removeGameWorldObject(s);
+
                     break;
                 }
 
@@ -1045,7 +1060,7 @@ public class SpaceRace extends BaseGame {
             }else if(npc.getType().equals("Rook")){
                 npcGhost = new ChessPieceRock("avatar").getChild();
             }else if(npc.getType().equals("Cube")){
-                npcGhost = new CustomCube("Cube");
+                npcGhost = new Cube("Cube");
             }else{
                 try {
                     throw new Exception(String.format("Can't find this (%s) in the MazeGame createNPCGhosts().  Make sure to add it to the if statement.", npc.getType()));
@@ -1059,6 +1074,18 @@ public class SpaceRace extends BaseGame {
                 npcGhost.setLocalScale(npc.getScale());
                 npcsGhosts.add(new NPCGhost(npcGhost, npc.getID(), npc.getLocation(), npc.getType()));
                 addGameWorldObject(npcGhost);
+            }
+        }
+    }
+
+    public void setCubeLocations(float[] cubeLocations) {
+        this.cubeLocations = cubeLocations;
+    }
+
+    public void removeCube(int id) {
+        for (int i = 0; i < 100; i++) {
+            if(cube[i].getID() == id){
+                removeGameWorldObject(cube[i]);
             }
         }
     }

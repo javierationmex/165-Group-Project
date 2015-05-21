@@ -12,6 +12,7 @@ import networking.packets.lobby.JoinPacket;
 import networking.packets.lobby.StartGamePacket;
 import sage.networking.server.GameConnectionServer;
 import sage.networking.server.IClientInfo;
+import sage.scene.shape.Cube;
 import swingmenus.multiplayer.data.PlayerInfo;
 import swingmenus.multiplayer.data.SimplePlayerInfo;
 
@@ -33,6 +34,7 @@ public class Server extends GameConnectionServer<UUID> {
     private SendPlayerInfo sendPlayerInfo;
     private boolean notSendingYet = true;
     private int finishedCount = 0;
+    private float[] locations;
 
 
     public Server(int localPort) throws IOException {
@@ -116,6 +118,35 @@ public class Server extends GameConnectionServer<UUID> {
 
         if (packet instanceof FinishedPacket) {
             addFinishedPlayer((FinishedPacket) packet);
+        }
+
+        if(packet instanceof CubeCountPacket){
+            generateCubeLocations(((CubeCountPacket) packet).getCubeCount());
+        }
+
+        if(packet instanceof HitCubePacket){
+            try {
+                sendPacketToAll((HitCubePacket) packet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void generateCubeLocations(int cubeCount) {
+        if(locations == null) {
+            Random rand = new Random();
+            locations = new float[cubeCount * 3];
+            for (int i = 0; i < cubeCount * 3; i += 3) {
+                locations[i] = 40 - rand.nextInt(80);
+                locations[i + 1] = 10;
+                locations[i + 2] = (1000 * i) * rand.nextFloat();
+            }
+            try {
+                sendPacketToAll(new CubeLocationsPacket(locations));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
