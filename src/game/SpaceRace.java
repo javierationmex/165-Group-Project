@@ -153,7 +153,7 @@ public class SpaceRace extends BaseGame {
     }
 
     private IDisplaySystem createDisplaySystem() {
-        IDisplaySystem displaySystem = new FullScreenDisplaySystem(400, 400, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
+        IDisplaySystem displaySystem = new FullScreenDisplaySystem(400, 400, 24, 20, true, "sage.renderer.jogl.JOGLRenderer");
         System.out.print("\nWaiting for display creation...");
         int count = 0;
         while (!displaySystem.isCreated()) {
