@@ -588,19 +588,19 @@ public class SpaceRace extends BaseGame {
     }
 
     private void addPlayer() {
-        if(player.getCharacterID() == 1){
+        if(player.getCharacterID() == 0){
             playerAvatar = new Arc170();
             player.setAvatarName("Arc170");
-        }else if(player.getCharacterID() == 0){
+        }/*else if(player.getCharacterID() == 0){
             playerAvatar = new Viper();
             player.setAvatarName("Viper");
-        }else if(player.getCharacterID() == 2){
+        }*/else if(player.getCharacterID() == 1){
             playerAvatar = new Ship().getChild();
             player.setAvatarName("SpaceShip");
-        }else if(player.getCharacterID() == 3){
+        }else if(player.getCharacterID() == 2){
             playerAvatar = new Pod().getChild();
             player.setAvatarName("SpacePod");
-        }else if(player.getCharacterID() == 4){
+        }else if(player.getCharacterID() == 3){
             playerAvatar = myObject;
             player.setAvatarName("SpaceShip Animated");
         }
@@ -1035,15 +1035,15 @@ public class SpaceRace extends BaseGame {
         if (!player.getClientID().toString().equals(this.player.getPlayerUUID().toString())) {
 
             //Add avatar adding here
-            if(player.getCharacterID() == 0) {
+            /*if(player.getCharacterID() == 0) {
                 player.setAvatar(new Viper());
-            }else if(player.getCharacterID() == 1){
+            }else*/ if(player.getCharacterID() == 0){
                 player.setAvatar(new Arc170());
-            }else if (player.getCharacterID() == 2){
+            }else if (player.getCharacterID() == 1){
                 player.setAvatar(new Ship().getChild());
-            }else if(player.getCharacterID() == 3) {
+            }else if(player.getCharacterID() == 2) {
                 player.setAvatar(new Pod().getChild());
-            }else if(player.getCharacterID() == 4) {
+            }else if(player.getCharacterID() == 3) {
                 player.setAvatar(myObject);
             }
 
