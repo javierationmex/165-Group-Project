@@ -47,8 +47,8 @@ public class MovePlayerBackwardAction extends BaseAbstractInputAction {
             // avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
         //}
         float[] f = playerAvatarP.getLinearVelocity();
-        f[0] += (float) dir.getX() * 20;
-        f[2] += (float) dir.getZ() * 20;
+        f[0] = 0;
+        f[2] = 0;
         playerAvatarP.setLinearVelocity(f);
     }
 

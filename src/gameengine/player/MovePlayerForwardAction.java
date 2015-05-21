@@ -29,13 +29,21 @@ public class MovePlayerForwardAction extends BaseAbstractInputAction {
 
     public void performAction(float time, Event e){
 
+
         Matrix3D rot = avatar.getLocalRotation();
         Vector3D dir = new Vector3D(0, 0, -1);
         dir = dir.mult(rot);
         dir.scale((double) (speed * time));
 
-        Vector3D projectedDirection = new Vector3D(0, 0, -1);
-//        projectedDirection = projectedDirection.mult(rot);
+
+        float[] f = playerAvatarP.getLinearVelocity();
+        f[0] += (float) dir.getX() * 20;
+        f[2] += (float) dir.getZ() * 20;
+        playerAvatarP.setLinearVelocity(f);
+
+
+        // Vector3D projectedDirection = new Vector3D(0, 0, -1);
+        //     projectedDirection = projectedDirection.mult(rot);
 //        //projectedDirection.scale(2);
 //        projectedDirection.add(avatar.getLocalTranslation().getCol(3));
 //
@@ -44,17 +52,11 @@ public class MovePlayerForwardAction extends BaseAbstractInputAction {
 //        float projectedz = (float) projectedDirection.getZ();
 //        float terrainHeight = terrain.getHeight(projectedx, projectedz);
         //if (projectedy <= terrainHeight) {
-            //dir=new Vector3D(0, 0, 0);
+        //dir=new Vector3D(0, 0, 0);
 
-            // playerAvatarP.setDamping(40f,0f);
-            //avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
+        // playerAvatarP.setDamping(40f,0f);
+        //avatar.translate((float) dir.getX(), (float) dir.getY(), (float) dir.getZ());
         //}
-
-        float[] f = playerAvatarP.getLinearVelocity();
-        f[0] += (float) dir.getX() * 20;
-        f[2] += (float) dir.getZ() * 20;
-        playerAvatarP.setLinearVelocity(f);
-
         //playerAvatarP.setFriction(100000);
         //playerAvatarP.setSleepThresholds(1,1);
 //        //CHECKING HEIGHTS
