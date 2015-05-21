@@ -57,7 +57,6 @@ import swingmenus.multiplayer.data.PlayerInfo;
 import swingmenus.multiplayer.data.SimplePlayerInfo;
 import trimesh.*;
 
-import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -98,13 +97,15 @@ public class SpaceRace extends BaseGame {
     private String oldScale;
     private boolean canProcess;
     private IPhysicsEngine physicsEngine;
-    private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, cube1P, pyramid1P;
+    private IPhysicsObject playerAvatarP, groundPlaneP, rightRailP, leftRailP, NPC1P, NPC2P, NPC3P, NPC4P;
     private Rectangle[] groundPlane;
     private boolean isPhysicsEnabled;
     private Cube rightRail, leftRail;
     private Cube finish;
     private Pod NPC1;
     private Ship NPC2;
+    private Arc170 NPC3;
+    private Viper NPC4;
     private CustomCube[] cube;
     private CenterCity[] city;
     private RotationController rotate;
@@ -122,13 +123,14 @@ public class SpaceRace extends BaseGame {
     private Model3DTriMesh myObject;
     private boolean gameover = false;
 
-
+    private Random rand = new Random();
     private IAudioManager audioMgr;
     private Sound windSound, npcSound, whooshSound, floop;
     private HUDString scoreString1, speedString, avatarName;
     private int cubeCount;
     private float[] cubeLocations;
     //private Sound[] whooshSound;
+    private int finishline = 21000;
 
     public SpaceRace(Player player) {
         this.player = player;
@@ -240,30 +242,37 @@ public class SpaceRace extends BaseGame {
         initTerrain();
         drawSkyBox();
 
-
+        //inviisible rails
         rightRail = new Cube();
         rightRail.scale(2, 10, 4000);
-        rightRail.translate(50, 0, 10000);
-        //addGameWorldObject(rightRail);
-        //leftRail.updateGeometricState(0,true);
+        rightRail.translate(50, 0, 5000);
+
 
         leftRail = new Cube();
         leftRail.scale(2, 10, 4000);
-        leftRail.translate(-50, 0, 10000);
-        //addGameWorldObject(leftRail);
+        leftRail.translate(-50, 0, 5000);
 
 
+        //NPC model adding
         NPC1 = new Pod();
-        NPC1.translate(0, 1, 0);
-        addGameWorldObject(NPC1);
+        NPC1.translate(-10, 5, -800);
         NPC1.updateGeometricState(0, true);
-        NPC1.setShowBound(true);
+        addGameWorldObject(NPC1);
 
         NPC2 = new Ship();
-        NPC2.translate(-30, 1, 0);
+        NPC2.translate(-5, 5, -800);
         NPC2.updateGeometricState(0, true);
         addGameWorldObject(NPC2);
 
+        NPC3 = new Arc170();
+        NPC3.translate(5, 5, -800);
+        NPC3.updateGeometricState(0, true);
+        addGameWorldObject(NPC3);
+
+        NPC4 = new Viper();
+        NPC4.translate(10, 5, -800);
+        NPC4.updateGeometricState(0, true);
+        addGameWorldObject(NPC4);
 
         String materialDir = "." + File.separator + "materials" + File.separator;
         String finishtextureFilename = "finish.jpg";
@@ -271,7 +280,7 @@ public class SpaceRace extends BaseGame {
         Texture finishtexture = TextureManager.loadTexture2D(finishtextureFilePath);
         finish = new Cube("finish");
 
-        finish.translate(0, 40, 21000);
+        finish.translate(0, 40, finishline);
         finish.rotate(180, new Vector3D(0, 1, 0));
         finish.rotate(180, new Vector3D(0, 0, 1));
         finish.scale(80, 40, 1);
@@ -299,12 +308,14 @@ public class SpaceRace extends BaseGame {
         String textureFilename = "elem.jpg";
         String textureFilePath = materialDir + textureFilename;
         Texture texture = TextureManager.loadTexture2D(textureFilePath);
-        for (int i = 0; i < 100; i++) {
+        int j = 0;
+        for (int i = 0; i < cubeCount; i++) {
             cube[i] = new CustomCube("bug", i);
-            cube[i].translate(cubeLocations[i], cubeLocations[i+1], cubeLocations[i+2]);
+            cube[i].translate(cubeLocations[j], cubeLocations[j + 1], cubeLocations[j + 2]);
+            j += 3;
             cube[i].scale(5, 5, 5);
             cube[i].rotate(45, new Vector3D(1, 1, 1));
-            cube[i].addController(rotate);
+            //cube[i].addController(rotate);
             addGameWorldObject(cube[i]);
             cube[i].setTexture(texture);
 
@@ -327,13 +338,6 @@ public class SpaceRace extends BaseGame {
     //PHYSICS
     private void createSagePhysicsWorld() {
         float mass = 100.0f;
-
-//        BoundingSphere tunnelBoundingBox = (BoundingSphere) tunnel.getWorldBound();
-//        tunnelP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), tunnelBoundingBox.getRadius(), tunnelBoundingBox.getRadius());
-//        tunnelP.setBounciness(0.5f);
-//        tunnel.setPhysicsObject(tunnelP);
-
-
 
         BoundingSphere playerBoundingBox = (BoundingSphere) playerAvatar.getWorldBound();
         playerAvatarP = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, playerAvatar.getLocalTranslation().getValues(), playerBoundingBox.getRadius(), playerBoundingBox.getRadius());
@@ -360,22 +364,30 @@ public class SpaceRace extends BaseGame {
 
 
         BoundingSphere NPC1BoundingBox = (BoundingSphere) NPC1.getWorldBound();
-        cube1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC1.getLocalTranslation().getValues(), NPC1BoundingBox.getRadius(), NPC1BoundingBox.getRadius());
-        cube1P.setBounciness(1.1f);
-        cube1P.setDamping(0.1f, 0.1f);
-        NPC1.setPhysicsObject(cube1P);
-        //cube1P.setLinearVelocity(new float[]{200f, 0f, 0f});
+
+        NPC1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC1.getLocalTranslation().getValues(), 3f, 3f);
+        NPC1P.setBounciness(1.1f);
+        NPC1P.setDamping(0.1f, 0.1f);
+        NPC1.setPhysicsObject(NPC1P);
+
+        NPC2P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getLocalTranslation().getValues(), 3f, 3f);
+        NPC2P.setBounciness(1.1f);
+        NPC2P.setDamping(0.1f, 0.1f);
+        NPC2.setPhysicsObject(NPC2P);
+
+        NPC3P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC3.getLocalTranslation().getValues(), 3f, 3f);
+        NPC3P.setBounciness(1.1f);
+        NPC3P.setDamping(0.1f, 0.1f);
+        NPC3.setPhysicsObject(NPC3P);
+
+        NPC4P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC4.getLocalTranslation().getValues(), 3f, 3f);
+        NPC4P.setBounciness(1.1f);
+        NPC4P.setDamping(0.1f, 0.1f);
+        NPC4.setPhysicsObject(NPC4P);
 
 
-        //float cube2Size[] = {3, 3, 3};
-        pyramid1P = physicsEngine.addCapsuleObject(physicsEngine.nextUID(), mass, NPC2.getLocalTranslation().getValues(), 3f, 3f);
-        pyramid1P.setBounciness(1.1f);
-        pyramid1P.setDamping(0.1f, 0.1f);
-        NPC2.setPhysicsObject(pyramid1P);
-        //pyramid1P.setLinearVelocity(new float[]{-200f, 0f, 0f});
         // add the ground groundPlane physics
         float up[] = {0,1,0}; // {0,1,0} is flat
-        //double position[] = {0,0,0,0};
         groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(), groundPlane[0].getWorldTranslation().getValues(), up, 0.0f);
         groundPlaneP.setBounciness(0.1f);
         groundPlaneP.setFriction(0);
@@ -466,7 +478,7 @@ public class SpaceRace extends BaseGame {
     public void jump() {
 
         float[] f = playerAvatarP.getLinearVelocity();
-        f[1] = f[1] + 300;
+        f[1] = f[1] + 100;
         playerAvatarP.setLinearVelocity(f);
     }
     //=====================================================================================================
@@ -529,6 +541,9 @@ public class SpaceRace extends BaseGame {
 
     }
 
+    //=====================================================================================================
+    //============================================================================================ SKY BOX
+    //=====================================================================================================
     private void drawSkyBox() {
         skybox = new SkyBox("skybox", 2000, 2000, 2000);
 
@@ -658,6 +673,9 @@ public class SpaceRace extends BaseGame {
         speedString.setText("Speed: " + ((int) speed[2] / 10) + " mph");
     }
 
+    //=====================================================================================================
+    //============================================================================================ UPDATE SECTION
+    //=====================================================================================================
     @Override
     protected void update(float time) {
         updateHUD();
@@ -698,10 +716,8 @@ public class SpaceRace extends BaseGame {
 
         //playerAvatar.getLocalTranslation().setElementAt(1, 3, desiredHeight);
 
-        if (isPhysicsEnabled) {
 
-            Random rand = new Random();
-            float ranfdomFloat = rand.nextFloat();
+
             SceneNode particle = NPC1;
 
             float[] swarmBehaviour = new float[3];
@@ -710,9 +726,9 @@ public class SpaceRace extends BaseGame {
                 Point3D startPoint = new Point3D(particle.getLocalTranslation().getCol(3));
                 Vector3D swarmVector = new Vector3D((finishPoint.getX() - startPoint.getX()), (finishPoint.getY() - startPoint.getY()), (finishPoint.getZ() - startPoint.getZ()));
                 swarmVector.normalize();
-                swarmBehaviour[0] = (float) (swarmVector.getX() * 0.1);
-                swarmBehaviour[1] = (float) (swarmVector.getY() * 0.1);
-                swarmBehaviour[2] = (float) (swarmVector.getZ() * 0.1);
+                swarmBehaviour[0] = (float) (swarmVector.getX() * 0.3);
+                swarmBehaviour[1] = (float) (swarmVector.getY() * 0.3);
+                swarmBehaviour[2] = (float) (swarmVector.getZ() * 0.3);
             }
 
 
@@ -734,30 +750,38 @@ public class SpaceRace extends BaseGame {
             behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
             behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
             behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
-            cube1P.setLinearVelocity(behaviour);
+        NPC1P.setLinearVelocity(behaviour);
 
 
             behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
             behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
             behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
-            pyramid1P.setLinearVelocity(behaviour);
+        NPC2P.setLinearVelocity(behaviour);
+
+        behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
+        behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
+        behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
+        NPC3P.setLinearVelocity(behaviour);
 
 
-            //playerAvatarP.setTransform(playerAvatar.getLocalTransform().getValues());
-            Matrix3D mat;
-            Vector3D translateVec, rotateVec;
+        behaviour[0] = (swarmBehaviour[0] + particleBehaviour[0]) * rand.nextFloat();
+        behaviour[1] = (swarmBehaviour[1] + particleBehaviour[1]) * rand.nextFloat();
+        behaviour[2] = (swarmBehaviour[2] + particleBehaviour[2]) * rand.nextFloat();
+        NPC4P.setLinearVelocity(behaviour);
 
-            for (SceneNode s : getGameWorld()){
-                if (s.getPhysicsObject() != null){
-                    mat = new Matrix3D(s.getPhysicsObject().getTransform());
-                    translateVec = mat.getCol(3);
-                    //rotateVec = mat.getCol(2);
-                    s.getLocalTranslation().setCol(3,translateVec);
-                    //s.getLocalRotation().setCol(3,rotateVec);
-                }
-            }
 
-        }
+        if (NPC1.getWorldTranslation().getCol(3).getZ() > finishline) NPC1P.setLinearVelocity(new float[]{0, 200, 0});
+        if (NPC2.getWorldTranslation().getCol(3).getZ() > finishline) NPC1P.setLinearVelocity(new float[]{0, 200, 0});
+        if (NPC3.getWorldTranslation().getCol(3).getZ() > finishline) NPC1P.setLinearVelocity(new float[]{0, 200, 0});
+        if (NPC4.getWorldTranslation().getCol(3).getZ() > finishline) NPC1P.setLinearVelocity(new float[]{0, 200, 0});
+        //playerAvatarP.setTransform(playerAvatar.getLocalTransform().getValues());
+
+
+        //for (SceneNode s : getGameWorld()){
+
+//            }
+
+
 
 
         if(client != null){
@@ -788,9 +812,21 @@ public class SpaceRace extends BaseGame {
             playerAvatarP.setLinearVelocity(f);
         }
 
+        Matrix3D mat;
+        Vector3D translateVec, rotateVec;
         for (SceneNode s : getGameWorld()) {
+
+            if (s.getPhysicsObject() != null) {
+                mat = new Matrix3D(s.getPhysicsObject().getTransform());
+                translateVec = mat.getCol(3);
+                //rotateVec = mat.getCol(2);
+                s.getLocalTranslation().setCol(3, translateVec);
+                //s.getLocalRotation().setCol(3,rotateVec);
+            }
+
             if (s.getName().equalsIgnoreCase("bug")) {
-                s.rotate(20, new Vector3D(0, 1, 0));
+                //s.rotate(20, new Vector3D(rand.nextInt(1), rand.nextInt(1), rand.nextInt(1)));
+                s.rotate(20, new Vector3D(1, 1, -1));
                 //s.scale(0, 0, 0.005f);
             }
             if (s.getWorldBound() != null) {
