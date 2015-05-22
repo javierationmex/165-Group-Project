@@ -858,8 +858,8 @@ public class SpaceRace extends BaseGame {
                     score += 10;
                     System.out.println("COLLISION SCORE" + score);
                     float[] f = playerAvatarP.getLinearVelocity();
-                    f[0] = f[0] * 1.2f;
-                    f[2] = f[2] * 1.2f;
+                    f[0] = f[0] * 1.5f;
+                    f[2] = f[2] * 1.5f;
                     playerAvatarP.setLinearVelocity(f);
                     try {
                         client.sendPacket(new HitCubePacket(((CustomCube) s).getID()));
@@ -963,7 +963,7 @@ public class SpaceRace extends BaseGame {
         whooshSound.initialize(audioMgr);
 
 
-        musicSound.setLocation(camera1.getLocation());
+        musicSound.setLocation(new Point3D(0, 0, 0));
         npcSound.setLocation(new Point3D(NPC1.getLocalTranslation().getCol(3)));
         windSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
         whooshSound.setLocation(new Point3D(playerAvatar.getLocalTranslation().getCol(3)));
@@ -978,15 +978,15 @@ public class SpaceRace extends BaseGame {
         whooshSound.setMaxDistance(10);
         whooshSound.setMinDistance(10.0f);
         whooshSound.setRollOff(1.0f);
-//        musicSound.setMaxDistance(10);
-//        musicSound.setMinDistance(10.0f);
-//        musicSound.setRollOff(1.0f);
+        //musicSound.setMaxDistance(10);
+        //musicSound.setMinDistance(10.0f);
+        //musicSound.setRollOff(1.0f);
 
 
         setEarParameters();
         npcSound.play();
         windSound.play();
-        musicSound.play();
+        musicSound.play(50, true);
         whooshSound.play();
 
 
