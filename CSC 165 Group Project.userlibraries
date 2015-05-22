@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="Java Gaming">
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/core-0.3.0.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/gluegen-rt.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/graphicslib3D.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/jbullet.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/jinput.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/jogl-all.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/jogl-test.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/luaj-jme-3.0.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/luaj-jse-3.0.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/sage.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/sagetest.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/vecmath.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/lib/jinput-test.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/joal-test.jar" />
+    <archive path="D:/Development/Projects/Java/CSC 165 Group Project/libs/Java Gaming/joal.jar" />
+  </library>
+</eclipse-userlibraries>
+
